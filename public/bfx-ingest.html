@@ -4,64 +4,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>bfx-ingest &middot; deterministic LLM context, open source</title>
+  <title>bfx-ingest &middot; turn your files into clean AI context, in your browser</title>
   <meta name="description"
-    content="bfx-ingest turns any codebase into clean, deterministic, token-efficient LLM context in one command. Open source, no dependencies, no network. Real benchmarks included.">
+    content="Drop your files or a folder in the browser and get one clean, token-counted context file for any AI, split into parts when it is too big. Nothing is uploaded. Open source, deterministic.">
   <link rel="canonical" href="https://butterflyfx.us/bfx-ingest.html">
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://butterflyfx.us/bfx-ingest.html">
-  <meta property="og:title" content="bfx-ingest &middot; deterministic LLM context, open source">
-  <meta property="og:description" content="Turn any codebase into clean, deterministic, token-efficient LLM context in one command. Open source, no deps, no network.">
+  <meta property="og:title" content="bfx-ingest &middot; turn your files into clean AI context, in your browser">
+  <meta property="og:description" content="Drop files or a folder, get one clean token-counted context file for any AI, split into parts when too big. Nothing uploaded.">
 
   <link rel="stylesheet" href="fonts.css">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="theme.css">
   <style>
-    /* Page-scoped styling so the demos look right regardless of theme. */
-    .codeblock {
-      background: rgba(8, 12, 24, 0.72);
-      border: 1px solid rgba(120, 180, 255, 0.18);
-      border-radius: 10px;
-      padding: 1rem 1.2rem;
-      overflow-x: auto;
-      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-      font-size: 0.95rem;
-      line-height: 1.5;
-      color: #d6e4ff;
-      margin: 0.6rem 0 0;
-    }
-    .codeblock .c { color: #35ff7a; }
-    .codeblock .k { color: #ffd700; }
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-      gap: 1rem;
-      margin-top: 0.5rem;
-    }
-    .stat-card {
-      background: rgba(14, 20, 38, 0.55);
-      border: 1px solid rgba(120, 180, 255, 0.16);
-      border-radius: 12px;
-      padding: 1.1rem 1.2rem;
-    }
-    .stat-num { font-size: 1.7rem; font-weight: 700; color: #58e0ff; line-height: 1.1; }
-    .stat-label { margin-top: 0.35rem; font-size: 0.9rem; opacity: 0.85; }
-    .downloads { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 0.6rem; }
-    .dl-card {
-      display: block;
-      background: rgba(14, 20, 38, 0.55);
-      border: 1px solid rgba(120, 180, 255, 0.16);
-      border-radius: 12px;
-      padding: 1.1rem 1.2rem;
-      text-decoration: none;
-      color: inherit;
-      transition: border-color 0.15s ease, transform 0.15s ease;
-    }
-    .dl-card:hover { border-color: #58e0ff; transform: translateY(-2px); }
-    .dl-fmt { font-weight: 700; color: #ffd700; }
-    .dl-desc { font-size: 0.88rem; opacity: 0.82; margin-top: 0.3rem; }
-    .honest { font-size: 0.92rem; opacity: 0.85; border-left: 3px solid rgba(53,255,122,0.6); padding-left: 0.9rem; margin-top: 1rem; }
+    .codeblock { background: rgba(8,12,24,.72); border:1px solid rgba(120,180,255,.18); border-radius:10px; padding:1rem 1.2rem; overflow-x:auto; font-family:"SFMono-Regular",Consolas,Menlo,monospace; font-size:.95rem; line-height:1.5; color:#d6e4ff; margin:.6rem 0 0; }
+    .codeblock .c { color:#35ff7a; }
+    .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:1rem; margin-top:.5rem; }
+    .stat-card { background:rgba(14,20,38,.55); border:1px solid rgba(120,180,255,.16); border-radius:12px; padding:1.1rem 1.2rem; }
+    .stat-num { font-size:1.6rem; font-weight:700; color:#58e0ff; line-height:1.1; word-break:break-all; }
+    .stat-label { margin-top:.35rem; font-size:.88rem; opacity:.85; }
+    .downloads { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem; margin-top:.6rem; }
+    .dl-card { display:block; background:rgba(14,20,38,.55); border:1px solid rgba(120,180,255,.16); border-radius:12px; padding:1.1rem 1.2rem; text-decoration:none; color:inherit; transition:.15s; cursor:pointer; }
+    .dl-card:hover { border-color:#58e0ff; transform:translateY(-2px); }
+    .dl-fmt { font-weight:700; color:#ffd700; }
+    .dl-desc { font-size:.86rem; opacity:.82; margin-top:.3rem; }
+    .honest { font-size:.92rem; opacity:.85; border-left:3px solid rgba(53,255,122,.6); padding-left:.9rem; margin-top:1rem; }
+    /* the tool */
+    .dropzone { border:2px dashed rgba(120,180,255,.4); border-radius:16px; padding:2.2rem 1.2rem; text-align:center; transition:.15s; background:rgba(10,16,32,.4); }
+    .dropzone.over { border-color:#58e0ff; background:rgba(20,40,70,.55); }
+    .dz-big { font-size:1.25rem; font-weight:600; }
+    .dz-or { opacity:.6; margin:.5rem 0; }
+    .dz-btns { display:flex; gap:.7rem; justify-content:center; flex-wrap:wrap; }
+    .dz-btns label { cursor:pointer; }
+    .dz-hint { font-size:.84rem; opacity:.65; margin-top:.9rem; }
+    .tool-opts { display:flex; gap:1.2rem; flex-wrap:wrap; align-items:flex-end; margin:1.2rem 0 .4rem; }
+    .tool-opts label { display:flex; flex-direction:column; font-size:.85rem; opacity:.9; gap:.3rem; }
+    .tool-opts select, .tool-opts input[type=number] { background:rgba(8,12,24,.8); color:#e7eef6; border:1px solid rgba(120,180,255,.25); border-radius:8px; padding:.5rem .7rem; font-size:.95rem; min-width:170px; }
+    #count { font-size:.9rem; opacity:.85; margin-top:.6rem; min-height:1.2em; }
+    .cta-btn:disabled { opacity:.45; cursor:default; transform:none; }
   </style>
 </head>
 
@@ -82,31 +63,92 @@
 
     <section class="hero glass">
       <div class="hero-title">bfx-ingest</div>
-      <div class="hero-subtitle">Deterministic LLM context from any codebase &middot; in one command</div>
+      <div class="hero-subtitle">Turn your files into clean AI context &middot; right here in your browser</div>
       <div class="hero-tagline">
-        Feeding a repo to an AI is messy: you paste files by hand, blow the context window, and get a different blob
-        every time so you can't cache or reproduce it. <strong>bfx-ingest</strong> turns a whole codebase into one clean,
-        token-counted, verifiable context artifact. Open source. No dependencies. No network. Your code never leaves your machine.
+        Feeding files to an AI is messy: you paste them by hand, blow the context window, and get a different blob every
+        time. Drop your files below and get <strong>one clean, token-counted context file</strong> for any model, split
+        into parts when it is too big. <strong>Nothing is uploaded. It all runs in your browser.</strong>
       </div>
       <div class="hero-cta">
-        <a href="#install" class="cta-btn">Install &amp; use</a>
-        <a href="https://github.com/kenbin64/bfx-ingest" class="cta-btn alt" target="_blank" rel="noopener">View source on GitHub</a>
-        <a href="#examples" class="cta-btn alt">Download examples</a>
+        <a href="#tool" class="cta-btn">Try it now</a>
+        <a href="https://github.com/kenbin64/bfx-ingest" class="cta-btn alt" target="_blank" rel="noopener">View source</a>
+        <a href="#install" class="cta-btn alt">Command-line version</a>
+      </div>
+    </section>
+
+    <!-- THE TOOL -->
+    <section class="section glass" id="tool">
+      <h2 class="section-title">Drop your files in</h2>
+      <div class="section-content">
+        <p>Files or a whole folder. Pick a format and a size for your AI, then download the context. Junk like
+          <code>node_modules</code>, <code>.git</code>, images, and binaries is skipped automatically.</p>
+
+        <div id="drop" class="dropzone">
+          <div class="dz-big">Drop files or a folder here</div>
+          <div class="dz-or">or</div>
+          <div class="dz-btns">
+            <label class="cta-btn">Choose files<input id="files" type="file" multiple hidden></label>
+            <label class="cta-btn alt">Choose a folder<input id="folder" type="file" hidden webkitdirectory directory></label>
+          </div>
+          <div class="dz-hint">Text and code only. Your files never leave this page.</div>
+        </div>
+
+        <div id="count"></div>
+
+        <div class="tool-opts">
+          <label>Format
+            <select id="fmt">
+              <option value="md">Markdown (GPT, Cursor, humans)</option>
+              <option value="xml">XML (Claude)</option>
+              <option value="json">JSON (your own pipeline)</option>
+            </select>
+          </label>
+          <label>Size for the AI
+            <select id="budget">
+              <option value="0">One file, no split</option>
+              <option value="180000">Claude (~200k, leaves headroom)</option>
+              <option value="115000">GPT-4o (~128k, leaves headroom)</option>
+              <option value="28000">Small model (~32k)</option>
+              <option value="custom">Custom...</option>
+            </select>
+          </label>
+          <label id="customWrap" style="display:none">Max tokens per part
+            <input id="customTokens" type="number" value="100000" min="1000" step="1000">
+          </label>
+          <button id="go" class="cta-btn" disabled>Generate context</button>
+          <button id="clear" class="cta-btn alt" style="display:none">Clear</button>
+        </div>
+
+        <div id="results" style="display:none; margin-top:1.4rem;">
+          <div class="stat-grid" id="stats"></div>
+          <h3 style="margin-top:1.4rem;">Download</h3>
+          <div id="downloads" class="downloads"></div>
+        </div>
+
+        <p class="honest">
+          Same files in gives the same output and the same content fingerprint every time, with no timestamps or
+          randomness, so it is reproducible. The token figure is the standard chars/4 estimate. The size budget covers the
+          context file; leave your model room for your prompt and its reply.
+        </p>
+        <p style="font-size:.92rem;margin-top:.6rem;">
+          <strong style="color:#35ff7a;">Free for early adopters.</strong> This tool is free while it is finding its feet.
+          Early users keep free access; if it gains traction, later versions may add paid tiers. <span id="mine" style="opacity:.8;"></span>
+        </p>
       </div>
     </section>
 
     <section class="section glass">
-      <h2 class="section-title">The problem, and the fix</h2>
+      <h2 class="section-title">Why it helps</h2>
       <div class="section-content">
         <p>
-          Working with an LLM on real code means assembling context. Done by hand it is slow, incomplete, and
-          non-reproducible: you forget files, send the same vendored code twice, overflow the window, and can never
-          recreate the exact input you used yesterday. That breaks evals, wastes tokens, and misses the prompt cache.
+          Done by hand, assembling context is slow, incomplete, and non-reproducible: you forget files, send the same
+          vendored code twice, overflow the window, and can never recreate yesterday's exact input. That breaks evals,
+          wastes tokens, and misses the prompt cache.
         </p>
         <p>
-          <strong>bfx-ingest walks the folder, content-addresses every file, dedupes identical ones, and emits one
-          artifact in the shape your model wants (Markdown, XML, or JSON), with a token count and a reproducible root
-          hash.</strong> Same repo in, same bytes and same hash out, on any machine.
+          <strong>bfx-ingest reads your files, fingerprints each one, collapses identical duplicates, and emits one
+          artifact in the shape your model wants, with a token count and a reproducible root fingerprint.</strong> Same
+          files in, same bytes out.
         </p>
       </div>
     </section>
@@ -114,104 +156,43 @@
     <section class="section glass">
       <h2 class="section-title">Measured on a real 1,593-file repo</h2>
       <div class="section-content">
-        <p>Numbers from actually running it, not a pitch. Counts are exact; token and cost figures are labelled estimates.</p>
+        <p>Numbers from actually running the command-line version, not a pitch. Counts are exact; token figures are labelled estimates.</p>
         <div class="stat-grid">
-          <div class="stat-card">
-            <div class="stat-num">1 command</div>
-            <div class="stat-label">replaces hand-pasting 1,593 files (18.2M characters) into one artifact</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num">~4.55M</div>
-            <div class="stat-label">tokens measured up front, so you scope before wasting a call</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num">same hash</div>
-            <div class="stat-label">identical input gives the identical root hash, verified by re-running</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num">~85%</div>
-            <div class="stat-label">of repeated-input cost turned into prompt-cache hits per session (illustrative)</div>
-          </div>
+          <div class="stat-card"><div class="stat-num">1,593</div><div class="stat-label">files (18.2M characters) folded into one artifact, no hand-pasting</div></div>
+          <div class="stat-card"><div class="stat-num">~4.55M</div><div class="stat-label">tokens measured up front, so you scope before wasting a call</div></div>
+          <div class="stat-card"><div class="stat-num">same hash</div><div class="stat-label">identical input gives the identical root fingerprint, verified by re-running</div></div>
+          <div class="stat-card"><div class="stat-num">~85%</div><div class="stat-label">of repeated-input cost turned into prompt-cache hits per session (illustrative)</div></div>
         </div>
         <p class="honest">
-          The dollar and token numbers are honest estimates (standard chars/4 heuristic, posted pricing, stated
-          assumptions); file, byte, and duplicate counts are exact. The full method and worked example are in the
-          <a class="card-link" href="https://github.com/kenbin64/bfx-ingest/blob/main/CASE_STUDY.md" target="_blank" rel="noopener">case study</a>.
-          Every figure is reproducible by re-running the included benchmark.
+          Token figures use the standard chars/4 heuristic; file, byte, and duplicate counts are exact. Every figure is
+          reproducible by re-running the included benchmark.
         </p>
       </div>
     </section>
 
     <section class="section glass" id="install">
-      <h2 class="section-title">Install and use</h2>
+      <h2 class="section-title">Prefer the command line?</h2>
       <div class="section-content">
-        <p>One command. Nothing to set up.</p>
-        <div class="codeblock"><span class="c"># the whole repo into Markdown context for GPT/Cursor</span>
+        <p>The same tool runs as one command, zero dependencies, for scripting and CI.</p>
+        <div class="codeblock"><span class="c"># whole repo into Markdown context</span>
 npx bfx-ingest ./my-project --format md --out context.md
 
-<span class="c"># Claude prefers XML; pipe straight to your clipboard</span>
-npx bfx-ingest ./src --format xml | clip
+<span class="c"># Claude prefers XML</span>
+npx bfx-ingest ./src --format xml --out context.xml
 
 <span class="c"># JSON for your own RAG / eval pipeline</span>
-npx bfx-ingest ./src --format json &gt; ctx.json</div>
-        <p style="margin-top:1rem;">
-          Options: <code>--format md|xml|json</code>, <code>--out FILE</code>, <code>--max-kb N</code>. It skips the usual
-          junk (<code>.git</code>, <code>node_modules</code>, build output, binaries, lockfiles) and honours a basic
-          <code>.gitignore</code>.
-        </p>
-      </div>
-    </section>
-
-    <section class="section glass" id="examples">
-      <h2 class="section-title">See exactly what it produces</h2>
-      <div class="section-content">
-        <p>
-          These are the real outputs of running bfx-ingest on a tiny 4-file demo project (two files are identical on
-          purpose, so you can watch dedup collapse them). Open source, downloadable, nothing hidden.
-        </p>
-        <div class="downloads">
-          <a class="dl-card" href="examples/demo-context.md" download>
-            <div class="dl-fmt">Markdown &darr;</div>
-            <div class="dl-desc">For GPT, Cursor, and humans. Fenced by language.</div>
-          </a>
-          <a class="dl-card" href="examples/demo-context.xml" download>
-            <div class="dl-fmt">XML &darr;</div>
-            <div class="dl-desc">Claude-shaped <code>&lt;file&gt;</code> tags.</div>
-          </a>
-          <a class="dl-card" href="examples/demo-context.json" download>
-            <div class="dl-fmt">JSON &darr;</div>
-            <div class="dl-desc">For your own RAG / eval pipeline. Carries the root hash.</div>
-          </a>
-        </div>
-        <p class="honest">
-          Notice all three share the same root hash and the same deduped file set. The duplicate
-          (<code>lib/util.js</code> = <code>helpers/util.js</code>) is collapsed to one body and referenced, not sent twice.
-        </p>
+npx bfx-ingest ./src --format json --out ctx.json</div>
+        <p style="margin-top:1rem;">Options: <code>--format md|xml|json</code>, <code>--out FILE</code>, <code>--max-kb N</code>. Skips <code>.git</code>, <code>node_modules</code>, build output, binaries, and lockfiles.</p>
       </div>
     </section>
 
     <section class="section glass">
       <h2 class="section-title">Why you can trust it</h2>
       <div class="pillars-grid">
-        <article class="pillar-card span-2x2">
-          <h3>No black box</h3>
-          <p>
-            The whole tool is one small, readable file of plain Node. No build step, nothing compiled or obfuscated,
-            MIT licensed. Read it before you run it.
-          </p>
-        </article>
-        <article class="pillar-card">
-          <h3>Local and offline</h3>
-          <p>Pure Node, zero dependencies, no network. Your code never leaves your machine.</p>
-        </article>
-        <article class="pillar-card">
-          <h3>Verify, don't trust</h3>
-          <p>Same repo in gives the same root hash out, on any machine. Re-run it and check, instead of taking my word.</p>
-        </article>
-        <article class="pillar-card">
-          <h3>Reproducible by design</h3>
-          <p>The hash and manifest prove exactly what the model saw, for evals, prompt caching, and provenance.</p>
-        </article>
+        <article class="pillar-card span-2x2"><h3>No black box</h3><p>The browser tool and the CLI are small, readable, MIT-licensed plain code. Read it before you run it. View source is right there.</p></article>
+        <article class="pillar-card"><h3>Nothing uploaded</h3><p>The browser version reads your files locally and never sends them anywhere. The CLI is pure Node, no network.</p></article>
+        <article class="pillar-card"><h3>Verify, don't trust</h3><p>Same files in gives the same fingerprint out. Re-run it and check, instead of taking my word.</p></article>
+        <article class="pillar-card"><h3>Reproducible by design</h3><p>The fingerprint and manifest prove exactly what the model saw, for evals, caching, and provenance.</p></article>
       </div>
     </section>
 
@@ -219,14 +200,14 @@ npx bfx-ingest ./src --format json &gt; ctx.json</div>
       <h2 class="section-title">About this project</h2>
       <div class="section-content">
         <p>
-          bfx-ingest is free and open source. It is a <strong>personal portfolio piece</strong>, built to demonstrate
-          the kind of reliable, reproducible, cost-efficient AI systems I build. It is not a commercial product or a
-          service for sale. I am seeking a full-time AI engineering role.
+          bfx-ingest is free and open source, a <strong>personal portfolio piece</strong> built to demonstrate the
+          reliable, reproducible, cost-efficient AI systems I build. It is not a commercial product or a service for sale.
+          I am seeking a full-time AI engineering or backend / platform role.
         </p>
         <div class="hero-cta">
           <a href="contact.html" class="cta-btn">Contact for hiring</a>
-          <a href="mailto:ken.bingham64@gmail.com" class="cta-btn alt">ken.bingham64@gmail.com</a>
           <a href="resume.html" class="cta-btn alt">Resume</a>
+          <a href="https://github.com/kenbin64" class="cta-btn alt" target="_blank" rel="noopener">GitHub</a>
         </div>
       </div>
     </section>
@@ -237,6 +218,228 @@ npx bfx-ingest ./src --format json &gt; ctx.json</div>
   </div>
 
   <script src="manifold-bg.js" defer></script>
+  <script>
+  (function () {
+    var $ = function (id) { return document.getElementById(id); };
+    var picked = [];                 // {path, file}
+    var BIN = /\.(png|jpe?g|gif|webp|bmp|ico|tiff?|pdf|zip|gz|tgz|tar|rar|7z|exe|dll|so|dylib|o|a|bin|dat|woff2?|ttf|otf|eot|mp[34]|m4a|wav|ogg|flac|mov|mp4|avi|mkv|webm|class|jar|pyc|pyo|wasm|lock|map|min\.js|min\.css|ds_store)$/i;
+    var SKIPDIR = /(^|\/)(\.git|node_modules|dist|build|out|\.next|\.nuxt|target|vendor|\.venv|venv|env|__pycache__|coverage|\.cache|\.idea|\.vscode)(\/|$)/i;
+
+    // Lightweight, first-party usage tracking. Anonymous: a beacon to our own
+    // log (no file content ever leaves the page) plus a personal local count.
+    function track(evt) {
+      try { fetch('/robots.txt?e=bfx-' + evt + '&t=' + Math.random().toString(36).slice(2), { mode: 'no-cors', cache: 'no-store' }); } catch (e) {}
+    }
+    function bumpMine() {
+      var n = (+localStorage.getItem('bfx-gen') || 0) + 1;
+      try { localStorage.setItem('bfx-gen', n); } catch (e) {}
+      showMine(); return n;
+    }
+    function showMine() {
+      var n = +localStorage.getItem('bfx-gen') || 0, m = $('mine');
+      if (m && n) m.textContent = 'You have built ' + n + ' context file' + (n > 1 ? 's' : '') + ' here.';
+    }
+
+    // deterministic 53-bit content fingerprint (cyrb53), hex
+    function fp(str) {
+      var h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+      for (var i = 0, ch; i < str.length; i++) {
+        ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+      }
+      h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507); h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+      h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507); h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+      return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16).padStart(14, '0');
+    }
+    function estTokens(s) { return Math.ceil(s.length / 4); }
+    function extOf(p) { var m = (p.split('/').pop() || '').split('.'); return m.length > 1 ? m.pop().toLowerCase() : ''; }
+    function escXml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+    function escAttr(s) { return escXml(s).replace(/"/g, '&quot;'); }
+    function sumTok(secs) { return secs.reduce(function (a, s) { return a + (s.tokens || 0); }, 0); }
+
+    function addFiles(list) {
+      for (var i = 0; i < list.length; i++) {
+        var f = list[i];
+        picked.push({ path: f.webkitRelativePath || f.name, file: f });
+      }
+      refresh();
+    }
+    function refresh() {
+      $('count').textContent = picked.length ? (picked.length + ' file' + (picked.length > 1 ? 's' : '') + ' ready') : '';
+      $('go').disabled = picked.length === 0;
+      $('clear').style.display = picked.length ? '' : 'none';
+    }
+
+    // --- inputs ---
+    $('files').addEventListener('change', function (e) { addFiles(e.target.files); e.target.value = ''; });
+    $('folder').addEventListener('change', function (e) { addFiles(e.target.files); e.target.value = ''; });
+    $('clear').addEventListener('click', function () { picked = []; refresh(); $('results').style.display = 'none'; });
+    $('budget').addEventListener('change', function () { $('customWrap').style.display = this.value === 'custom' ? '' : 'none'; });
+    showMine();
+
+    // --- drag and drop (files and folders) ---
+    var dz = $('drop');
+    ['dragenter', 'dragover'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add('over'); }); });
+    ['dragleave', 'drop'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.remove('over'); }); });
+    dz.addEventListener('drop', function (e) {
+      var items = e.dataTransfer.items;
+      var canTree = items && items.length && items[0].webkitGetAsEntry;
+      if (canTree) {
+        var entries = [], jobs = [];
+        for (var i = 0; i < items.length; i++) { var en = items[i].webkitGetAsEntry(); if (en) entries.push(en); }
+        entries.forEach(function (en) { jobs.push(walk(en, '')); });
+        Promise.all(jobs).then(refresh);
+      } else { addFiles(e.dataTransfer.files); }
+    });
+    function walk(entry, prefix) {
+      return new Promise(function (resolve) {
+        if (entry.isFile) {
+          entry.file(function (f) { picked.push({ path: (prefix ? prefix + '/' : '') + f.name, file: f }); resolve(); }, resolve);
+        } else if (entry.isDirectory) {
+          var reader = entry.createReader(), acc = [];
+          (function readBatch() {
+            reader.readEntries(function (ents) {
+              if (!ents.length) {
+                Promise.all(acc.map(function (en) { return walk(en, (prefix ? prefix + '/' : '') + entry.name); })).then(resolve);
+              } else { acc = acc.concat(Array.prototype.slice.call(ents)); readBatch(); }
+            }, resolve);
+          })();
+        } else resolve();
+      });
+    }
+
+    // --- generate ---
+    $('go').addEventListener('click', function () { generate().catch(function (err) { alert('Something went wrong: ' + err); }); });
+
+    function getBudget() {
+      var v = $('budget').value;
+      if (v === 'custom') return Math.max(0, parseInt($('customTokens').value, 10) || 0);
+      return parseInt(v, 10) || 0;
+    }
+
+    async function generate() {
+      $('go').disabled = true; $('go').textContent = 'Reading...';
+      var sorted = picked.slice().sort(function (a, b) { return a.path < b.path ? -1 : a.path > b.path ? 1 : 0; });
+      var sections = [], seen = {}, skipped = 0, dups = 0;
+      for (var i = 0; i < sorted.length; i++) {
+        var it = sorted[i];
+        if (SKIPDIR.test(it.path) || BIN.test(it.path)) { skipped++; continue; }
+        var text;
+        try { text = await it.file.text(); } catch (e) { skipped++; continue; }
+        if (text.indexOf(String.fromCharCode(0)) !== -1) { skipped++; continue; }  // binary
+        var h = fp(text);
+        if (seen[h]) { dups++; sections.push({ path: it.path, dupOf: seen[h], hash: h, tokens: 0 }); continue; }
+        seen[h] = it.path;
+        sections.push({ path: it.path, content: text, hash: h, tokens: estTokens(text) });
+      }
+      var unique = sections.filter(function (s) { return s.content != null; });
+      if (!unique.length) { $('go').disabled = false; $('go').textContent = 'Generate context'; alert('No readable text files found (everything was binary or skipped).'); return; }
+      var totalTokens = sumTok(unique);
+      var rootHash = fp(unique.map(function (s) { return s.path + '\t' + s.hash; }).join('\n'));
+      var meta = { uniqueCount: unique.length, dupCount: dups, skipCount: skipped, rootHash: rootHash };
+
+      var budget = getBudget();
+      var parts = pack(sections, budget);
+      var fmt = $('fmt').value;
+      var ext = fmt === 'md' ? 'md' : fmt;
+
+      // render + downloads
+      var dl = $('downloads'); dl.innerHTML = '';
+      for (var p = 0; p < parts.length; p++) {
+        var text2 = renderPart(parts[p], p + 1, parts.length, fmt, meta);
+        var name = parts.length > 1 ? ('context.part' + (p + 1) + 'of' + parts.length + '.' + ext) : ('context.' + ext);
+        dl.appendChild(downloadCard(name, text2, sumTok(parts[p])));
+      }
+      if (parts.length > 1) {
+        var all = document.createElement('button'); all.className = 'cta-btn'; all.style.gridColumn = '1/-1'; all.textContent = 'Download all ' + parts.length + ' parts';
+        all.addEventListener('click', function () { Array.prototype.forEach.call(dl.querySelectorAll('a.dl-card'), function (a, k) { setTimeout(function () { a.click(); }, k * 350); }); });
+        dl.appendChild(all);
+      }
+
+      // stats
+      $('stats').innerHTML = '' +
+        card(meta.uniqueCount, 'files included') +
+        card('~' + totalTokens.toLocaleString(), 'estimated tokens') +
+        card(parts.length, 'part' + (parts.length > 1 ? 's' : '') + (budget ? ' (under ' + budget.toLocaleString() + ' each)' : '')) +
+        card(meta.dupCount, 'duplicates collapsed') +
+        card(meta.skipCount, 'binary / junk skipped') +
+        card(meta.rootHash, 'root fingerprint');
+      $('results').style.display = '';
+      track('generate'); bumpMine();
+      $('go').disabled = false; $('go').textContent = 'Generate context';
+      $('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function card(num, label) { return '<div class="stat-card"><div class="stat-num">' + num + '</div><div class="stat-label">' + label + '</div></div>'; }
+
+    function pack(sections, budget) {
+      if (!budget) return [sections];
+      // split any single file bigger than the budget, by lines
+      var expanded = [];
+      sections.forEach(function (s) {
+        if (s.content != null && s.tokens > budget) {
+          var lines = s.content.split('\n'), chunk = [], ct = 0, subs = [];
+          lines.forEach(function (ln) {
+            var t = estTokens(ln + '\n');
+            if (ct + t > budget && chunk.length) { subs.push(chunk.join('\n')); chunk = []; ct = 0; }
+            chunk.push(ln); ct += t;
+          });
+          if (chunk.length) subs.push(chunk.join('\n'));
+          subs.forEach(function (body, k) { expanded.push({ path: s.path + ' (part ' + (k + 1) + '/' + subs.length + ')', content: body, hash: s.hash, tokens: estTokens(body) }); });
+        } else expanded.push(s);
+      });
+      var parts = [], cur = [], ct = 0;
+      expanded.forEach(function (s) {
+        var t = s.tokens || 0;
+        if (ct + t > budget && cur.length) { parts.push(cur); cur = []; ct = 0; }
+        cur.push(s); ct += t;
+      });
+      if (cur.length) parts.push(cur);
+      return parts;
+    }
+
+    function renderPart(secs, i, n, fmt, meta) {
+      if (fmt === 'md') {
+        var L = ['# bfx-ingest context'];
+        if (n > 1) L.push('Part ' + i + ' of ' + n);
+        L.push('Files: ' + meta.uniqueCount + ' unique, ' + meta.dupCount + ' duplicates collapsed, ' + meta.skipCount + ' skipped');
+        L.push('Estimated tokens (this part): ~' + sumTok(secs).toLocaleString());
+        L.push('Root fingerprint: ' + meta.rootHash);
+        L.push('');
+        secs.forEach(function (s) {
+          if (s.content != null) { L.push('## ' + s.path, '```' + (extOf(s.path) || ''), s.content, '```', ''); }
+          else { L.push('## ' + s.path, '_identical to ' + s.dupOf + ', not repeated_', ''); }
+        });
+        return L.join('\n');
+      }
+      if (fmt === 'xml') {
+        var O = ['<context root-fingerprint="' + meta.rootHash + '"' + (n > 1 ? ' part="' + i + '/' + n + '"' : '') + '>'];
+        secs.forEach(function (s) {
+          if (s.content != null) O.push('  <file path="' + escAttr(s.path) + '" fingerprint="' + s.hash + '" tokens="' + s.tokens + '">\n' + escXml(s.content) + '\n  </file>');
+          else O.push('  <file path="' + escAttr(s.path) + '" identical-to="' + escAttr(s.dupOf) + '"/>');
+        });
+        O.push('</context>');
+        return O.join('\n');
+      }
+      var obj = {
+        meta: { part: n > 1 ? (i + '/' + n) : '1/1', uniqueFiles: meta.uniqueCount, duplicatesCollapsed: meta.dupCount, skipped: meta.skipCount, rootFingerprint: meta.rootHash, estTokensThisPart: sumTok(secs) },
+        files: secs.map(function (s) { return s.content != null ? { path: s.path, fingerprint: s.hash, estTokens: s.tokens, content: s.content } : { path: s.path, identicalTo: s.dupOf }; })
+      };
+      return JSON.stringify(obj, null, 2);
+    }
+
+    function downloadCard(name, text, tok) {
+      var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.className = 'dl-card'; a.href = url; a.download = name;
+      a.addEventListener('click', function () { track('download'); });
+      a.innerHTML = '<div class="dl-fmt">' + name + ' &darr;</div><div class="dl-desc">~' + tok.toLocaleString() + ' tokens</div>';
+      return a;
+    }
+  })();
+  </script>
 </body>
 
 </html>
