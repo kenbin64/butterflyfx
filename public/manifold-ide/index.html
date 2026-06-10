@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Manifold IDE · z = xy</title>
+  <meta name="description"
+    content="A 100% browser IDE powered by Manifold AI. Folder, language, run, debug, deploy via MCP.">
+  <link rel="stylesheet" href="css/ide.css">
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='28'%3E◇%3C/text%3E%3C/svg%3E">
+</head>
+
+<body class="theme-dark">
+  <header class="rail rail-top">
+    <div class="brand"><span class="glyph">◇</span> Manifold IDE</div>
+    <div class="path" id="filePath" title="Active file">untitled</div>
+    <div id="publicBanner" class="public-banner">Public mode — restricted, client-side only. No server access.</div>
+
+    <label class="ctrl">
+      <span class="ctrl-label">lang</span>
+      <select id="langSelect">
+        <option value="javascript">JavaScript</option>
+        <option value="typescript">TypeScript</option>
+        <option value="python">Python</option>
+        <option value="html">HTML</option>
+        <option value="css">CSS</option>
+        <option value="json">JSON</option>
+        <option value="markdown">Markdown</option>
+        <option value="rust">Rust</option>
+        <option value="go">Go</option>
+        <option value="shell">Shell</option>
+      </select>
+    </label>
+
+    <label class="ctrl">
+      <span class="ctrl-label">engine</span>
+      <select id="engineSelect">
+        <option value="auto">auto</option>
+        <option value="ollama:qwen2.5-coder:1.5b" selected>Ollama: Qwen 1.5B (server-side)</option>
+        <option value="ollama:qwen2.5-coder:7b">Ollama: Qwen 7B (server-side)</option>
+        <option value="ollama:llama3.1:8b">Ollama: Llama 3.1 8B (server-side)</option>
+        <option value="webllm">Qwen2.5-1.5B · WebGPU · ~1 GB</option>
+        <option value="webllm-3b">Llama-3.2-3B · WebGPU · ~2 GB</option>
+        <option value="transformers">SmolLM2-1.7B · WASM</option>
+        <option value="deterministic">deterministic · instant</option>
+      </select>
+    </label>
+
+    <button class="ctrl-btn" id="examplesBtn" title="Examples">💡 examples</button>
+    <button class="ctrl-btn" id="ingestBtn" title="Ingest Markdown">📥 ingest</button>
+    <button class="ctrl-btn" id="aiDiagBtn" title="AI diagnostics">🧪 AI diag</button>
+
+    <button class="ctrl-btn run" id="runBtn" title="Run (Ctrl+Enter)">▶ run</button>
+    <button class="ctrl-btn dbg" id="debugBtn" title="Debug (step the dimensional ladder)">◐ debug</button>
+    <button class="ctrl-btn dep" id="deployBtn" title="Deploy via MCP">☁ deploy</button>
+    <button class="ctrl-btn" id="gitBtn" title="Git"> git</button>
+
+    <button class="ctrl-btn" id="grantFolderBtn" title="Grant a local folder">📁 folder</button>
+    <button class="ctrl-btn" id="connectMcpBtn" title="Connect MCP bridge">🔌 MCP</button>
+
+    <div class="lens" id="dimIndicator" title="Project dimensional level">◇ dim 1 (point)</div>
+    <a class="ctrl-btn link" href="../index.html">portal</a>
+    <button class="ctrl-btn" id="secretBtn" title="Secret (local-only)" style="display:none">🔐 secret</button>
+  </header>
+
+  <main id="surface">
+    <aside class="side side-left" id="sideLeft">
+      <div class="side-head">
+        <span>EXPLORER</span>
+        <button class="icon-btn" id="newFileBtn" title="New file (uses language dropdown)">+</button>
+      </div>
+      <div class="scope-bar" id="scopeBar" title="All AI file writes are confined to this root.">
+        <span class="scope-label">scope:</span>
+        <span class="scope-root" id="scopeRoot">(no root)</span>
+        <button type="button" class="scope-toggle" id="allowAllBtn" aria-pressed="false"
+          title="Allow all AI writes within this root without per-write confirms. Resets when you switch roots.">
+          🔒 confirm each
+        </button>
+      </div>
+      <div class="tree" id="tree">
+        <div class="tree-empty">no folder granted<br><small>click 📁 folder above</small></div>
+      </div>
+      <div class="side-head" style="margin-top:8px">OPEN TABS</div>
+      <div class="tabs-list" id="tabsList"></div>
+      <div class="side-head" style="margin-top:8px">DEPLOY TARGETS
+        <button class="icon-btn" id="addDeployBtn" title="Add allowed deploy target">+</button>
+      </div>
+      <div class="deploy-list" id="deployList">
+        <div class="tree-empty"><small>no targets · ☁ deploy will ask first</small></div>
+      </div>
+    </aside>
+
+    <section class="center">
+      <div class="tab-bar" id="tabBar"></div>
+      <div class="editor-host" id="editorHost"></div>
+      <div class="bottom" id="bottom">
+        <div class="bottom-tabs">
+          <button class="bt-tab active" data-pane="console">CONSOLE</button>
+          <button class="bt-tab" data-pane="debug">DEBUG</button>
+          <button class="bt-tab" data-pane="manifold">MANIFOLD</button>
+          <button class="bt-tab" data-pane="preview">PREVIEW</button>
+          <span class="spacer"></span>
+          <button class="icon-btn" id="clearConsoleBtn" title="Clear">⌫</button>
+          <button class="icon-btn" id="bottomToggle" title="Collapse">▾</button>
+        </div>
+        <pre class="pane pane-console active" id="paneConsole"></pre>
+        <pre class="pane pane-debug" id="paneDebug"></pre>
+        <pre class="pane pane-manifold" id="paneManifold"></pre>
+        <div class="pane pane-preview" id="panePreview"><iframe id="previewFrame" style="width:100%;height:100%;border:none;background:#fff;"></iframe></div>
+      </div>
+    </section>
+
+    <aside class="side side-right" id="sideRight">
+      <div class="side-head">
+        <span>MANIFOLD AI</span>
+        <span class="ai-status" id="aiStatus">deterministic</span>
+      </div>
+      <div class="ai-reader" id="aiReader" aria-live="polite">
+        <article class="ai-page ai-page-empty" id="aiPage">
+          <div class="ai-empty-hint">No messages yet — ask the manifold below.</div>
+        </article>
+      </div>
+      <div class="ai-pager">
+        <button type="button" class="pg-btn" id="aiPrevBtn" title="Previous (Alt+←)" disabled>◀</button>
+        <span class="pg-indicator" id="aiPageIndicator">0 / 0</span>
+        <button type="button" class="pg-btn" id="aiNextBtn" title="Next (Alt+→)" disabled>▶</button>
+        <span class="spacer"></span>
+        <button type="button" class="pg-btn" id="aiLatestBtn" title="Jump to latest">⤓ latest</button>
+      </div>
+      <div class="ai-progress hidden" id="aiProgress">
+        <div class="upgrade-label"><span class="u-text">loading model…</span><span class="u-pct">0%</span></div>
+        <div class="upgrade-track">
+          <div class="upgrade-fill"></div>
+        </div>
+        <!-- Secret panel: shown only on localhost and after unlocking with your passphrase. -->
+        <div id="secretPanel" class="secret-panel hidden">
+          <div class="secret-body">
+            <h3>Local Secret Panel</h3>
+            <p class="muted">This panel is local-only. Your passphrase and settings are stored in this browser and never sent to the server.</p>
+            <div id="secretLockedArea">
+              <label for="secretPass">Enter passphrase to unlock:</label>
+              <input id="secretPass" type="password" autocomplete="new-password">
+              <button id="secretUnlockBtn">Unlock</button>
+              <button id="secretCreateBtn">Create New</button>
+            </div>
+            <div id="secretUnlockedArea" style="display:none">
+              <p>Unlocked. Local features and owner controls:</p>
+              <label><input type="checkbox" id="secretLocalOnlyToggle" checked> Enforce local-only LLM (no server contact)</label>
+              <div style="margin-top:8px">
+                <label><input type="checkbox" id="secretOwnerAccessToggle"> Enable Owner / Server Access</label>
+              </div>
+              <div style="margin-top:8px">
+                <label for="secretBridgeUrl">Bridge URL:</label>
+                <input id="secretBridgeUrl" type="text" placeholder="ws://localhost:8765" style="width:90%">
+                <div style="margin-top:6px">
+                  <button id="secretBridgeSave">Save URL</button>
+                  <button id="secretBridgeConnect">Connect Bridge</button>
+                  <button id="secretBridgeSSH">SSH Helper</button>
+                </div>
+              </div>
+              <div style="margin-top:8px"><button id="secretLockBtn">Lock</button></div>
+              <div style="margin-top:8px">
+                <button id="secretExportBtn">Export Backup</button>
+                <button id="secretImportBtn">Import Backup</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Git staging modal -->
+      <div id="gitPanel" class="modal hidden">
+        <div class="modal-body">
+          <h3>Git Staging</h3>
+          <div id="gitFilesList" style="max-height:240px;overflow:auto;border:1px solid var(--panel-border);padding:6px;margin-bottom:8px"></div>
+          <label>Commit message: <input id="gitCommitMsg" type="text" style="width:80%"></label>
+          <div style="margin-top:8px">
+            <button id="gitStageAllBtn">Stage All</button>
+            <button id="gitCommitBtn">Commit & Push</button>
+            <button id="gitCloseBtn">Close</button>
+          </div>
+        </div>
+      </div>
+      <form id="aiForm" class="ai-form">
+        <textarea id="aiPrompt" rows="6"
+          placeholder="Ask the manifold about your code…&#10;&#10;Enter sends · Shift+Enter newline · chips below for quick actions"></textarea>
+        <div class="ai-actions">
+          <button type="button" class="ai-chip" data-action="explain">explain</button>
+          <button type="button" class="ai-chip" data-action="refactor">refactor</button>
+          <button type="button" class="ai-chip" data-action="fix">fix</button>
+          <button type="button" class="ai-chip" data-action="test">test</button>
+          <span class="spacer"></span>
+          <button type="submit" class="ai-send" title="Send (Enter)">send ↵</button>
+        </div>
+      </form>
+    </aside>
+  </main>
+
+  <footer class="rail rail-bottom">
+    <span class="status" id="ideStatus">ready</span>
+    <span id="cursorPos">Ln 1, Col 1</span>
+    <span class="spacer"></span>
+    <span id="toolList">tools: code_exec</span>
+    <span class="hint-keys">Ctrl+Enter run · Ctrl+S save · Ctrl+B sidebar · Ctrl+J bottom</span>
+  </footer>
+
+  <script src="../js/auth-gate.js"></script>
+  <script type="module" src="js/ide.js"></script>
+</body>
+
+</html>

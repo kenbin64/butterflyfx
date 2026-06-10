@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About &middot; Kenneth W. Bingham, AI Engineer</title>
+  <meta name="description"
+    content="About Kenneth W. Bingham, AI Engineer and Backend / Platform Engineer: 10+ years building reliable systems, now focused on the reliability layer around AI.">
+  <link rel="canonical" href="https://butterflyfx.us/about.html">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="carousel.css">
+  <link rel="stylesheet" href="theme.css">
+</head>
+
+<body>
+  <canvas id="spiral-bg"></canvas>
+
+  <nav class="navbar glass">
+    <a href="index.html">Home</a>
+    <a href="about.html" class="active">About</a>
+    <a href="method.html">Method</a>
+    <a href="resume.html">Resume</a>
+    <a href="research.html">Research</a>
+    <a href="contact.html">Contact</a>
+    <a href="https://github.com/kenbin64" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+
+  <div class="content">
+
+    <header>
+      <img src="kennethbingham.webp" alt="Kenneth W. Bingham" class="hero-photo"
+        style="width:120px;height:120px;margin-bottom:1em;" />
+      <h1>Kenneth W. Bingham</h1>
+      <h2>AI Engineer &middot; Backend &amp; Platform Engineer</h2>
+      <h3>Open to hybrid and remote</h3>
+    </header>
+
+    <section class="section glass">
+      <h2 class="section-title">Who I am</h2>
+      <div class="section-content">
+        <p>
+          I am a software engineer with more than ten years building reliable systems end to end, across regulated,
+          high-stakes domains: U.S. Air Force programs (I held a Secret clearance), healthcare and insurance, fintech,
+          and fleet payments. I work full-stack, from database and API to a modern front end and the cloud deploy that
+          puts it in production.
+        </p>
+        <p>
+          Since August 2025, on my own initiative, I have gone deep into AI engineering: not only how to use large
+          language models, but how they work and how to make them reliable through operating directives and geometric
+          representation. I build the reliability layer around AI: deterministic pipelines, evaluation and verification
+          harnesses, and reproducible systems. I prove my work with tests and reproducible numbers, and I separate what is
+          established from what is a model from what is still a conjecture under test, so the bold ideas stay credible.
+        </p>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">What I optimize for</h2>
+      <div class="section-content">
+        <ul>
+          <li><b>Determinism over fluency.</b> The model is nondeterministic; the system around it must not be. Schema-validated outputs, retry budgets, and verifier passes, so malformed or drifting output never reaches the next stage.</li>
+          <li><b>Cost where it counts.</b> Route cheap calls to cheap models, cache byte-identical context, budget tokens, so frontier spend goes only where frontier reasoning is required.</li>
+          <li><b>Reproducibility and provenance.</b> Content-addressed, hash-verified, deterministic replay, so you can prove exactly what a system did and recreate it on any machine.</li>
+          <li><b>Ownership end to end.</b> I run my own Linux infrastructure with zero-downtime, auto-rollback deploys, and I own problems from architecture through production.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">Beyond the keyboard</h2>
+      <div class="section-content">
+        <p>
+          I am a drummer, a singer, and an acrylic painter, and an independent researcher in geometric, representation-based
+          computation. The same instinct runs through all of it: find the structure underneath, and let it carry the work.
+        </p>
+        <div class="hero-cta" style="margin-top:1.2em;">
+          <a href="resume.html" class="cta-btn">Full resume</a>
+          <a href="method.html" class="cta-btn alt">How I work</a>
+          <a href="research.html" class="cta-btn alt">Research and writing</a>
+          <a href="contact.html" class="cta-btn alt">Contact</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 Kenneth W. Bingham &middot; ButterflyFx</p>
+    </footer>
+  </div>
+
+  <script src="manifold-bg.js" defer></script>
+</body>
+
+</html>

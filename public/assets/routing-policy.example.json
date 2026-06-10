@@ -1,0 +1,102 @@
+{
+  "$note": "Personal AI-spend routing policy. Drop into a Continue config, an Augment guideline, or a custom router loop. Signals are 0..1. Tier names align with router.js DEFAULT_CATALOG; vendor model names are illustrative and current as of 2026-05.",
+  "rules": [
+    {
+      "task": "inline_completion",
+      "signals": { "complexity": 0.1, "stakes": 0.1, "context": 0.1 },
+      "tier": "nano",
+      "preferred": ["copilot", "continue/local-llama-3.1-8b"],
+      "rationale": "Latency dominates; cost is per-keystroke. Local or in-IDE small models only."
+    },
+    {
+      "task": "quick_chat",
+      "signals": { "complexity": 0.2, "stakes": 0.1, "context": 0.1 },
+      "tier": "nano",
+      "preferred": ["claude-haiku-3.5", "gpt-4o-mini", "gemini-2.5-flash"],
+      "rationale": "Single-shot question, no codebase context. Anything fancier is wasted credits."
+    },
+    {
+      "task": "single_file_refactor",
+      "signals": { "complexity": 0.5, "stakes": 0.3, "context": 0.4 },
+      "tier": "small-mid",
+      "preferred": ["augment-sonnet", "cursor-sonnet", "claude-sonnet-4.5"],
+      "rationale": "Sonnet handles single-file edits cleanly. Don't burn Opus for this."
+    },
+    {
+      "task": "test_generation",
+      "signals": { "complexity": 0.4, "stakes": 0.2, "context": 0.4 },
+      "tier": "small-mid",
+      "preferred": ["claude-sonnet-4.5", "claude-haiku-3.5"],
+      "rationale": "Pattern-matching task. Haiku for boilerplate, Sonnet when tests are non-trivial."
+    },
+    {
+      "task": "cross_file_architecture",
+      "signals": { "complexity": 0.75, "stakes": 0.6, "context": 0.85 },
+      "tier": "mid-large",
+      "preferred": ["augment-sonnet-with-codebase-context", "gpt-5"],
+      "rationale": "Needs big context window + code retrieval. Sonnet+Augment usually beats raw frontier here."
+    },
+    {
+      "task": "production_code_review",
+      "signals": { "complexity": 0.6, "stakes": 0.85, "context": 0.5 },
+      "tier": "large",
+      "flags": { "irreversible_action": false },
+      "preferred": ["gpt-5", "claude-sonnet-4.5-extended-thinking"],
+      "rationale": "Stakes are high; cost of a miss > cost of the call. Use extended thinking."
+    },
+    {
+      "task": "hard_debugging",
+      "signals": { "complexity": 0.9, "stakes": 0.7, "context": 0.8 },
+      "tier": "frontier",
+      "preferred": ["claude-opus-4.7-extended-thinking"],
+      "rationale": "State-space search. This is the actual use case Opus exists for."
+    },
+    {
+      "task": "spec_or_rfc_drafting",
+      "signals": { "complexity": 0.55, "stakes": 0.5, "context": 0.6 },
+      "tier": "mid",
+      "preferred": ["claude-sonnet-4.5"],
+      "rationale": "Prose + structure. Sonnet writes cleaner specs than frontier models in my testing."
+    },
+    {
+      "task": "embeddings_or_search",
+      "signals": { "complexity": 0, "stakes": 0, "context": 0 },
+      "tier": "embed",
+      "flags": { "kind": "embedding" },
+      "preferred": ["local/bge-small-en-v1.5", "local/bge-large-en-v1.5"],
+      "rationale": "Always free, always local, always fast. No exceptions."
+    },
+    {
+      "task": "image_or_diagram_analysis",
+      "signals": { "complexity": 0.5, "stakes": 0.4, "context": 0.3 },
+      "tier": "mid",
+      "flags": { "needs_vision": true },
+      "preferred": ["claude-sonnet-4.5", "gemini-2.5-flash"],
+      "rationale": "Cheapest vision-capable tier; Gemini Flash is often the value pick."
+    },
+    {
+      "task": "pii_or_regulated_content",
+      "signals": { "complexity": 0.5, "stakes": 0.9, "context": 0.3 },
+      "tier": "local",
+      "flags": { "contains_pii": true, "must_be_offline": true },
+      "preferred": ["local/llama-3.1-8b-instruct", "local/llama-3.1-70b"],
+      "rationale": "Never leaves the machine. Quality trade-off accepted in exchange for privacy."
+    },
+    {
+      "task": "irreversible_action",
+      "signals": { "complexity": 0.7, "stakes": 0.95, "context": 0.5 },
+      "tier": "frontier",
+      "flags": { "irreversible_action": true },
+      "preferred": ["claude-opus-4.7"],
+      "verify_step": { "tier": "frontier", "second_pass": true },
+      "rationale": "Deploys, db writes, irreversible commits. Always run the verify step from plan()."
+    }
+  ],
+  "global_rules": [
+    "Don't pay Opus for Sonnet work — if Sonnet would be indistinguishable, Sonnet wins. Cost ratio ~20x.",
+    "Don't pay Sonnet for Haiku work — boilerplate, formatting, simple edits are Haiku-grade. Cost ratio ~10x.",
+    "Frontier is for irreversibility, ambiguity, and high context. Everywhere else, frontier is waste.",
+    "Always route embeddings to a local model. There is no reason to pay for cloud embeddings.",
+    "When stakes >= 0.7, append a verify step using the same or one-tier-up model."
+  ]
+}

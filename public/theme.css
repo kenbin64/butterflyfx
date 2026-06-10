@@ -1,0 +1,143 @@
+/* theme.css — layered AFTER style.css.
+   Palette: cyan / green / purple / gold on deep-space substrate.
+   Golden-ratio spacing.  Contrast tuned for readability over the
+   live manifold-bg.js raymarched surface. */
+
+:root {
+  --phi:        1.6180339887;
+
+  /* Base substrate — deep space, slightly violet */
+  --bg-0:       #06060f;
+  --bg-1:       #0c0a1c;
+
+  /* Four base colors */
+  --c-cyan:     #2cf0ff;
+  --c-green:    #4dffb0;
+  --c-purple:   #c79aff;
+  --c-gold:     #ffd166;
+
+  /* Soft / readable text tints (≥ WCAG AAA on --panel) */
+  --t-primary:  #f6f6fa;
+  --t-secondary:#cdd0dc;
+  --t-muted:    #9aa0b4;
+
+  /* Translucent panel: dark enough that text wins over any background */
+  --panel:      rgba(8, 8, 22, 0.78);
+  --panel-edge: rgba(199, 154, 255, 0.22);  /* purple kiss */
+  --panel-glow: 0 1px 0 rgba(255,255,255,0.04) inset,
+                0 calc(8px * var(--phi)) calc(32px * var(--phi)) rgba(0,0,0,0.55),
+                0 0 0 1px var(--panel-edge);
+}
+
+/* Substrate ---------------------------------------------------------- */
+html, body {
+  background: radial-gradient(ellipse at 50% 0%, var(--bg-1) 0%, var(--bg-0) 60%) !important;
+  color: var(--t-primary) !important;
+}
+
+/* Make the bg canvas a true backdrop, not a tinted overlay. */
+#spiral-bg {
+  filter: none !important;
+  opacity: 1 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+/* Glass panels — darker + crisp edge → text always wins ------------- */
+.glass, .hero, .section, .route-section, .demo, .result-card, .layer-card,
+.project-card, .contact-form, .navbar {
+  background: var(--panel) !important;
+  box-shadow: var(--panel-glow) !important;
+  backdrop-filter: blur(calc(8px * var(--phi))) saturate(1.15) !important;
+  -webkit-backdrop-filter: blur(calc(8px * var(--phi))) saturate(1.15) !important;
+  border-radius: calc(12px * var(--phi)) !important;
+  color: var(--t-primary) !important;
+}
+
+/* Project / service / details cards lived on a white background in
+   the legacy stylesheet — restore them to the dark substrate so text
+   doesn't disappear over the manifold. */
+.project-card, .service-card, .details-card, .layer-card, .result-card {
+  color: var(--t-primary) !important;
+}
+.project-card *, .service-card *, .details-card *, .layer-card *, .result-card * {
+  color: inherit;
+}
+.project-card h3, .service-title, .details-card h3 { color: var(--c-cyan) !important; }
+.project-summary, .service-short                    { color: var(--t-secondary) !important; }
+.project-tech                                       { color: var(--t-secondary) !important; }
+.project-tech li:before                             { color: var(--c-gold) !important; }
+
+.project-card:hover, .project-card:focus,
+.service-card:hover, .service-card:focus {
+  background: rgba(20, 16, 40, 0.92) !important;
+  color: var(--t-primary) !important;
+  border-color: var(--c-purple) !important;
+  box-shadow: 0 calc(8px * var(--phi)) calc(40px * var(--phi)) rgba(124, 92, 255, 0.35) !important;
+}
+
+/* Typography accents — assign one color per role -------------------- */
+.hero-title, .section-title, h1, h2 { color: var(--c-gold)   !important; text-shadow: 0 1px 16px rgba(0,0,0,0.6); }
+.hero-subtitle, h3                  { color: var(--c-cyan)   !important; }
+.hero-role, h4                      { color: var(--c-green)  !important; }
+.hero-tagline                       { color: var(--c-purple) !important; }
+.math, code, pre                    { color: var(--c-gold)   !important; background: rgba(0,0,0,0.45) !important; }
+
+/* Body copy contrast over the manifold */
+p, li, td, label, .section-content { color: var(--t-secondary) !important; }
+strong, b                          { color: var(--t-primary)   !important; }
+
+/* Links */
+a               { color: var(--c-cyan); }
+a:hover, a:focus{ color: var(--c-gold); }
+
+/* Navbar — clearer state, golden-ratio padding ---------------------- */
+.navbar a {
+  color: var(--c-cyan) !important;
+  padding: 6px 10px !important;
+  font-size: 0.95em !important;
+}
+.navbar a:hover, .navbar a.active {
+  background: linear-gradient(90deg, var(--c-purple), var(--c-cyan)) !important;
+  color: var(--bg-0) !important;
+}
+
+/* CTAs — gradient across the four-color palette --------------------- */
+.cta-btn {
+  background: linear-gradient(95deg, var(--c-cyan) 0%, var(--c-green) 40%,
+                                     var(--c-gold) 70%, var(--c-purple) 100%) !important;
+  color: var(--bg-0) !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 18px rgba(124, 92, 255, 0.35) !important;
+}
+.cta-btn:hover, .cta-btn:focus {
+  background: linear-gradient(95deg, var(--c-purple), var(--c-gold)) !important;
+  color: var(--bg-0) !important;
+  box-shadow: 0 6px 28px rgba(255, 209, 102, 0.45) !important;
+}
+
+/* Routing-page demo overrides — keep the inline styles legible ------ */
+.route-section h2 { color: var(--c-gold)  !important; }
+.route-section h3 { color: var(--c-green) !important; }
+.demo-row label   { color: var(--c-cyan)  !important; }
+.demo-row .val    { color: var(--c-green) !important; }
+.flag-grid label  { color: var(--t-secondary) !important; }
+.result-tier      { color: var(--c-gold)  !important; }
+.result-cost      { color: var(--c-green) !important; }
+.result-reason    { color: var(--t-secondary) !important; }
+.plan-step        { border-left-color: var(--c-purple) !important; background: rgba(0,0,0,0.45) !important; }
+.plan-step .step-name { color: var(--c-purple) !important; }
+.truth-table th   { color: var(--c-gold) !important; background: rgba(0,0,0,0.55) !important; }
+.truth-table td.t { color: var(--c-green)  !important; }
+.truth-table td.f { color: var(--t-muted)  !important; }
+
+/* Footer */
+footer, footer * { color: var(--t-muted) !important; }
+
+/* Selection */
+::selection { background: var(--c-purple); color: var(--bg-0); }
+
+/* Reduced motion — keep canvas but kill the time-driven palette swirl */
+@media (prefers-reduced-motion: reduce) {
+  #spiral-bg { opacity: 0.55 !important; }
+}

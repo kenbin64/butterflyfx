@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>z=xy Transparent Manifold Lens</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            color: #e0f2f1;
+            font-family: Consolas, monospace;
+            overflow: hidden;
+        }
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+       .glass {
+            background: rgba(10, 20, 30, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(79, 195, 247, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        #hud {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            padding: 16px;
+            z-index: 10;
+            width: 340px;
+        }
+        #hud h3 {
+            margin: 0 0 12px 0;
+            color: #4fc3f7;
+            font-weight: 500;
+        }
+       .row {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            font-size: 13px;
+        }
+       .label { opacity: 0.7; }
+       .value { color: #80deea; }
+       .alert { color: #ff8a80; }
+       .stable { color: #b9f6ca; }
+        #extraction {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            right: 15px;
+            padding: 12px;
+            z-index: 10;
+            max-height: 140px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        #extraction-title {
+            color: #4fc3f7;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+       .log-line {
+            margin: 3px 0;
+            opacity: 0.9;
+        }
+        #legend {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 16px;
+            z-index: 10;
+        }
+       .gradient {
+            width: 100%;
+            height: 12px;
+            background: linear-gradient(90deg, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
+            border-radius: 6px;
+            margin: 8px 0;
+        }
+    </style>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <div id="hud" class="glass">
+        <h3>z = x · y Extractor</h3>
+        <div class="row"><span class="label">Position x:</span><span class="value" id="xVal">0.00</span></div>
+        <div class="row"><span class="label">Position y:</span><span class="value" id="yVal">0.00</span></div>
+        <div class="row"><span class="label">Extracted z:</span><span class="value" id="zVal">0.00</span></div>
+        <div class="row"><span class="label">Manifold Hue:</span><span class="value" id="hueVal">180°</span></div>
+        <div class="row"><span class="label">Curvature:</span><span class="value" id="curveVal">0.00</span></div>
+        <div class="row"><span class="label">Region:</span><span class="value" id="regionVal">SADDLE</span></div>
+        <div style="margin-top:12px; font-size:11px; opacity:0.6;">
+            No hard coding. All values read from surface geometry.
+        </div>
+    </div>
+
+    <div id="legend" class="glass">
+        <div style="font-size: 13px; margin-bottom: 6px;">Spectrum Map</div>
+        <div class="gradient"></div>
+        <div style="display:flex; justify-content:space-between; font-size:10px; opacity:0.7;">
+            <span>z = -4</span>
+            <span>z = 0</span>
+            <span>z = +4</span>
+        </div>
+        <div style="margin-top:12px; font-size:11px;">
+            Blue: Negative correlation<br>
+            Green: Neutral/Saddle<br>
+            Red: Positive correlation
+        </div>
+    </div>
+
+    <div id="extraction" class="glass">
+        <div id="extraction-title">Live Extraction Log: Geometry → Value → Meaning</div>
+        <div id="logContent"></div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        const canvas = document.getElementById('canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 100);
+        camera.position.set(5, 5);
+
+        const renderer = new THREE.WebGLRenderer({
+            canvas: canvas,
+            antialias: true,
+            alpha: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 0);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.3;
+
+        // BUILD THE TWISTED SQUARE: z = xy
+        const size = 4, segments = 80;
+        const geometry = new THREE.PlaneGeometry(size, size, segments, segments);
+        const colors = new Float32Array(geometry.attributes.position.count * 3);
+        const positions = geometry.attributes.position;
+
+        for(let i = 0; i < positions.count; i++) {
+            const x = positions.getX(i);
+            const y = positions.getY(i);
+            const z = x * y; // THE ONLY RULE: geometry defines the value
+            positions.setZ(i, z);
+
+            // Color = direct mapping from z, no lookup table
+            const t = (z + 4) / 8; // normalize -4 to 4 into 0 to 1
+            const hue = 0.66 * (1 - t); // blue to red
+            const color = new THREE.Color().setHSL(hue, 1.0, 0.5);
+            colors[i*3] = color.r;
+            colors[i*3+1] = color.g;
+            colors[i*3+2] = color.b;
+        }
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        geometry.computeVertexNormals();
+
+        const material = new THREE.MeshPhysicalMaterial({
+            vertexColors: true,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.85,
+            roughness: 0.2,
+            metalness: 0.1,
+            transmission: 0.6,
+            thickness: 0.5
+        });
+
+        const surface = new THREE.Mesh(geometry, material);
+        scene.add(surface);
+
+        // Grid to show it's a coordinate system, not magic
+        const grid = new THREE.GridHelper(4, 8, 0x4fc3f7, 0x37474f);
+        grid.rotation.x = Math.PI / 2;
+        grid.position.z = -4.01;
+        grid.material.opacity = 0.2;
+        grid.material.transparent = true;
+        scene.add(grid);
+
+        // Lighting for glass effect
+        scene.add(new THREE.AmbientLight(0x444444));
+        const light1 = new THREE.DirectionalLight(0x4fc3f7, 0.8);
+        light1.position.set(5, 5, 5);
+        scene.add(light1);
+        const light2 = new THREE.DirectionalLight(0xff8a80, 0.4);
+        light2.position.set(-5, -5, 5);
+        scene.add(light2);
+
+        // LENS: The extractor probe
+        const lensGroup = new THREE.Group();
+        const lensSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(0.06, 16, 16),
+            new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.9
+            })
+        );
+        const lensRing = new THREE.Mesh(
+            new THREE.RingGeometry(0.08, 0.12, 32),
+            new THREE.MeshBasicMaterial({
+                color: 0x4fc3f7,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.6
+            })
+        );
+        lensGroup.add(lensSphere);
+        lensGroup.add(lensRing);
+        scene.add(lensGroup);
+
+        const probeLine = new THREE.Line(
+            new THREE.BufferGeometry(),
+            new THREE.LineBasicMaterial({
+                color: 0x4fc3f7,
+                transparent: true,
+                opacity: 0.5
+            })
+        );
+        scene.add(probeLine);
+
+        // Extraction logic: ALL FROM GEOMETRY
+        let lensX = 0, lensY = 0;
+        const logContent = document.getElementById('logContent');
+
+        function extractFromManifold(x, y) {
+            x = THREE.MathUtils.clamp(x, -2, 2);
+            y = THREE.MathUtils.clamp(y, -2, 2);
+            const z = x * y; // No hard coding. This IS the extraction
+
+            lensGroup.position.set(x, y, z);
+            probeLine.geometry.setFromPoints([
+                new THREE.Vector3(x, y, z),
+                new THREE.Vector3(x, y, -4)
+            ]);
+
+            // Curvature = how "twisted" we are. Second derivative of xy = 0, so use distance from origin
+            const curvature = Math.abs(x) + Math.abs(y);
+
+            // Region classification from geometry alone
+            let region = "SADDLE";
+            if (Math.abs(z) < 0.5) region = "NEUTRAL";
+            else if (z > 2) region = "HIGH+ CORRELATION";
+            else if (z < -2) region = "HIGH- CORRELATION";
+            else if (curvature > 2.5) region = "UNSTABLE EDGE";
+
+            // Hue extracted from z
+            const hue = 180 - ((z + 4) / 8) * 180;
+
+            // Update transparent HUD
+            document.getElementById('xVal').textContent = x.toFixed(3);
+            document.getElementById('yVal').textContent = y.toFixed(3);
+            document.getElementById('zVal').textContent = z.toFixed(3);
+            document.getElementById('hueVal').textContent = hue.toFixed(0) + '°';
+            document.getElementById('curveVal').textContent = curvature.toFixed(2);
+            document.getElementById('regionVal').textContent = region;
+            document.getElementById('regionVal').className = curvature > 2.5? 'value alert' : 'value stable';
+
+            // Log the extraction: show the process
+            const entry = document.createElement('div');
+            entry.className = 'log-line';
+            entry.innerHTML = `[${new Date().toLocaleTimeString()}] Sample @ (${x.toFixed(2)}, ${y.toFixed(2)}) → z=${z.toFixed(2)} → ${region}`;
+            logContent.insertBefore(entry, logContent.firstChild);
+            if(logContent.children.length > 6) logContent.removeChild(logContent.lastChild);
+        }
+
+        // Interaction: move lens by dragging
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function updateLensFromMouse(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersect = raycaster.intersectObject(surface);
+            if(intersect.length > 0) {
+                lensX = intersect[0].point.x;
+                lensY = intersect[0].point.y;
+                extractFromManifold(lensX, lensY);
+            }
+        }
+
+        canvas.addEventListener('pointerdown', () => controls.autoRotate = false);
+        canvas.addEventListener('pointerup', () => controls.autoRotate = true);
+        canvas.addEventListener('pointermove', (e) => {
+            if(e.buttons === 1 || e.shiftKey) updateLensFromMouse(e);
+        });
+        canvas.addEventListener('click', updateLensFromMouse);
+
+        // Auto-sweep demo: show the lens extracting values
+        let autoTime = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            autoTime += 0.005;
+
+            // If user isn't interacting, auto-sweep the manifold
+            if(controls.autoRotate) {
+                lensX = Math.sin(autoTime * 1.3) * 1.8;
+                lensY = Math.cos(autoTime) * 1.8;
+                extractFromManifold(lensX, lensY);
+            }
+
+            lensGroup.rotation.z += 0.02;
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // Init
+        extractFromManifold(0, 0);
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

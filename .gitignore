@@ -1,0 +1,6 @@
+node_modules/
+*.backup
+*.backup_*.tar.gz
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bfx-ingest &middot; deterministic LLM context, open source</title>
+  <meta name="description"
+    content="bfx-ingest turns any codebase into clean, deterministic, token-efficient LLM context in one command. Open source, no dependencies, no network. Real benchmarks included.">
+  <link rel="canonical" href="https://butterflyfx.us/bfx-ingest.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://butterflyfx.us/bfx-ingest.html">
+  <meta property="og:title" content="bfx-ingest &middot; deterministic LLM context, open source">
+  <meta property="og:description" content="Turn any codebase into clean, deterministic, token-efficient LLM context in one command. Open source, no deps, no network.">
+
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    /* Page-scoped styling so the demos look right regardless of theme. */
+    .codeblock {
+      background: rgba(8, 12, 24, 0.72);
+      border: 1px solid rgba(120, 180, 255, 0.18);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      overflow-x: auto;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #d6e4ff;
+      margin: 0.6rem 0 0;
+    }
+    .codeblock .c { color: #35ff7a; }
+    .codeblock .k { color: #ffd700; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+    .stat-card {
+      background: rgba(14, 20, 38, 0.55);
+      border: 1px solid rgba(120, 180, 255, 0.16);
+      border-radius: 12px;
+      padding: 1.1rem 1.2rem;
+    }
+    .stat-num { font-size: 1.7rem; font-weight: 700; color: #58e0ff; line-height: 1.1; }
+    .stat-label { margin-top: 0.35rem; font-size: 0.9rem; opacity: 0.85; }
+    .downloads { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 0.6rem; }
+    .dl-card {
+      display: block;
+      background: rgba(14, 20, 38, 0.55);
+      border: 1px solid rgba(120, 180, 255, 0.16);
+      border-radius: 12px;
+      padding: 1.1rem 1.2rem;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s ease, transform 0.15s ease;
+    }
+    .dl-card:hover { border-color: #58e0ff; transform: translateY(-2px); }
+    .dl-fmt { font-weight: 700; color: #ffd700; }
+    .dl-desc { font-size: 0.88rem; opacity: 0.82; margin-top: 0.3rem; }
+    .honest { font-size: 0.92rem; opacity: 0.85; border-left: 3px solid rgba(53,255,122,0.6); padding-left: 0.9rem; margin-top: 1rem; }
+  </style>
+</head>
+
+<body>
+  <canvas id="spiral-bg"></canvas>
+
+  <nav class="navbar glass">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="method.html">Method</a>
+    <a href="bfx-ingest.html" class="active">bfx-ingest</a>
+    <a href="resume.html">Resume</a>
+    <a href="research.html">Research</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+
+  <div class="content">
+
+    <section class="hero glass">
+      <div class="hero-title">bfx-ingest</div>
+      <div class="hero-subtitle">Deterministic LLM context from any codebase &middot; in one command</div>
+      <div class="hero-tagline">
+        Feeding a repo to an AI is messy: you paste files by hand, blow the context window, and get a different blob
+        every time so you can't cache or reproduce it. <strong>bfx-ingest</strong> turns a whole codebase into one clean,
+        token-counted, verifiable context artifact. Open source. No dependencies. No network. Your code never leaves your machine.
+      </div>
+      <div class="hero-cta">
+        <a href="#install" class="cta-btn">Install &amp; use</a>
+        <a href="https://github.com/kenbin64/bfx-ingest" class="cta-btn alt" target="_blank" rel="noopener">View source on GitHub</a>
+        <a href="#examples" class="cta-btn alt">Download examples</a>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">The problem, and the fix</h2>
+      <div class="section-content">
+        <p>
+          Working with an LLM on real code means assembling context. Done by hand it is slow, incomplete, and
+          non-reproducible: you forget files, send the same vendored code twice, overflow the window, and can never
+          recreate the exact input you used yesterday. That breaks evals, wastes tokens, and misses the prompt cache.
+        </p>
+        <p>
+          <strong>bfx-ingest walks the folder, content-addresses every file, dedupes identical ones, and emits one
+          artifact in the shape your model wants (Markdown, XML, or JSON), with a token count and a reproducible root
+          hash.</strong> Same repo in, same bytes and same hash out, on any machine.
+        </p>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">Measured on a real 1,593-file repo</h2>
+      <div class="section-content">
+        <p>Numbers from actually running it, not a pitch. Counts are exact; token and cost figures are labelled estimates.</p>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-num">1 command</div>
+            <div class="stat-label">replaces hand-pasting 1,593 files (18.2M characters) into one artifact</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">~4.55M</div>
+            <div class="stat-label">tokens measured up front, so you scope before wasting a call</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">same hash</div>
+            <div class="stat-label">identical input gives the identical root hash, verified by re-running</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">~85%</div>
+            <div class="stat-label">of repeated-input cost turned into prompt-cache hits per session (illustrative)</div>
+          </div>
+        </div>
+        <p class="honest">
+          The dollar and token numbers are honest estimates (standard chars/4 heuristic, posted pricing, stated
+          assumptions); file, byte, and duplicate counts are exact. The full method and worked example are in the
+          <a class="card-link" href="https://github.com/kenbin64/bfx-ingest/blob/main/CASE_STUDY.md" target="_blank" rel="noopener">case study</a>.
+          Every figure is reproducible by re-running the included benchmark.
+        </p>
+      </div>
+    </section>
+
+    <section class="section glass" id="install">
+      <h2 class="section-title">Install and use</h2>
+      <div class="section-content">
+        <p>One command. Nothing to set up.</p>
+        <div class="codeblock"><span class="c"># the whole repo into Markdown context for GPT/Cursor</span>
+npx bfx-ingest ./my-project --format md --out context.md
+
+<span class="c"># Claude prefers XML; pipe straight to your clipboard</span>
+npx bfx-ingest ./src --format xml | clip
+
+<span class="c"># JSON for your own RAG / eval pipeline</span>
+npx bfx-ingest ./src --format json &gt; ctx.json</div>
+        <p style="margin-top:1rem;">
+          Options: <code>--format md|xml|json</code>, <code>--out FILE</code>, <code>--max-kb N</code>. It skips the usual
+          junk (<code>.git</code>, <code>node_modules</code>, build output, binaries, lockfiles) and honours a basic
+          <code>.gitignore</code>.
+        </p>
+      </div>
+    </section>
+
+    <section class="section glass" id="examples">
+      <h2 class="section-title">See exactly what it produces</h2>
+      <div class="section-content">
+        <p>
+          These are the real outputs of running bfx-ingest on a tiny 4-file demo project (two files are identical on
+          purpose, so you can watch dedup collapse them). Open source, downloadable, nothing hidden.
+        </p>
+        <div class="downloads">
+          <a class="dl-card" href="examples/demo-context.md" download>
+            <div class="dl-fmt">Markdown &darr;</div>
+            <div class="dl-desc">For GPT, Cursor, and humans. Fenced by language.</div>
+          </a>
+          <a class="dl-card" href="examples/demo-context.xml" download>
+            <div class="dl-fmt">XML &darr;</div>
+            <div class="dl-desc">Claude-shaped <code>&lt;file&gt;</code> tags.</div>
+          </a>
+          <a class="dl-card" href="examples/demo-context.json" download>
+            <div class="dl-fmt">JSON &darr;</div>
+            <div class="dl-desc">For your own RAG / eval pipeline. Carries the root hash.</div>
+          </a>
+        </div>
+        <p class="honest">
+          Notice all three share the same root hash and the same deduped file set. The duplicate
+          (<code>lib/util.js</code> = <code>helpers/util.js</code>) is collapsed to one body and referenced, not sent twice.
+        </p>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">Why you can trust it</h2>
+      <div class="pillars-grid">
+        <article class="pillar-card span-2x2">
+          <h3>No black box</h3>
+          <p>
+            The whole tool is one small, readable file of plain Node. No build step, nothing compiled or obfuscated,
+            MIT licensed. Read it before you run it.
+          </p>
+        </article>
+        <article class="pillar-card">
+          <h3>Local and offline</h3>
+          <p>Pure Node, zero dependencies, no network. Your code never leaves your machine.</p>
+        </article>
+        <article class="pillar-card">
+          <h3>Verify, don't trust</h3>
+          <p>Same repo in gives the same root hash out, on any machine. Re-run it and check, instead of taking my word.</p>
+        </article>
+        <article class="pillar-card">
+          <h3>Reproducible by design</h3>
+          <p>The hash and manifest prove exactly what the model saw, for evals, prompt caching, and provenance.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">About this project</h2>
+      <div class="section-content">
+        <p>
+          bfx-ingest is free and open source. It is a <strong>personal portfolio piece</strong>, built to demonstrate
+          the kind of reliable, reproducible, cost-efficient AI systems I build. It is not a commercial product or a
+          service for sale. I am seeking a full-time AI engineering role.
+        </p>
+        <div class="hero-cta">
+          <a href="contact.html" class="cta-btn">Contact for hiring</a>
+          <a href="mailto:ken.bingham64@gmail.com" class="cta-btn alt">ken.bingham64@gmail.com</a>
+          <a href="resume.html" class="cta-btn alt">Resume</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 Kenneth W. Bingham &middot; ButterflyFx &middot; bfx-ingest is MIT-licensed open source.</p>
+    </footer>
+  </div>
+
+  <script src="manifold-bg.js" defer></script>
+</body>
+
+</html>

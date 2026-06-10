@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research and writing &middot; Kenneth W. Bingham</title>
+  <meta name="description"
+    content="Independent research in geometric, representation-based computation (dimensional programming), with every claim labeled by how well it is supported, and links to the working, measured demonstrations.">
+  <meta name="keywords" content="dimensional programming, manifold, derive not store, AI reliability, independent research, geometric computation">
+  <meta name="author" content="Kenneth W. Bingham">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://butterflyfx.us/research.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://butterflyfx.us/research.html">
+  <meta property="og:title" content="Research and writing &middot; Kenneth W. Bingham">
+  <meta property="og:description" content="Independent research in geometric computation, every claim labeled by how well it is supported, with the working demonstrations linked.">
+  <meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
+
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="carousel.css">
+  <link rel="stylesheet" href="theme.css">
+</head>
+
+<body>
+  <canvas id="spiral-bg"></canvas>
+
+  <nav class="navbar glass">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="method.html">Method</a>
+    <a href="resume.html">Resume</a>
+    <a href="research.html" class="active">Research</a>
+    <a href="contact.html">Contact</a>
+    <a href="https://github.com/kenbin64" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+
+  <div class="content">
+
+    <header>
+      <h1>Research and writing</h1>
+      <h2>Independent research in geometric, representation-based computation</h2>
+      <h3>Dimensional programming, with every claim labeled by how well it is supported</h3>
+    </header>
+
+    <section class="section glass">
+      <div class="section-content">
+        <p style="opacity:0.9;line-height:1.7;">
+          This is independent research, done on my own initiative, into representing data as derivable geometry
+          (<b>dimensional programming</b>, built on <span style="font-family:ui-monospace,monospace">z = x &middot; y</span>
+          as an organizing manifold) so a system computes what it needs instead of storing and re-sending it. I hold it to
+          one rule: separate what is <b>established</b> from what is a <b>defensible model</b> from what is a
+          <b>conjecture under test</b>, and label every claim. The bold ideas stay bold; the honesty keeps them credible.
+        </p>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">The demonstrations (measured, you can re-run them)</h2>
+      <div class="pillars-grid">
+        <article class="pillar-card span-2x2">
+          <h3>Dimensional Programming API</h3>
+          <p>
+            A dependency-free library that represents data as nested points on the manifold and hands a model only the
+            slice it needs. Measured result: a roughly <b>99.7% token reduction</b> answering a localized question over a
+            large nested structure. The Russian Doll and Car hello-worlds run live, with the full API reference.
+          </p>
+          <a href="https://valuesai.online/dimensional-api.html" class="card-link" target="_blank" rel="noopener">Open the API and demos &rarr;</a>
+        </article>
+        <article class="pillar-card">
+          <h3>Derive, don't store</h3>
+          <p>
+            A whole field of values computed live from one small definition, with no array of values anywhere on the page,
+            plus the honest storage-versus-compute number and where it does not apply.
+          </p>
+          <a href="https://valuesai.online/derive.html" class="card-link" target="_blank" rel="noopener">Open the demonstration &rarr;</a>
+        </article>
+        <article class="pillar-card">
+          <h3>Hallucination verifier</h3>
+          <p>
+            The same discipline reduced to a number: a deterministic verifier took unsupported model output from about
+            <b>39% to 0%</b> while best-of-N kept the answer rate high. Open source, reproducible.
+          </p>
+          <a href="https://github.com/kenbin64" class="card-link" target="_blank" rel="noopener">Source on GitHub &rarr;</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">The essays (the ideas, with labeled boundaries)</h2>
+      <div class="pillars-grid">
+        <article class="pillar-card">
+          <h3>The Spiral and the Nested Point</h3>
+          <p>
+            Why fitting AI to geometry may help, the nested point as scale recursion, and the expansion-collapse rhythm of
+            <span style="font-family:ui-monospace,monospace">z = x &middot; y</span>. Each section tagged established,
+            defensible model, or conjecture under test.
+          </p>
+          <a href="https://dimensionalprogramming.com/the-spiral-and-the-nested-point.html" class="card-link" target="_blank" rel="noopener">Read it &rarr;</a>
+        </article>
+        <article class="pillar-card">
+          <h3>The SEAT and the Shadow</h3>
+          <p>
+            <span style="font-family:ui-monospace,monospace">z = x &middot; y&sup2;</span> as a real surface, the helix
+            behind a wave, and why a formula has a body. Offered as a conjecture and a lens, with the boundary to physics
+            kept bright on purpose.
+          </p>
+          <a href="https://dimensionalprogramming.com/the-seat-and-the-shadow.html" class="card-link" target="_blank" rel="noopener">Read it &rarr;</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <div class="section-content" style="opacity:0.85;">
+        <p>
+          <b>An honest note on scope.</b> The measured demonstrations above are real and reproducible. The larger thesis,
+          that representing data as geometry can reduce the drift and hallucination caused by paradigm mismatch, is a
+          conjecture under test, not a settled result, and it is presented that way. The geometry is an organizing
+          principle; it gives no raw compute speedup. The full theory, with claims labeled, lives at
+          <a href="https://dimensionalprogramming.com" target="_blank" rel="noopener">dimensionalprogramming.com</a>.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 Kenneth W. Bingham &middot; ButterflyFx</p>
+    </footer>
+  </div>
+
+  <script src="manifold-bg.js" defer></script>
+</body>
+
+</html>

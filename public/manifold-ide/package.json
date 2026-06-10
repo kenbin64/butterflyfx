@@ -1,0 +1,18 @@
+{
+  "name": "manifold-ide",
+  "version": "1.0.0",
+  "description": "Manifold IDE: a dimensional-programming workspace that runs on your machine.",
+  "main": "local-server.js",
+  "bin": {
+    "manifold-ide": "./local-server.js"
+  },
+  "scripts": {
+    "start": "node local-server.js",
+    "start:quiet": "node local-server.js --no-open"
+  },
+  "keywords": ["manifold", "dimensional-programming", "ide", "ai", "local"],
+  "author": "Kenneth Bingham <kenetics.art@gmail.com>",
+  "license": "SEE LICENSE IN ../LICENSE.md",
+  "engines": { "node": ">=18" },
+  "dependencies": {}
+}

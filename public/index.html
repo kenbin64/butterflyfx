@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kenneth W. Bingham &middot; AI Engineer, Backend &amp; Platform Engineer</title>
+  <meta name="description"
+    content="Kenneth W. Bingham, AI engineer focused on the reliability layer around LLMs: deterministic pipelines, evaluation and verification harnesses, reproducibility, and cost-efficiency. Open-source tools with real, reproducible numbers.">
+  <meta name="keywords" content="AI Engineer, LLM, RAG, evals, prompt caching, reproducibility, event sourcing, backend engineer, platform engineer, CI/CD, deterministic systems">
+  <meta name="author" content="Kenneth W. Bingham">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://butterflyfx.us/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://butterflyfx.us/">
+  <meta property="og:title" content="Kenneth W. Bingham &middot; AI Engineer, Backend &amp; Platform Engineer">
+  <meta property="og:description" content="The reliability layer around LLMs: deterministic, reproducible, cost-efficient systems. Open-source tools with real numbers.">
+  <meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
+
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://butterflyfx.us/">
+  <meta property="twitter:title" content="Kenneth W. Bingham &middot; AI Engineer, Backend &amp; Platform Engineer">
+  <meta property="twitter:description" content="The reliability layer around LLMs: deterministic, reproducible, cost-efficient systems. Open-source tools with real numbers.">
+  <meta property="twitter:image" content="https://butterflyfx.us/kennethbingham.jpg">
+
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="carousel.css">
+  <link rel="stylesheet" href="theme.css">
+</head>
+
+<body>
+  <canvas id="spiral-bg"></canvas>
+
+  <nav class="navbar glass">
+    <a href="index.html" class="active">Home</a>
+    <a href="about.html">About</a>
+    <a href="method.html">Method</a>
+    <a href="resume.html">Resume</a>
+    <a href="research.html">Research</a>
+    <a href="contact.html">Contact</a>
+    <a href="https://github.com/kenbin64" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+
+  <div class="content">
+
+    <!-- 1. WHO -->
+    <section class="hero glass">
+      <img src="kennethbingham.webp" alt="Kenneth W. Bingham" class="hero-photo" />
+      <div class="hero-title">Kenneth W. Bingham</div>
+      <div class="hero-subtitle">AI Engineer &middot; Backend &amp; Platform Engineer</div>
+      <div class="hero-role">10+ years &middot; Open to hybrid and remote</div>
+      <div class="hero-tagline">
+        I build the <b>reliability layer around AI</b>: deterministic pipelines, evaluation and verification harnesses,
+        and reproducible, cost-efficient systems. Everything below runs, is tested, and is open to read and re-run yourself.
+      </div>
+      <div class="hero-cta">
+        <a href="resume.html" class="cta-btn">View resume</a>
+        <a href="#work" class="cta-btn alt">See the work</a>
+        <a href="https://www.linkedin.com/in/kenneth-bingham-11378b10" class="cta-btn alt" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/kenbin64" class="cta-btn alt" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </section>
+
+    <!-- 2. PROOF -->
+    <section class="section glass" id="work">
+      <h2 class="section-title">Proof, not promises</h2>
+      <p style="margin:0 0 1.2em;opacity:0.88;">
+        Every project here is something I built end to end. Each names a standard pattern and a result you can verify.
+        Nothing asks to be trusted; it asks to be re-run.
+      </p>
+      <div class="projects-grid">
+
+        <div class="project-card">
+          <h3>bfx-ingest</h3>
+          <p class="project-summary">
+            A zero-dependency CLI that turns a codebase into clean, deterministic LLM context in one command. On a real
+            1,593-file repo it produced one verifiable artifact reported at ~4.55M tokens, so you scope before wasting a
+            call. Same input gives the same root hash, which makes context reproducible for evals and byte-identical for
+            prompt caching, cutting repeated input cost by roughly 85% in a typical session.
+          </p>
+          <ul class="project-tech">
+            <li>Content-addressed &middot; deterministic &middot; no deps, no network</li>
+            <li>Tested &middot; real benchmark included</li>
+          </ul>
+          <a href="bfx-ingest.html" class="cta-btn">See it, with real numbers</a>
+        </div>
+
+        <div class="project-card">
+          <h3>The Conduit</h3>
+          <p class="project-summary">
+            A water-system telemetry, health-monitoring, and compliance platform: one health number per station, a signed
+            go-live gate, a tamper-evident audit trail, and a dependency-free 3D network view with selectable system types.
+            Covered by 123 deterministic automated tests. Live and open to explore.
+          </p>
+          <ul class="project-tech">
+            <li>123 deterministic tests &middot; signed go-live gate</li>
+            <li>Tamper-evident audit &middot; plain JavaScript, no frameworks</li>
+          </ul>
+          <a href="https://theconduit.me" class="cta-btn" target="_blank" rel="noopener">Open the live demo</a>
+        </div>
+
+        <div class="project-card">
+          <h3>Deterministic multiplayer netcode</h3>
+          <p class="project-summary">
+            Real-time multiplayer where game state is derived from a seed and an append-only command log, so every client
+            replays identical events and converges on byte-identical state, eliminating an entire class of state-divergence
+            bugs. Fast Track verifies 503 legal paths with 0 teleports. Live as a playable demo at KensGames.
+          </p>
+          <ul class="project-tech">
+            <li>Event sourcing &middot; deterministic lockstep</li>
+            <li>WebGL2 / Three.js &middot; Node / WebSocket &middot; Linux VPS</li>
+          </ul>
+          <a href="https://kensgames.com" class="cta-btn" target="_blank" rel="noopener">Play the demo</a>
+        </div>
+
+        <div class="project-card">
+          <h3>Zero-downtime deployment system</h3>
+          <p class="project-summary">
+            An atomic, content-addressed release pipeline: each deploy is hashed into a verifiable manifest, promoted by an
+            atomic symlink swap, health-checked, and automatically rolled back on failure. It replaced in-place deploys that
+            left a site broken on partial failure with immutable releases and one-command rollback.
+          </p>
+          <ul class="project-tech">
+            <li>Atomic releases &middot; health-gated auto-rollback</li>
+            <li>GitHub Actions CI/CD across multiple domains</li>
+          </ul>
+          <a href="https://github.com/kenbin64" class="cta-btn" target="_blank" rel="noopener">Source on GitHub</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. HOW + VISION -->
+    <section class="section glass" id="approach">
+      <h2 class="section-title">How I work, and where it is going</h2>
+      <div class="section-content">
+        <p style="opacity:0.9;line-height:1.7;">
+          I get this reliability out of stock models by <b>directing</b> them, not hoping. Explicit operating directives,
+          hard constraints, and a verification pass at each step keep a model on track and out of drift. Reduced to a
+          single number, that discipline took a verifier's hallucinated output from about <b>39% to 0%</b> while keeping
+          the answer rate high.
+        </p>
+        <p style="opacity:0.9;line-height:1.7;">
+          Since August 2025, on my own initiative, I have gone past <i>using</i> AI into how it works and how to optimize
+          it, and I am developing an original framework for it: <b>dimensional programming</b>, representing data as
+          derivable geometry so a model reads only what it needs instead of being handed everything. It is demonstrated,
+          not just claimed. A dependency-free API measures a roughly <b>99.7% token reduction</b> answering localized
+          questions over a large nested structure. The ideas are mine; every claim is published with a clear label for how
+          well it is supported, so the bold parts stay bold and the whole thing stays honest.
+        </p>
+        <div class="hero-cta" style="margin-top:1.2em;">
+          <a href="https://valuesai.online" class="cta-btn" target="_blank" rel="noopener">See the API and live demos</a>
+          <a href="https://dimensionalprogramming.com" class="cta-btn alt" target="_blank" rel="noopener">Read the theory</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. SKILLS -->
+    <section class="section glass">
+      <h2 class="section-title">Core skills</h2>
+      <div class="pillars-grid">
+        <article class="pillar-card span-2x2">
+          <h3>Reliability around an unreliable model</h3>
+          <p>
+            The model is nondeterministic; the system around it must not be. Schema-validated outputs, retry budgets,
+            verifier passes, and evaluation harnesses, so malformed or drifting output never reaches the next stage.
+          </p>
+        </article>
+        <article class="pillar-card">
+          <h3>AI / LLM</h3>
+          <p>LLM integration, RAG, evals, structured outputs, tool / function calling, model routing, prompt caching, token budgeting; self-hosted local models.</p>
+        </article>
+        <article class="pillar-card">
+          <h3>Backend &amp; infrastructure</h3>
+          <p>Node.js, Python, C# / .NET, Java, REST, WebSockets, PostgreSQL, SQL Server, SQLite, Linux, nginx, Docker, CI/CD, zero-downtime deploys.</p>
+        </article>
+        <article class="pillar-card">
+          <h3>Cost and latency</h3>
+          <p>Route cheap calls to cheap models, cache byte-identical context, budget tokens, so frontier spend goes only where frontier reasoning is required.</p>
+        </article>
+        <article class="pillar-card">
+          <h3>Reproducibility &amp; provenance</h3>
+          <p>Content-addressed, hash-verified, deterministic replay, so you can prove exactly what a system did and recreate it on any machine.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 5. HIRING -->
+    <section class="section glass">
+      <h2 class="section-title">Looking for my next role</h2>
+      <div class="section-content">
+        <p>
+          I am seeking a full-time AI engineering or backend / platform role, open to hybrid and remote. The projects on
+          this site are <b>personal portfolio pieces</b>, built end to end to demonstrate the work above. They are not
+          commercial products or services for sale.
+        </p>
+        <div class="hero-cta">
+          <a href="contact.html" class="cta-btn">Contact for hiring</a>
+          <a href="resume.html" class="cta-btn alt">Resume</a>
+          <a href="research.html" class="cta-btn alt">Research and writing</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 Kenneth W. Bingham &middot; ButterflyFx</p>
+    </footer>
+  </div>
+
+  <script src="manifold-bg.js" defer></script>
+</body>
+
+</html>
