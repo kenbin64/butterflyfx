@@ -4,3 +4,8 @@ node_modules/
 .DS_Store
 Thumbs.db
 *.log
+
+# NEVER commit TLS private keys or the server ssl dir (lives on the VPS only)
+nginx/ssl/
+*.key
+*.pem
