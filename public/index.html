@@ -1,216 +1,337 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kenneth W. Bingham &middot; AI Engineer, Backend &amp; Platform Engineer</title>
-  <meta name="description"
-    content="Kenneth W. Bingham, AI engineer focused on the reliability layer around LLMs: deterministic pipelines, evaluation and verification harnesses, reproducibility, and cost-efficiency. Open-source tools with real, reproducible numbers.">
-  <meta name="keywords" content="AI Engineer, LLM, RAG, evals, prompt caching, reproducibility, event sourcing, backend engineer, platform engineer, CI/CD, deterministic systems">
-  <meta name="author" content="Kenneth W. Bingham">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://butterflyfx.us/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kenneth W. Bingham · AI Reliability, Backend &amp; Platform Engineer</title>
+<meta name="description" content="Kenneth W. Bingham builds the reliability layer around AI: deterministic pipelines, evaluation and verification harnesses, reproducible and cost-efficient systems. Open tools with real, re-runnable numbers.">
+<meta name="author" content="Kenneth W. Bingham">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://butterflyfx.us/">
+<meta property="og:title" content="Kenneth W. Bingham · AI Reliability, Backend &amp; Platform Engineer">
+<meta property="og:description" content="The reliability layer around AI: deterministic, reproducible, cost-efficient systems. Open tools with real numbers.">
+<meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:image" content="https://butterflyfx.us/kennethbingham.jpg">
+<style>
+/* ===== Butterflyfx hub - golden-ratio layout, Schwarz-Diamond backdrop ===== */
+:root{
+  --bg:#06070f;
+  --panel:rgba(13,18,30,0.66);
+  --panel-solid:#0c1018;
+  --edge:rgba(255,255,255,0.10);
+  --txt:#eaf1f8; --mut:#9fb0c4; --dim:#6c7c90;
+  --cyan:#7cf3ff; --purple:#c79aff; --green:#5fe39a; --gold:#e3b86b; --white:#f2f6fb;
+  /* golden-ratio spacing scale (powers of phi) */
+  --s0:.382rem; --s1:.618rem; --s2:1rem; --s3:1.618rem; --s4:2.618rem; --s5:4.236rem; --s6:6.854rem;
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font-family:"Segoe UI",system-ui,-apple-system,sans-serif;line-height:1.62;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+#bg{position:fixed;inset:0;z-index:0;display:block}
+.shell{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:0 var(--s3)}
+a{color:var(--cyan);text-decoration:none}
 
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://butterflyfx.us/">
-  <meta property="og:title" content="Kenneth W. Bingham &middot; AI Engineer, Backend &amp; Platform Engineer">
-  <meta property="og:description" content="The reliability layer around LLMs: deterministic, reproducible, cost-efficient systems. Open-source tools with real numbers.">
-  <meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
+/* nav */
+nav{position:sticky;top:0;z-index:5;backdrop-filter:blur(14px);
+  background:rgba(8,10,18,0.55);border-bottom:1px solid var(--edge)}
+nav .row{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;gap:var(--s2);
+  padding:var(--s1) var(--s3);flex-wrap:wrap}
+nav .brand{font-weight:800;letter-spacing:.5px;margin-right:auto;font-size:1rem}
+nav .brand span{color:var(--gold)}
+nav a{color:var(--mut);font-size:.92rem;padding:.2rem 0;border-bottom:2px solid transparent}
+nav a:hover,nav a.active{color:var(--txt);border-bottom-color:var(--cyan)}
 
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://butterflyfx.us/">
-  <meta property="twitter:title" content="Kenneth W. Bingham &middot; AI Engineer, Backend &amp; Platform Engineer">
-  <meta property="twitter:description" content="The reliability layer around LLMs: deterministic, reproducible, cost-efficient systems. Open-source tools with real numbers.">
-  <meta property="twitter:image" content="https://butterflyfx.us/kennethbingham.jpg">
+/* panels with the palette signature */
+.panel{position:relative;background:var(--panel);backdrop-filter:blur(12px);
+  border:1px solid var(--edge);border-radius:18px;padding:var(--s4);
+  margin:var(--s3) 0;overflow:hidden;box-shadow:0 24px 60px -40px #000}
+.panel::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--green),var(--gold),var(--purple));opacity:.75}
+h1,h2,h3{line-height:1.18;margin:0 0 var(--s1)}
+.kicker{font-family:ui-monospace,monospace;font-size:.74rem;letter-spacing:2px;
+  text-transform:uppercase;color:var(--cyan);margin-bottom:var(--s1)}
+.sect-title{font-size:1.5rem;color:var(--white)}
+.lede{color:var(--mut);max-width:64ch}.lede b{color:var(--txt)}
 
-  <link rel="stylesheet" href="fonts.css">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="carousel.css">
-  <link rel="stylesheet" href="theme.css">
+/* hero */
+.hero{display:grid;grid-template-columns:1fr;gap:var(--s2);margin-top:var(--s4)}
+.hero .photo{width:96px;height:96px;border-radius:50%;object-fit:cover;
+  border:2px solid var(--gold);box-shadow:0 0 36px -8px var(--gold)}
+.hero h1{font-size:2.3rem;letter-spacing:-.5px}
+.hero .sub{color:var(--gold);font-family:ui-monospace,monospace;font-size:.95rem;letter-spacing:.5px}
+.hero .role{color:var(--dim);font-size:.86rem}
+.hero .tag{color:var(--txt);font-size:1.08rem;max-width:62ch;margin-top:var(--s1)}
+.cta{display:flex;gap:var(--s1);flex-wrap:wrap;margin-top:var(--s2)}
+.btn{display:inline-block;border-radius:11px;padding:.6rem 1.25rem;font-size:.92rem;font-weight:600;
+  border:1px solid var(--cyan);color:var(--cyan);background:rgba(124,243,255,.07);transition:.15s}
+.btn:hover{background:rgba(124,243,255,.16)}
+.btn.primary{background:var(--cyan);color:#06121f;border-color:var(--cyan)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.alt{border-color:var(--edge);color:var(--txt);background:rgba(255,255,255,.04)}
+.btn.alt:hover{border-color:var(--purple);color:var(--purple)}
+
+/* project grid - golden proportion cards */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s3);margin-top:var(--s3)}
+.card{background:rgba(10,14,24,.6);border:1px solid var(--edge);border-radius:14px;
+  padding:var(--s3);border-left:3px solid var(--cyan)}
+.card:nth-child(2){border-left-color:var(--green)}
+.card:nth-child(3){border-left-color:var(--gold)}
+.card:nth-child(4){border-left-color:var(--purple)}
+.card h3{font-size:1.12rem;color:var(--white)}
+.card .num{font-family:ui-monospace,monospace;color:var(--cyan);font-size:.8rem;
+  display:block;margin:.2rem 0 var(--s1)}
+.card p{color:var(--mut);font-size:.94rem;margin:0 0 var(--s1)}
+.card .tags{font-size:.78rem;color:var(--dim);font-family:ui-monospace,monospace;margin-bottom:var(--s2)}
+.card a.go{font-size:.88rem;font-weight:600}
+
+/* pillars */
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s2);margin-top:var(--s3)}
+.pillar{background:rgba(10,14,24,.5);border:1px solid var(--edge);border-radius:12px;padding:var(--s2)}
+.pillar.wide{grid-column:span 3;border-top:2px solid var(--gold)}
+.pillar h3{font-size:1rem;color:var(--white)}
+.pillar p{color:var(--mut);font-size:.88rem;margin:0}
+
+/* the network */
+.net{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s2);margin-top:var(--s3)}
+.node{display:block;background:rgba(10,14,24,.55);border:1px solid var(--edge);border-radius:12px;
+  padding:var(--s2);transition:.15s}
+.node:hover{transform:translateY(-2px);border-color:var(--cyan)}
+.node .n{font-weight:700;color:var(--white);font-size:.98rem}
+.node .d{color:var(--mut);font-size:.82rem;margin-top:.2rem}
+.node .u{color:var(--cyan);font-size:.74rem;font-family:ui-monospace,monospace;margin-top:.4rem;display:block}
+
+.note{color:var(--dim);font-size:.84rem;margin-top:var(--s2)}
+footer{text-align:center;color:var(--dim);font-size:.82rem;padding:var(--s4) 0 var(--s5);line-height:1.7}
+.credit{max-width:70ch;margin:var(--s2) auto 0;color:#5c6b7c;font-size:.76rem}
+
+@media(max-width:760px){
+  :root{--s4:1.8rem;--s5:2.8rem}
+  .grid,.pillars,.net{grid-template-columns:1fr}
+  .pillar.wide{grid-column:span 1}
+  .hero h1{font-size:1.8rem}
+  .sect-title{font-size:1.28rem}
+}
+</style>
 </head>
-
 <body>
-  <canvas id="spiral-bg"></canvas>
+<canvas id="bg"></canvas>
 
-  <nav class="navbar glass">
-    <a href="index.html" class="active">Home</a>
-    <a href="about.html">About</a>
-    <a href="method.html">Method</a>
-    <a href="resume.html">Resume</a>
-    <a href="research.html">Research</a>
-    <a href="contact.html">Contact</a>
-    <a href="https://github.com/kenbin64" target="_blank" rel="noopener">GitHub</a>
-  </nav>
+<nav><div class="row">
+  <span class="brand">⨳ Butterfly<span>fx</span></span>
+  <a href="index.html" class="active">Home</a>
+  <a href="about.html">About</a>
+  <a href="method.html">Method</a>
+  <a href="resume.html">Resume</a>
+  <a href="research.html">Research</a>
+  <a href="contact.html">Contact</a>
+  <a href="https://github.com/kenbin64" target="_blank" rel="noopener">GitHub</a>
+</div></nav>
 
-  <div class="content">
+<div class="shell">
 
-    <!-- 1. WHO -->
-    <section class="hero glass">
-      <img src="kennethbingham.webp" alt="Kenneth W. Bingham" class="hero-photo" />
-      <div class="hero-title">Kenneth W. Bingham</div>
-      <div class="hero-subtitle">AI Engineer &middot; Backend &amp; Platform Engineer</div>
-      <div class="hero-role">10+ years &middot; Open to hybrid and remote</div>
-      <div class="hero-tagline">
-        I build the <b>reliability layer around AI</b>: deterministic pipelines, evaluation and verification harnesses,
-        and reproducible, cost-efficient systems. Everything below runs, is tested, and is open to read and re-run yourself.
+  <!-- HERO -->
+  <section class="panel hero">
+    <img src="kennethbingham.webp" alt="Kenneth W. Bingham" class="photo">
+    <div class="kicker">Butterflyfx · small inputs, large effects</div>
+    <h1>Kenneth W. Bingham</h1>
+    <div class="sub">AI Reliability · Backend &amp; Platform Engineer</div>
+    <div class="role">10+ years · open to hybrid and remote</div>
+    <p class="tag">I build the <b>reliability layer around AI</b>: deterministic pipelines, evaluation and
+      verification harnesses, and reproducible, cost-efficient systems. Everything below <b>runs, is tested, and is
+      open to re-run yourself</b> - no claim that isn't demonstrated.</p>
+    <div class="cta">
+      <a href="resume.html" class="btn primary">View resume</a>
+      <a href="#work" class="btn alt">See the work</a>
+      <a href="https://www.linkedin.com/in/kenneth-bingham-11378b10" class="btn alt" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/kenbin64" class="btn alt" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </section>
+
+  <!-- PROOF -->
+  <section class="panel" id="work">
+    <div class="kicker">The work</div>
+    <h2 class="sect-title">Proof, not promises</h2>
+    <p class="lede">Every project is something I built end to end. Each names a standard pattern and a result you can
+      verify. Nothing asks to be trusted - it asks to be re-run.</p>
+    <div class="grid">
+
+      <div class="card">
+        <h3>bfx-ingest</h3>
+        <span class="num">~4.55M tokens measured · ~85% repeat-input cost cut</span>
+        <p>A zero-dependency CLI that turns a codebase into clean, deterministic LLM context in one command. On a real
+          1,593-file repo it produced one verifiable artifact, so you scope before wasting a call. Same input → same root
+          hash, making context reproducible for evals and byte-identical for prompt caching.</p>
+        <div class="tags">content-addressed · deterministic · no deps, no network · tested</div>
+        <a class="go" href="bfx-ingest.html">See it, with real numbers →</a>
       </div>
-      <div class="hero-cta">
-        <a href="resume.html" class="cta-btn">View resume</a>
-        <a href="#work" class="cta-btn alt">See the work</a>
-        <a href="https://www.linkedin.com/in/kenneth-bingham-11378b10" class="cta-btn alt" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://github.com/kenbin64" class="cta-btn alt" target="_blank" rel="noopener">GitHub</a>
+
+      <div class="card">
+        <h3>The Conduit</h3>
+        <span class="num">123 deterministic tests · signed go-live gate</span>
+        <p>A water-system telemetry, health-monitoring and compliance platform: one health number per station, a signed
+          go-live gate, a tamper-evident audit trail, and a dependency-free 3D network view. Live and open to explore.</p>
+        <div class="tags">tamper-evident audit · plain JavaScript, no frameworks</div>
+        <a class="go" href="https://theconduit.me" target="_blank" rel="noopener">Open the live demo →</a>
       </div>
-    </section>
 
-    <!-- 2. PROOF -->
-    <section class="section glass" id="work">
-      <h2 class="section-title">Proof, not promises</h2>
-      <p style="margin:0 0 1.2em;opacity:0.88;">
-        Every project here is something I built end to end. Each names a standard pattern and a result you can verify.
-        Nothing asks to be trusted; it asks to be re-run.
-      </p>
-      <div class="projects-grid">
-
-        <div class="project-card">
-          <h3>bfx-ingest</h3>
-          <p class="project-summary">
-            A zero-dependency CLI that turns a codebase into clean, deterministic LLM context in one command. On a real
-            1,593-file repo it produced one verifiable artifact reported at ~4.55M tokens, so you scope before wasting a
-            call. Same input gives the same root hash, which makes context reproducible for evals and byte-identical for
-            prompt caching, cutting repeated input cost by roughly 85% in a typical session.
-          </p>
-          <ul class="project-tech">
-            <li>Content-addressed &middot; deterministic &middot; no deps, no network</li>
-            <li>Tested &middot; real benchmark included</li>
-          </ul>
-          <a href="bfx-ingest.html" class="cta-btn">See it, with real numbers</a>
-        </div>
-
-        <div class="project-card">
-          <h3>The Conduit</h3>
-          <p class="project-summary">
-            A water-system telemetry, health-monitoring, and compliance platform: one health number per station, a signed
-            go-live gate, a tamper-evident audit trail, and a dependency-free 3D network view with selectable system types.
-            Covered by 123 deterministic automated tests. Live and open to explore.
-          </p>
-          <ul class="project-tech">
-            <li>123 deterministic tests &middot; signed go-live gate</li>
-            <li>Tamper-evident audit &middot; plain JavaScript, no frameworks</li>
-          </ul>
-          <a href="https://theconduit.me" class="cta-btn" target="_blank" rel="noopener">Open the live demo</a>
-        </div>
-
-        <div class="project-card">
-          <h3>Deterministic multiplayer netcode</h3>
-          <p class="project-summary">
-            Real-time multiplayer where game state is derived from a seed and an append-only command log, so every client
-            replays identical events and converges on byte-identical state, eliminating an entire class of state-divergence
-            bugs. Fast Track verifies 503 legal paths with 0 teleports. Live as a playable demo at KensGames.
-          </p>
-          <ul class="project-tech">
-            <li>Event sourcing &middot; deterministic lockstep</li>
-            <li>WebGL2 / Three.js &middot; Node / WebSocket &middot; Linux VPS</li>
-          </ul>
-          <a href="https://kensgames.com" class="cta-btn" target="_blank" rel="noopener">Play the demo</a>
-        </div>
-
-        <div class="project-card">
-          <h3>Zero-downtime deployment system</h3>
-          <p class="project-summary">
-            An atomic, content-addressed release pipeline: each deploy is hashed into a verifiable manifest, promoted by an
-            atomic symlink swap, health-checked, and automatically rolled back on failure. It replaced in-place deploys that
-            left a site broken on partial failure with immutable releases and one-command rollback.
-          </p>
-          <ul class="project-tech">
-            <li>Atomic releases &middot; health-gated auto-rollback</li>
-            <li>GitHub Actions CI/CD across multiple domains</li>
-          </ul>
-          <a href="https://github.com/kenbin64" class="cta-btn" target="_blank" rel="noopener">Source on GitHub</a>
-        </div>
-
+      <div class="card">
+        <h3>Deterministic multiplayer netcode</h3>
+        <span class="num">503 legal paths verified · 0 teleports</span>
+        <p>Real-time multiplayer where state is derived from a seed and an append-only command log, so every client
+          replays identical events and converges on byte-identical state - eliminating a whole class of divergence bugs.</p>
+        <div class="tags">event sourcing · deterministic lockstep · WebGL2 · Node/WebSocket</div>
+        <a class="go" href="https://kensgames.com" target="_blank" rel="noopener">Play the demo →</a>
       </div>
-    </section>
 
-    <!-- 3. HOW + VISION -->
-    <section class="section glass" id="approach">
-      <h2 class="section-title">How I work, and where it is going</h2>
-      <div class="section-content">
-        <p style="opacity:0.9;line-height:1.7;">
-          I get this reliability out of stock models by <b>directing</b> them, not hoping. Explicit operating directives,
-          hard constraints, and a verification pass at each step keep a model on track and out of drift. Reduced to a
-          single number, that discipline took a verifier's hallucinated output from about <b>39% to 0%</b> while keeping
-          the answer rate high. The point is not a <b>smarter</b> model, which understandably makes people wary; it is a
-          <b>cheaper and more reliable</b> one. I focus my instance of it; the provider's model itself is untouched.
-        </p>
-        <p style="opacity:0.9;line-height:1.7;">
-          Since August 2025, on my own initiative, I have gone past <i>using</i> AI into how it works and how to optimize
-          it, and I am developing an original framework for it: <b>dimensional programming</b>, representing data as
-          derivable geometry so a model reads only what it needs instead of being handed everything. It is demonstrated,
-          not just claimed. A dependency-free API measures a roughly <b>99.7% token reduction</b> answering localized
-          questions over a large nested structure. The ideas are mine; every claim is published with a clear label for how
-          well it is supported, so the bold parts stay bold and the whole thing stays honest.
-        </p>
-        <div class="hero-cta" style="margin-top:1.2em;">
-          <a href="https://valuesai.online" class="cta-btn" target="_blank" rel="noopener">See the API and live demos</a>
-          <a href="https://dimensionalprogramming.com" class="cta-btn alt" target="_blank" rel="noopener">Read the theory</a>
-        </div>
+      <div class="card">
+        <h3>Zero-downtime deployment system</h3>
+        <span class="num">atomic releases · health-gated auto-rollback</span>
+        <p>A content-addressed release pipeline: each deploy is hashed into a verifiable manifest, promoted by an atomic
+          symlink swap, health-checked, and rolled back automatically on failure. Immutable releases, one-command rollback.</p>
+        <div class="tags">GitHub Actions CI/CD across multiple domains</div>
+        <a class="go" href="https://github.com/kenbin64" target="_blank" rel="noopener">Source on GitHub →</a>
       </div>
-    </section>
 
-    <!-- 4. SKILLS -->
-    <section class="section glass">
-      <h2 class="section-title">Core skills</h2>
-      <div class="pillars-grid">
-        <article class="pillar-card span-2x2">
-          <h3>Reliability around an unreliable model</h3>
-          <p>
-            The model is nondeterministic; the system around it must not be. Schema-validated outputs, retry budgets,
-            verifier passes, and evaluation harnesses, so malformed or drifting output never reaches the next stage.
-          </p>
-        </article>
-        <article class="pillar-card">
-          <h3>AI / LLM</h3>
-          <p>LLM integration, RAG, evals, structured outputs, tool / function calling, model routing, prompt caching, token budgeting; self-hosted local models.</p>
-        </article>
-        <article class="pillar-card">
-          <h3>Backend &amp; infrastructure</h3>
-          <p>Node.js, Python, C# / .NET, Java, REST, WebSockets, PostgreSQL, SQL Server, SQLite, Linux, nginx, Docker, CI/CD, zero-downtime deploys.</p>
-        </article>
-        <article class="pillar-card">
-          <h3>Cost and latency</h3>
-          <p>Route cheap calls to cheap models, cache byte-identical context, budget tokens, so frontier spend goes only where frontier reasoning is required.</p>
-        </article>
-        <article class="pillar-card">
-          <h3>Reproducibility &amp; provenance</h3>
-          <p>Content-addressed, hash-verified, deterministic replay, so you can prove exactly what a system did and recreate it on any machine.</p>
-        </article>
-      </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- 5. HIRING -->
-    <section class="section glass">
-      <h2 class="section-title">Looking for my next role</h2>
-      <div class="section-content">
-        <p>
-          I am seeking a full-time AI engineering or backend / platform role, open to hybrid and remote. The projects on
-          this site are <b>personal portfolio pieces</b>, built end to end to demonstrate the work above. They are not
-          commercial products or services for sale.
-        </p>
-        <div class="hero-cta">
-          <a href="contact.html" class="cta-btn">Contact for hiring</a>
-          <a href="resume.html" class="cta-btn alt">Resume</a>
-          <a href="research.html" class="cta-btn alt">Research and writing</a>
-        </div>
-      </div>
-    </section>
+  <!-- HOW + VISION -->
+  <section class="panel" id="approach">
+    <div class="kicker">How I get it</div>
+    <h2 class="sect-title">Reliability out of a model you don't control</h2>
+    <p class="lede">I get reliability from stock models by <b>directing</b> them, not hoping. Explicit operating
+      directives, hard constraints, and a verification pass at each step keep a model on track and out of drift. Reduced
+      to one number, that discipline took a verifier's hallucinated output from about <b>39% to 0%</b> on a tested task
+      while keeping the answer rate high. Not a <b>smarter</b> model - a <b>cheaper and more reliable</b> one. I focus my
+      instance of it; the provider's model is untouched.</p>
+    <p class="lede" style="margin-top:var(--s2)">Since August 2025, on my own initiative, I went past <i>using</i> AI
+      into how it works and how to optimize it, and I'm building an original framework: <b>dimensional programming</b>  - 
+      representing data as derivable geometry so a model reads only what it needs. Demonstrated, not just claimed: a
+      dependency-free API measures a roughly <b>99.7% token reduction</b> answering localized questions over a large
+      nested structure. The ideas are mine; every claim is published with a label for how well it's supported.</p>
+    <div class="cta">
+      <a href="https://valuesai.online" class="btn primary" target="_blank" rel="noopener">See the API &amp; live demos</a>
+      <a href="https://dimensionalprogramming.com" class="btn alt" target="_blank" rel="noopener">Read the theory</a>
+    </div>
+  </section>
 
-    <footer>
-      <p>&copy; 2026 Kenneth W. Bingham &middot; ButterflyFx</p>
-    </footer>
-  </div>
+  <!-- SKILLS -->
+  <section class="panel">
+    <div class="kicker">Core skills</div>
+    <h2 class="sect-title">What I bring</h2>
+    <div class="pillars">
+      <article class="pillar wide">
+        <h3>Reliability around an unreliable model</h3>
+        <p>The model is nondeterministic; the system around it must not be. Schema-validated outputs, retry budgets,
+          verifier passes, and evaluation harnesses, so malformed or drifting output never reaches the next stage.</p>
+      </article>
+      <article class="pillar"><h3>AI / LLM</h3><p>LLM integration, RAG, evals, structured outputs, tool/function calling, model routing, prompt caching, token budgeting; self-hosted local models.</p></article>
+      <article class="pillar"><h3>Backend &amp; infrastructure</h3><p>Node.js, Python, C#/.NET, Java, REST, WebSockets, PostgreSQL, SQL Server, SQLite, Linux, nginx, Docker, CI/CD, zero-downtime deploys.</p></article>
+      <article class="pillar"><h3>Cost &amp; latency</h3><p>Route cheap calls to cheap models, cache byte-identical context, budget tokens, so frontier spend goes only where frontier reasoning is required.</p></article>
+      <article class="pillar"><h3>Reproducibility &amp; provenance</h3><p>Content-addressed, hash-verified, deterministic replay, so you can prove exactly what a system did and recreate it on any machine.</p></article>
+      <article class="pillar"><h3>The honest discipline</h3><p>Every claim is demonstrated in tested code and labeled for how well it's supported. The bold parts stay bold; the whole stays honest.</p></article>
+    </div>
+  </section>
 
-  <script src="manifold-bg.js" defer></script>
+  <!-- THE NETWORK -->
+  <section class="panel">
+    <div class="kicker">The butterfly effect</div>
+    <h2 class="sect-title">One banner, many small causes</h2>
+    <p class="lede">Everything I build runs on one idea - <b>small inputs, large effects</b>: a tiny rule, derived into
+      vast structure. Each site below is one instance of it, all under the Butterflyfx banner.</p>
+    <div class="net">
+      <a class="node" href="https://valuesai.online" target="_blank" rel="noopener"><div class="n">The Lab</div><div class="d">Live, free, no-AI browser tools - token minimizer, hardener, dimensional linter, derive demo, manifolds.</div><span class="u">valuesai.online</span></a>
+      <a class="node" href="https://dimensionalprogramming.com" target="_blank" rel="noopener"><div class="n">The Framework</div><div class="d">Dimensional programming - thinking in shapes and actions, the theory behind the tools.</div><span class="u">dimensionalprogramming.com</span></a>
+      <a class="node" href="https://tetracubedb.com" target="_blank" rel="noopener"><div class="n">TetraCubeDB</div><div class="d">A manifold database: store the rule, derive on observation, lowest possible storage.</div><span class="u">tetracubedb.com</span></a>
+      <a class="node" href="https://schwartzdiamond.com" target="_blank" rel="noopener"><div class="n">Schwarz Diamond</div><div class="d">The principle: minimal material, maximum surface - more from less, proven.</div><span class="u">schwartzdiamond.com</span></a>
+      <a class="node" href="https://kensgames.com" target="_blank" rel="noopener"><div class="n">Kens Games</div><div class="d">Deterministic multiplayer games - state derived from a seed, byte-identical across clients.</div><span class="u">kensgames.com</span></a>
+      <a class="node" href="https://theconduit.me" target="_blank" rel="noopener"><div class="n">The Conduit</div><div class="d">Water-system telemetry, health, and compliance - 123 tests, signed go-live gate.</div><span class="u">theconduit.me</span></a>
+    </div>
+    <p class="note">More sites in the family (Kenetic Arts - an immersive 3D art gallery; the geometry showcase) are in progress.</p>
+  </section>
+
+  <!-- HIRING -->
+  <section class="panel">
+    <div class="kicker">Availability</div>
+    <h2 class="sect-title">Looking for my next role</h2>
+    <p class="lede">Seeking a full-time AI engineering or backend / platform role, open to hybrid and remote. The projects
+      here are <b>personal portfolio pieces</b>, built end to end to demonstrate the work above - not commercial products
+      for sale.</p>
+    <div class="cta">
+      <a href="contact.html" class="btn primary">Contact for hiring</a>
+      <a href="resume.html" class="btn alt">Resume</a>
+      <a href="research.html" class="btn alt">Research &amp; writing</a>
+    </div>
+  </section>
+
+  <footer>
+    © 2026 Kenneth W. Bingham · Butterflyfx
+    <div class="credit">Concept and direction: Kenneth W. Bingham. Built with the help of Claude AI under a standing
+      directive to be skeptical, to insist on proof, and to allow no claim that is not demonstrated in tested code. The
+      ideas are the author's; the AI implemented and verified them, it did not originate them.</div>
+  </footer>
+</div>
+
+<script>
+/* ===== Schwarz Diamond + starfield backdrop, mouse-traversable ===== */
+(function () {
+  var cv = document.getElementById('bg'), x = cv.getContext('2d'), W, H, t = 0, stars = [];
+  var mx = 0, my = 0, tmx = 0, tmy = 0;                 // eased mouse-drive
+  function resize() { W = cv.width = innerWidth; H = cv.height = innerHeight; initStars(); }
+  function initStars() {
+    stars = []; var n = Math.min(260, (W * H / 7000) | 0), pal = ['#ffffff', '#ffffff', '#cfe9ff', '#7cf3ff', '#5fe39a', '#e3b86b', '#c79aff'];
+    for (var i = 0; i < n; i++) stars.push({ x: Math.random() * W, y: Math.random() * H, z: Math.random() * 0.8 + 0.2, a: Math.random() * 6.28, sp: Math.random() * 0.03 + 0.005, c: pal[(Math.random() * pal.length) | 0] });
+  }
+  // The true Schwarz D minimal-surface field. F=0 is the surface; the two networks are F>0 / F<0.
+  function F(a, b, c) {
+    return Math.sin(a) * Math.sin(b) * Math.sin(c) + Math.sin(a) * Math.cos(b) * Math.cos(c)
+         + Math.cos(a) * Math.sin(b) * Math.cos(c) + Math.cos(a) * Math.cos(b) * Math.sin(c);
+  }
+  function glow(cx, cy, r, col) { var g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(cx - r, cy - r, r * 2, r * 2); }
+  function fabric() {
+    var planes = 12, N = 38, R = 6.2, fov = Math.min(W, H) * 0.95, horizon = H * 0.5, nearZ = 1.3, stepZ = 0.56;
+    var camZ = t * 0.55, camX = mx * 5.0 + 1.4 * Math.sin(t * 0.05), camY = my * 4.0 + 1.0 * Math.sin(t * 0.07);
+    var B = [[], [], [], [], []], g = [];
+    for (var a = 0; a <= N; a++) g[a] = (a / N * 2 - 1) * R;
+    for (var pl = 0; pl < planes; pl++) {
+      var dz = nearZ + pl * stepZ, wz = camZ + dz, fade = 1 - pl / planes;
+      var bucket = fade < 0.16 ? B[4] : B[pl < 3 ? 0 : pl < 6 ? 1 : pl < 9 ? 2 : 3], fg = [];
+      for (var b = 0; b <= N; b++) { var wy = camY + g[b]; for (var c = 0; c <= N; c++) fg[b * (N + 1) + c] = F(camX + g[c], wy, wz); }
+      for (var j = 0; j < N; j++) for (var i = 0; i < N; i++) {
+        var f00 = fg[j * (N + 1) + i], f10 = fg[j * (N + 1) + i + 1], f11 = fg[(j + 1) * (N + 1) + i + 1], f01 = fg[(j + 1) * (N + 1) + i], pts = [];
+        if ((f00 < 0) != (f10 < 0)) { var u = f00 / (f00 - f10); pts.push(g[i] + (g[i + 1] - g[i]) * u, g[j]); }
+        if ((f10 < 0) != (f11 < 0)) { var u2 = f10 / (f10 - f11); pts.push(g[i + 1], g[j] + (g[j + 1] - g[j]) * u2); }
+        if ((f01 < 0) != (f11 < 0)) { var u3 = f01 / (f01 - f11); pts.push(g[i] + (g[i + 1] - g[i]) * u3, g[j + 1]); }
+        if ((f00 < 0) != (f01 < 0)) { var u4 = f00 / (f00 - f01); pts.push(g[i], g[j] + (g[j + 1] - g[j]) * u4); }
+        for (var q = 0; q + 3 < pts.length; q += 4)
+          bucket.push(W / 2 + (pts[q] / dz) * fov, horizon - (pts[q + 1] / dz) * fov, W / 2 + (pts[q + 2] / dz) * fov, horizon - (pts[q + 3] / dz) * fov);
+      }
+    }
+    var styles = ['rgba(124,243,255,0.46)', 'rgba(95,227,154,0.38)', 'rgba(227,184,107,0.40)', 'rgba(199,154,255,0.46)', 'rgba(130,160,210,0.09)'];
+    x.lineWidth = 1;
+    for (var k = 0; k < 5; k++) { var arr = B[k]; if (!arr.length) continue; x.strokeStyle = styles[k]; x.beginPath(); for (var m = 0; m < arr.length; m += 4) { x.moveTo(arr[m], arr[m + 1]); x.lineTo(arr[m + 2], arr[m + 3]); } x.stroke(); }
+  }
+  function draw() {
+    t += 0.01; mx += (tmx - mx) * 0.04; my += (tmy - my) * 0.04;
+    var gg = x.createLinearGradient(0, 0, 0, H); gg.addColorStop(0, '#080a18'); gg.addColorStop(0.55, '#0a0f22'); gg.addColorStop(1, '#05060d');
+    x.fillStyle = gg; x.fillRect(0, 0, W, H);
+    glow(W * (0.72 - mx * 0.3), H * (0.22 + my * 0.2), 320, 'rgba(160,90,255,0.10)');
+    glow(W * (0.22 - mx * 0.2), H * (0.34 + my * 0.2), 260, 'rgba(0,200,255,0.07)');
+    for (var i = 0; i < stars.length; i++) { var s = stars[i]; s.a += s.sp; x.globalAlpha = (0.3 + 0.7 * Math.abs(Math.sin(s.a))) * s.z; x.fillStyle = s.c; var px = s.x - mx * 30 * s.z, py = s.y - my * 24 * s.z; x.fillRect(px, py, s.z * 1.6, s.z * 1.6); }
+    x.globalAlpha = 1;
+    fabric();
+    requestAnimationFrame(draw);
+  }
+  addEventListener('mousemove', function (e) { tmx = e.clientX / innerWidth - 0.5; tmy = e.clientY / innerHeight - 0.5; });
+  addEventListener('resize', resize);
+  resize(); draw();
+})();
+</script>
 </body>
-
 </html>
