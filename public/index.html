@@ -146,43 +146,53 @@ footer{text-align:center;color:var(--dim);font-size:.82rem;padding:var(--s4) 0 v
 
   <section class="panel" id="work">
     <div class="kicker">The work</div>
-    <h2 class="sect-title">Proof, not promises</h2>
-    <p class="lede">Every project is something I built end to end. Each names a standard pattern and a result you can
-      verify. Nothing asks to be trusted; it asks to be re-run.</p>
+    <h2 class="sect-title">Fixing AI's worst failure modes</h2>
+    <p class="lede">AI's biggest problems right now are simple to name: it <b>makes things up</b>, it <b>costs too much</b>,
+      and you <b>can't reproduce</b> what it did. Here is what I built for each, with a number you can check and a
+      <b>tool you can run right now</b>, in your browser, no signup.</p>
     <div class="grid">
       <div class="card">
-        <h3>bfx-ingest</h3>
-        <span class="num">~4.55M tokens measured · ~85% repeat-input cost cut</span>
-        <p>A zero-dependency CLI that turns a codebase into clean, deterministic LLM context in one command. On a real
-          1,593-file repo it produced one verifiable artifact, so you scope before wasting a call. Same input gives the
-          same root hash, making context reproducible for evals and byte-identical for prompt caching.</p>
-        <div class="tags">content-addressed · deterministic · no deps, no network · tested</div>
-        <a class="go" href="bfx-ingest.html">See it, with real numbers &rarr;</a>
+        <h3>&ldquo;AI just makes things up&rdquo;</h3>
+        <span class="num">~39% &rarr; 0% hallucinated output on a tested task</span>
+        <p>The number-one reason AI stays out of production. I don't promise zero - that's the red flag. I ground
+          answers in your data, flag every unsupported claim, and verify before anything ships. The Hardener does the
+          flagging: paste a document and it marks what isn't backed by a source.</p>
+        <div class="tags">grounding · verification pass · let it say &ldquo;I don't know&rdquo;</div>
+        <a class="go" href="https://valuesai.online/harden.html" target="_blank" rel="noopener">Try the Hardener live &rarr;</a>
       </div>
       <div class="card">
-        <h3>The Conduit</h3>
-        <span class="num">123 deterministic tests · signed go-live gate</span>
-        <p>A water-system telemetry, health-monitoring and compliance platform: one health number per station, a signed
-          go-live gate, a tamper-evident audit trail, and a dependency-free 3D network view. Live and open to explore.</p>
-        <div class="tags">tamper-evident audit · plain JavaScript, no frameworks</div>
-        <a class="go" href="https://theconduit.me" target="_blank" rel="noopener">Open the live demo &rarr;</a>
+        <h3>&ldquo;AI is too expensive&rdquo;</h3>
+        <span class="num">~99.7% fewer tokens on localized queries</span>
+        <p>Every token is money, and most prompts ship far more than the model needs. I cut the input: the Token
+          Minimizer strips a prompt to what matters, and the dimensional API answers a localized question over a huge
+          nested structure by reading only the slice it needs.</p>
+        <div class="tags">token budgeting · derive-not-store · prompt caching</div>
+        <a class="go" href="https://valuesai.online/token-minimizer.html" target="_blank" rel="noopener">Try the Token Minimizer live &rarr;</a>
       </div>
       <div class="card">
-        <h3>Deterministic multiplayer netcode</h3>
-        <span class="num">503 legal paths verified · 0 teleports</span>
-        <p>Real-time multiplayer where state is derived from a seed and an append-only command log, so every client
-          replays identical events and converges on byte-identical state, eliminating a whole class of divergence bugs.</p>
-        <div class="tags">event sourcing · deterministic lockstep · WebGL2 · Node/WebSocket</div>
-        <a class="go" href="https://kensgames.com" target="_blank" rel="noopener">Play the demo &rarr;</a>
+        <h3>&ldquo;You can't reproduce what it did&rdquo;</h3>
+        <span class="num">1,593-file repo &rarr; one hash-identical artifact · ~85% repeat-input cost cut</span>
+        <p>Same input, different output - so you can't audit it, evaluate it, or cache it. bfx-ingest turns a codebase
+          into deterministic context: the same input yields the same root hash every run, byte-identical for prompt
+          caching and reproducible for evals.</p>
+        <div class="tags">content-addressed · deterministic · no deps, tested</div>
+        <a class="go" href="bfx-ingest.html">See bfx-ingest, with a live demo &rarr;</a>
       </div>
       <div class="card">
-        <h3>Zero-downtime deployment system</h3>
-        <span class="num">atomic releases · health-gated auto-rollback</span>
-        <p>A content-addressed release pipeline: each deploy is hashed into a verifiable manifest, promoted by an atomic
-          symlink swap, health-checked, and rolled back automatically on failure. Immutable releases, one-command rollback.</p>
-        <div class="tags">GitHub Actions CI/CD across multiple domains</div>
-        <a class="go" href="https://github.com/kenbin64" target="_blank" rel="noopener">Source on GitHub &rarr;</a>
+        <h3>&ldquo;The codebase rots into duplication&rdquo;</h3>
+        <span class="num">structural duplication scored, not guessed</span>
+        <p>No single source of truth means the same value drifts in five places and the model has five things to get
+          wrong. The Dimensional Linter measures structural duplication in your code so you can collapse it to one
+          source - the rule, not the copies.</p>
+        <div class="tags">single source of truth · structural dedup</div>
+        <a class="go" href="https://valuesai.online/dimensional-linter.html" target="_blank" rel="noopener">Try the Dimensional Linter live &rarr;</a>
       </div>
+    </div>
+    <p class="note">Beyond the AI layer, the same engineering depth, all live:</p>
+    <div class="net">
+      <a class="node" href="https://theconduit.me" target="_blank" rel="noopener"><div class="n">The Conduit</div><div class="d">Water-system telemetry, health and compliance: 123 deterministic tests, a signed go-live gate, tamper-evident audit.</div><span class="u">theconduit.me</span></a>
+      <a class="node" href="https://kensgames.com" target="_blank" rel="noopener"><div class="n">Deterministic netcode</div><div class="d">Real-time multiplayer from a seed and an append-only log: 503 legal paths verified, 0 teleports, byte-identical state.</div><span class="u">kensgames.com</span></a>
+      <a class="node" href="https://github.com/kenbin64" target="_blank" rel="noopener"><div class="n">Zero-downtime deploys</div><div class="d">Content-addressed releases, atomic symlink swap, health-gated auto-rollback. One-command rollback across domains.</div><span class="u">github.com/kenbin64</span></a>
     </div>
   </section>
 
