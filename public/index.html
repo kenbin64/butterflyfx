@@ -32,7 +32,7 @@ html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--txt);
   font-family:"Segoe UI",system-ui,-apple-system,sans-serif;line-height:1.62;
   -webkit-font-smoothing:antialiased;overflow-x:hidden}
-#bg{position:fixed;inset:0;z-index:0;display:block}
+#spiral-bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;display:block;pointer-events:none;filter:blur(.5px) brightness(1.1) saturate(1.2)}
 .shell{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:0 var(--s3)}
 a{color:var(--cyan);text-decoration:none}
 
@@ -112,7 +112,7 @@ footer{text-align:center;color:var(--dim);font-size:.82rem;padding:var(--s4) 0 v
 </style>
 </head>
 <body>
-<canvas id="bg"></canvas>
+<canvas id="spiral-bg"></canvas>
 
 <nav><div class="row">
   <span class="brand"><img src="assets/butterfly.png" alt="Butterflyfx">Butterfly<span>fx</span></span>
@@ -259,71 +259,6 @@ footer{text-align:center;color:var(--dim);font-size:.82rem;padding:var(--s4) 0 v
   </footer>
 </div>
 
-<script>
-/* ===== The literal Schwarz Diamond, rotating in a starfield with galaxies ===== */
-(function () {
-  var cv = document.getElementById('bg'), x = cv.getContext('2d'), W, H, t = 0;
-  var stars = [], pts = [], L = 0;
-  var mxa = 0, mya = 0, tmxa = 0, tmya = 0;            // eased mouse-rotation
-  function resize() { W = cv.width = innerWidth; H = cv.height = innerHeight; initStars(); buildDiamond(); }
-  function initStars() {
-    stars = []; var n = Math.min(340, (W * H / 5800) | 0), pal = ['#ffffff', '#ffffff', '#cfe9ff', '#7cf3ff', '#5fe39a', '#e3b86b', '#c79aff'];
-    for (var i = 0; i < n; i++) stars.push({ x: Math.random() * W, y: Math.random() * H, z: Math.random() * 0.85 + 0.15, a: Math.random() * 6.28, sp: Math.random() * 0.03 + 0.005, c: pal[(Math.random() * pal.length) | 0] });
-  }
-  // The true Schwarz D (Diamond) minimal-surface field. F=0 is the surface; F>0 and F<0 are the two interwoven networks.
-  function F(a, b, c) { return Math.sin(a) * Math.sin(b) * Math.sin(c) + Math.sin(a) * Math.cos(b) * Math.cos(c) + Math.cos(a) * Math.sin(b) * Math.cos(c) + Math.cos(a) * Math.cos(b) * Math.sin(c); }
-  function Fz(a, b, c) { return Math.cos(c) * Math.cos(a - b) - Math.sin(c) * Math.sin(a + b); } // which of the two networks
-  function buildDiamond() {
-    pts = []; var n = 2; L = 2 * Math.PI * n; var M = 42, h = L / M, half = L / 2, cap = 4600, found = [];
-    for (var i = 0; i <= M; i++) for (var j = 0; j <= M; j++) for (var k = 0; k <= M; k++) {
-      var a = i * h, b = j * h, c = k * h;
-      if (Math.abs(F(a, b, c)) < 0.085) found.push([a - half, b - half, c - half, Fz(a, b, c) >= 0 ? 1 : 0]);
-    }
-    var stride = Math.max(1, (found.length / cap) | 0);
-    for (var p = 0; p < found.length; p += stride) pts.push(found[p]);
-  }
-  function glow(cx, cy, r, col) { var g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(cx - r, cy - r, r * 2, r * 2); }
-  function galaxy(cx, cy, rot, scl) {
-    x.save(); x.translate(cx, cy); x.rotate(rot);
-    for (var k = 1; k < 170; k++) {
-      var rad = k * 0.6 * scl, ang = k * 0.30 + (k % 2) * Math.PI, px = Math.cos(ang) * rad, py = Math.sin(ang) * rad * 0.45;
-      x.globalAlpha = Math.max(0, 0.5 - rad / (150 * scl)); x.fillStyle = k % 3 === 0 ? '#c79aff' : (k % 3 === 1 ? '#7cf3ff' : '#ffffff'); x.fillRect(px, py, 1.6, 1.6);
-    }
-    x.globalAlpha = 1; x.restore();
-  }
-  function draw() {
-    t += 0.01; mxa += (tmxa - mxa) * 0.045; mya += (tmya - mya) * 0.045;
-    var gg = x.createLinearGradient(0, 0, 0, H); gg.addColorStop(0, '#080a18'); gg.addColorStop(0.55, '#0a0f22'); gg.addColorStop(1, '#05060d');
-    x.fillStyle = gg; x.fillRect(0, 0, W, H);
-    glow(W * 0.80, H * 0.16, 320, 'rgba(160,90,255,0.10)');
-    glow(W * 0.16, H * 0.72, 280, 'rgba(0,200,255,0.07)');
-    galaxy(W * 0.84, H * 0.80, t * 0.04, 1.15);
-    galaxy(W * 0.13, H * 0.20, -t * 0.03, 0.85);
-    for (var i = 0; i < stars.length; i++) { var s = stars[i]; s.a += s.sp; x.globalAlpha = (0.3 + 0.7 * Math.abs(Math.sin(s.a))) * s.z; x.fillStyle = s.c; x.fillRect(s.x - mxa * 40 * s.z, s.y - mya * 30 * s.z, s.z * 1.7, s.z * 1.7); }
-    x.globalAlpha = 1;
-    // the literal Schwarz Diamond, slow auto-spin + mouse rotation
-    var ang = t * 0.05 + mxa * 2.0, tilt = 0.55 + mya * 1.1;
-    var ca = Math.cos(ang), sa = Math.sin(ang), ct = Math.cos(tilt), st = Math.sin(tilt);
-    var scale = 0.6 * Math.min(W, H) / L, cx = W / 2, cy = H * 0.5, proj = [];
-    for (var p = 0; p < pts.length; p++) {
-      var X = pts[p][0], Y = pts[p][1], Z = pts[p][2];
-      var rxv = X * ca + Z * sa, rz = -X * sa + Z * ca;
-      var ryv = Y * ct - rz * st, rz2 = Y * st + rz * ct;
-      proj.push([cx + rxv * scale, cy - ryv * scale, rz2, pts[p][3]]);
-    }
-    proj.sort(function (a, b) { return b[2] - a[2]; });
-    for (var q = 0; q < proj.length; q++) {
-      var P = proj[q], near = 0.5 - P[2] / (1.5 * L); near = near < 0 ? 0 : near > 1 ? 1 : near;
-      x.globalAlpha = 0.16 + 0.74 * near; x.fillStyle = P[3] ? '#7cf3ff' : '#c79aff';
-      var r = 1 + 1.7 * near; x.fillRect(P[0] - r / 2, P[1] - r / 2, r, r);
-    }
-    x.globalAlpha = 1;
-    requestAnimationFrame(draw);
-  }
-  addEventListener('mousemove', function (e) { tmxa = e.clientX / innerWidth - 0.5; tmya = e.clientY / innerHeight - 0.5; });
-  addEventListener('resize', resize);
-  resize(); draw();
-})();
-</script>
+<script src="manifold-bg.js" defer></script>
 </body>
 </html>
