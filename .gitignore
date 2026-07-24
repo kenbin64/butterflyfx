@@ -9,3 +9,11 @@ Thumbs.db
 nginx/ssl/
 *.key
 *.pem
+
+# Working notes — personal, keep LOCAL and out of the public repo
+ken-asset-inventory.md
+resume-draft.md
+
+# Editor backups
+*.bak
+public/*.bak

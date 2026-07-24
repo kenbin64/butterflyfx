@@ -53,9 +53,13 @@ nav a:hover,nav a.active{color:var(--txt);border-bottom-color:var(--cyan)}
   background:linear-gradient(90deg,var(--cyan),var(--green),var(--gold),var(--purple));opacity:.75}
 h1,h2,h3{line-height:1.18;margin:0 0 var(--s1)}
 .kicker{font-family:ui-monospace,monospace;font-size:.74rem;letter-spacing:2px;
-  text-transform:uppercase;color:var(--cyan);margin-bottom:var(--s1)}
+  text-transform:uppercase;color:var(--cyan);margin-bottom:var(--s1);display:flex;align-items:center;gap:.6rem}
+.kicker .ch{color:var(--gold);opacity:.9;font-weight:700;
+  border:1px solid rgba(227,184,107,.4);border-radius:6px;padding:.05rem .4rem;letter-spacing:1px}
 .sect-title{font-size:1.5rem;color:var(--white)}
 .lede{color:var(--mut);max-width:64ch}.lede b{color:var(--txt)}
+.bridge{color:var(--dim);font-style:italic;font-size:.94rem;max-width:66ch;
+  border-left:2px solid rgba(227,184,107,.35);padding-left:var(--s2);margin:var(--s3) 0 0}
 
 .hero{display:grid;grid-template-columns:1fr;gap:var(--s2);margin-top:var(--s4)}
 .hero .photo{width:96px;height:96px;border-radius:50%;object-fit:cover;
@@ -72,6 +76,12 @@ h1,h2,h3{line-height:1.18;margin:0 0 var(--s1)}
 .btn.primary:hover{filter:brightness(1.08)}
 .btn.alt{border-color:var(--edge);color:var(--txt);background:rgba(255,255,255,.04)}
 .btn.alt:hover{border-color:var(--purple);color:var(--purple)}
+
+.problems{display:flex;gap:var(--s2);flex-wrap:wrap;margin-top:var(--s3)}
+.problems .p{flex:1;min-width:220px;background:rgba(10,14,24,.55);border:1px solid var(--edge);
+  border-radius:12px;padding:var(--s2) var(--s3);border-top:2px solid var(--purple)}
+.problems .p b{color:var(--white);display:block;font-size:1.02rem}
+.problems .p span{color:var(--mut);font-size:.86rem}
 
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s3);margin-top:var(--s3)}
 .card{background:rgba(10,14,24,.62);border:1px solid var(--edge);border-radius:14px;
@@ -127,6 +137,7 @@ footer{text-align:center;color:var(--dim);font-size:.82rem;padding:var(--s4) 0 v
 
 <div class="shell">
 
+  <!-- ===================================================== HERO -->
   <section class="panel hero">
     <img src="kennethbingham.webp" alt="Kenneth W. Bingham" class="photo">
     <div class="kicker">Butterflyfx · small inputs, large effects</div>
@@ -136,20 +147,38 @@ footer{text-align:center;color:var(--dim);font-size:.82rem;padding:var(--s4) 0 v
     <p class="tag">I build the <b>reliability layer around AI</b>: deterministic pipelines, evaluation and
       verification harnesses, and reproducible, cost-efficient systems. Everything below <b>runs, is tested, and is
       open to re-run yourself</b>, with no claim that isn't demonstrated.</p>
+    <p class="bridge">What follows is meant to be read in order: the problem, what I built for it, how I get
+      reliability from a model I don't control, the single idea underneath all of it, and the broader engineering
+      that backs it up.</p>
     <div class="cta">
       <a href="resume.html" class="btn primary">View resume</a>
-      <a href="#work" class="btn alt">See the work</a>
+      <a href="#problem" class="btn alt">Start the story</a>
       <a href="https://www.linkedin.com/in/kenneth-bingham-11378b10" class="btn alt" target="_blank" rel="noopener">LinkedIn</a>
       <a href="https://github.com/kenbin64" class="btn alt" target="_blank" rel="noopener">GitHub</a>
     </div>
   </section>
 
+  <!-- ===================================================== 01 · THE PROBLEM -->
+  <section class="panel" id="problem">
+    <div class="kicker"><span class="ch">01</span> The problem</div>
+    <h2 class="sect-title">Why AI stays out of production</h2>
+    <p class="lede">Three failures keep AI out of real systems. Name them plainly and each stops being a mystery and
+      becomes an engineering problem with an answer.</p>
+    <div class="problems">
+      <div class="p"><b>It makes things up</b><span>Confident output with nothing behind it. The number-one reason it never ships.</span></div>
+      <div class="p"><b>It costs too much</b><span>Every token is money, and most prompts send far more than the model needs.</span></div>
+      <div class="p"><b>You can't reproduce it</b><span>Same input, different output — so you can't audit it, evaluate it, or cache it.</span></div>
+    </div>
+    <p class="bridge">Each of these has an answer I built, with a number you can check and a tool you can run right
+      now — in your browser, no signup.</p>
+  </section>
+
+  <!-- ===================================================== 02 · THE WORK -->
   <section class="panel" id="work">
-    <div class="kicker">The work</div>
-    <h2 class="sect-title">Fixing AI's worst failure modes</h2>
-    <p class="lede">AI's biggest problems right now are simple to name: it <b>makes things up</b>, it <b>costs too much</b>,
-      and you <b>can't reproduce</b> what it did. Here is what I built for each, with a number you can check and a
-      <b>tool you can run right now</b>, in your browser, no signup.</p>
+    <div class="kicker"><span class="ch">02</span> The work</div>
+    <h2 class="sect-title">What I built for each — and you can run it now</h2>
+    <p class="lede">One answer per problem above, in the same order. I don't promise perfection — that's the red flag.
+      I promise a demonstrated number and code you can re-run.</p>
     <div class="grid">
       <div class="card">
         <h3>&ldquo;AI just makes things up&rdquo;</h3>
@@ -190,16 +219,13 @@ footer{text-align:center;color:var(--dim);font-size:.82rem;padding:var(--s4) 0 v
         <a class="go" href="https://valuesai.online/dimensional-linter.html" target="_blank" rel="noopener">Try the Dimensional Linter live &rarr;</a>
       </div>
     </div>
-    <p class="note">Beyond the AI layer, the same engineering depth, all live:</p>
-    <div class="net">
-      <a class="node" href="https://theconduit.me" target="_blank" rel="noopener"><div class="n">The Conduit</div><div class="d">Water-system telemetry, health and compliance: 123 deterministic tests, a signed go-live gate, tamper-evident audit.</div><span class="u">theconduit.me</span></a>
-      <a class="node" href="https://kensgames.com" target="_blank" rel="noopener"><div class="n">Deterministic netcode</div><div class="d">Real-time multiplayer from a seed and an append-only log: 503 legal paths verified, 0 teleports, byte-identical state.</div><span class="u">kensgames.com</span></a>
-      <a class="node" href="https://github.com/kenbin64" target="_blank" rel="noopener"><div class="n">Zero-downtime deploys</div><div class="d">Content-addressed releases, atomic symlink swap, health-gated auto-rollback. One-command rollback across domains.</div><span class="u">github.com/kenbin64</span></a>
-    </div>
+    <p class="bridge">None of this comes from a smarter model. It comes from one discipline applied to a model I
+      don't control.</p>
   </section>
 
+  <!-- ===================================================== 03 · HOW -->
   <section class="panel" id="approach">
-    <div class="kicker">How I get it</div>
+    <div class="kicker"><span class="ch">03</span> How I get it</div>
     <h2 class="sect-title">Reliability out of a model you don't control</h2>
     <p class="lede">I get reliability from stock models by <b>directing</b> them, not hoping. Explicit operating
       directives, hard constraints, and a verification pass at each step keep a model on track and out of drift. Reduced
@@ -215,11 +241,45 @@ footer{text-align:center;color:var(--dim);font-size:.82rem;padding:var(--s4) 0 v
       <a href="https://valuesai.online" class="btn primary" target="_blank" rel="noopener">See the API &amp; live demos</a>
       <a href="https://dimensionalprogramming.com" class="btn alt" target="_blank" rel="noopener">Read the theory</a>
     </div>
+    <p class="bridge">That framework isn't a side project. It's the single idea every one of these builds runs on.</p>
   </section>
 
+  <!-- ===================================================== 04 · THE ONE IDEA -->
   <section class="panel">
-    <div class="kicker">Core skills</div>
-    <h2 class="sect-title">What I bring</h2>
+    <div class="kicker"><span class="ch">04</span> The one idea</div>
+    <h2 class="sect-title">Small inputs, large effects</h2>
+    <p class="lede">Everything I build runs on one idea, <b>small inputs, large effects</b>: a tiny rule, derived into
+      vast structure. Each site below is one instance of it, all under the Butterflyfx banner.</p>
+    <div class="net">
+      <a class="node" href="https://valuesai.online" target="_blank" rel="noopener"><div class="n">The Lab</div><div class="d">Live, free, no-AI browser tools: token minimizer, hardener, dimensional linter, derive demo, manifolds.</div><span class="u">valuesai.online</span></a>
+      <a class="node" href="https://dimensionalprogramming.com" target="_blank" rel="noopener"><div class="n">The Framework</div><div class="d">Dimensional programming: thinking in shapes and actions, the theory behind the tools.</div><span class="u">dimensionalprogramming.com</span></a>
+      <a class="node" href="https://tetracubedb.com" target="_blank" rel="noopener"><div class="n">TetraCubeDB</div><div class="d">A manifold database: store the rule, derive on observation, lowest possible storage.</div><span class="u">tetracubedb.com</span></a>
+      <a class="node" href="https://schwartzdiamond.com" target="_blank" rel="noopener"><div class="n">Schwarz Diamond</div><div class="d">The principle: minimal material, maximum surface. More from less, proven.</div><span class="u">schwartzdiamond.com</span></a>
+      <a class="node" href="https://kensgames.com" target="_blank" rel="noopener"><div class="n">Kens Games</div><div class="d">Deterministic multiplayer games: state derived from a seed, byte-identical across clients.</div><span class="u">kensgames.com</span></a>
+      <a class="node" href="https://theconduit.me" target="_blank" rel="noopener"><div class="n">The Conduit</div><div class="d">Water-system telemetry, health, and compliance: 123 tests, signed go-live gate.</div><span class="u">theconduit.me</span></a>
+    </div>
+    <p class="note">More in the family (Kenetic Arts, an immersive 3D art gallery; the z = x&middot;y geometry showcase) are in progress.</p>
+  </section>
+
+  <!-- ===================================================== 05 · BEYOND AI -->
+  <section class="panel">
+    <div class="kicker"><span class="ch">05</span> Beyond the AI layer</div>
+    <h2 class="sect-title">The same engineering, other problems</h2>
+    <p class="lede">Reliability isn't only an AI story. The same discipline — deterministic systems, verified state,
+      reproducible builds — runs under production systems that have nothing to do with a model. Depth, not just a
+      demo.</p>
+    <div class="net">
+      <a class="node" href="https://theconduit.me" target="_blank" rel="noopener"><div class="n">The Conduit</div><div class="d">Water-system telemetry, health and compliance: 123 deterministic tests, a signed go-live gate, tamper-evident audit.</div><span class="u">theconduit.me</span></a>
+      <a class="node" href="https://kensgames.com" target="_blank" rel="noopener"><div class="n">Deterministic netcode</div><div class="d">Real-time multiplayer from a seed and an append-only log: 503 legal paths verified, 0 teleports, byte-identical state.</div><span class="u">kensgames.com</span></a>
+      <a class="node" href="https://github.com/kenbin64" target="_blank" rel="noopener"><div class="n">Zero-downtime deploys</div><div class="d">Content-addressed releases, atomic symlink swap, health-gated auto-rollback. One-command rollback across domains.</div><span class="u">github.com/kenbin64</span></a>
+    </div>
+    <p class="bridge">Put together, here is the toolkit a team gets when they hire me.</p>
+  </section>
+
+  <!-- ===================================================== 06 · WHAT I BRING -->
+  <section class="panel">
+    <div class="kicker"><span class="ch">06</span> What I bring</div>
+    <h2 class="sect-title">The toolkit, in one place</h2>
     <div class="pillars">
       <article class="pillar wide">
         <h3>Reliability around an unreliable model</h3>
@@ -234,24 +294,9 @@ footer{text-align:center;color:var(--dim);font-size:.82rem;padding:var(--s4) 0 v
     </div>
   </section>
 
+  <!-- ===================================================== 07 · AVAILABILITY -->
   <section class="panel">
-    <div class="kicker">The butterfly effect</div>
-    <h2 class="sect-title">One banner, many small causes</h2>
-    <p class="lede">Everything I build runs on one idea, <b>small inputs, large effects</b>: a tiny rule, derived into
-      vast structure. Each site below is one instance of it, all under the Butterflyfx banner.</p>
-    <div class="net">
-      <a class="node" href="https://valuesai.online" target="_blank" rel="noopener"><div class="n">The Lab</div><div class="d">Live, free, no-AI browser tools: token minimizer, hardener, dimensional linter, derive demo, manifolds.</div><span class="u">valuesai.online</span></a>
-      <a class="node" href="https://dimensionalprogramming.com" target="_blank" rel="noopener"><div class="n">The Framework</div><div class="d">Dimensional programming: thinking in shapes and actions, the theory behind the tools.</div><span class="u">dimensionalprogramming.com</span></a>
-      <a class="node" href="https://tetracubedb.com" target="_blank" rel="noopener"><div class="n">TetraCubeDB</div><div class="d">A manifold database: store the rule, derive on observation, lowest possible storage.</div><span class="u">tetracubedb.com</span></a>
-      <a class="node" href="https://schwartzdiamond.com" target="_blank" rel="noopener"><div class="n">Schwarz Diamond</div><div class="d">The principle: minimal material, maximum surface. More from less, proven.</div><span class="u">schwartzdiamond.com</span></a>
-      <a class="node" href="https://kensgames.com" target="_blank" rel="noopener"><div class="n">Kens Games</div><div class="d">Deterministic multiplayer games: state derived from a seed, byte-identical across clients.</div><span class="u">kensgames.com</span></a>
-      <a class="node" href="https://theconduit.me" target="_blank" rel="noopener"><div class="n">The Conduit</div><div class="d">Water-system telemetry, health, and compliance: 123 tests, signed go-live gate.</div><span class="u">theconduit.me</span></a>
-    </div>
-    <p class="note">More in the family (Kenetic Arts, an immersive 3D art gallery; the z = x&middot;y geometry showcase) are in progress.</p>
-  </section>
-
-  <section class="panel">
-    <div class="kicker">Availability</div>
+    <div class="kicker"><span class="ch">07</span> Availability</div>
     <h2 class="sect-title">Looking for my next role</h2>
     <p class="lede">Seeking a full-time AI engineering or backend / platform role, open to hybrid and remote. The projects
       here are <b>personal portfolio pieces</b>, built end to end to demonstrate the work above, not commercial products

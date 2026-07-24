@@ -34,7 +34,7 @@
   document.head.appendChild(css);
 
   var links = [['Home', '/'], ['About', '/about.html'], ['Method', '/method.html'],
-               ['Resume', '/resume.html'], ['Research', '/research.html'], ['Contact', '/contact.html']];
+               ['Resume', '/resume.html'], ['Teach', '/teach.html'], ['Research', '/research.html'], ['Contact', '/contact.html']];
   var inner = '<div class="row"><a class="brand" href="/"><img src="/assets/butterfly.png" alt="Butterflyfx">Butterfly<b>fx</b></a>';
   links.forEach(function (l) {
     var on = (l[1] === here) ? ' here' : '';
