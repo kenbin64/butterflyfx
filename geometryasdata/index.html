@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geometry as Data · Butterflyfx</title>
+<meta name="description" content="Data stores every value. Geometry stores the rule that makes them plus a small residual, and rebuilds the rest - shown live on a real sound file and a real image. Pattern, rule, residual.">
+<link rel="canonical" href="https://butterflyfx.us/geometryasdata/">
+<style>
+:root{
+ --bg:#06070f; --panel:rgba(13,18,30,.66); --edge:rgba(255,255,255,.10);
+ --txt:#eaf1f8; --mut:#9fb0c4; --dim:#6c7c90;
+ --cyan:#7cf3ff; --purple:#c79aff; --green:#5fe39a; --gold:#e3b86b; --white:#f2f6fb;
+ --s1:.618rem; --s2:1rem; --s3:1.618rem; --s4:2.618rem; --s5:4.236rem; --maxw:1080px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--txt);
+ font-family:"Segoe UI",system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+#bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;opacity:.55}
+.shell{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding:0 var(--s3)}
+a{color:var(--cyan);text-decoration:none}
+nav{position:sticky;top:0;z-index:5;backdrop-filter:blur(14px);background:rgba(8,10,18,.55);border-bottom:1px solid var(--edge)}
+nav .row{max-width:var(--maxw);margin:0 auto;display:flex;align-items:center;gap:var(--s2);padding:var(--s1) var(--s3)}
+nav .brand{font-weight:800;margin-right:auto;color:var(--white)} nav .brand b{color:var(--gold)}
+.panel{position:relative;background:var(--panel);backdrop-filter:blur(12px);border:1px solid var(--edge);
+ border-radius:18px;padding:var(--s4);margin:var(--s3) 0;overflow:hidden;box-shadow:0 24px 60px -40px #000}
+.panel::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
+ background:linear-gradient(90deg,var(--cyan),var(--green),var(--gold),var(--purple));opacity:.8}
+h1,h2,h3{line-height:1.14;margin:0 0 var(--s1)}
+.kicker{font-family:ui-monospace,monospace;font-size:.74rem;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:var(--s1)}
+.hero h1{font-size:2.7rem;letter-spacing:-1px;background:linear-gradient(90deg,var(--white),var(--cyan) 60%,var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sect-title{font-size:1.5rem;color:var(--white)}
+.lede{color:var(--mut);max-width:66ch}.lede b{color:var(--txt)}
+.big{font-size:1.08rem;color:var(--white)}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s2);margin:var(--s3) 0}
+.trio .t{background:rgba(10,14,24,.6);border:1px solid var(--edge);border-radius:12px;padding:var(--s2);position:relative}
+.trio .t.pat{border-top:2px solid var(--cyan);box-shadow:inset 0 1px 20px -14px var(--cyan)}
+.trio .t.rul{border-top:2px solid var(--green);box-shadow:inset 0 1px 20px -14px var(--green)}
+.trio .t.res{border-top:2px solid var(--gold);box-shadow:inset 0 1px 20px -14px var(--gold)}
+.trio .t h4{margin:0 0 .3rem;font-size:.8rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--white)}
+.trio .t p{margin:0;color:var(--mut);font-size:.88rem}
+canvas.viz{width:100%;display:block;border-radius:12px;background:#03060d;border:1px solid var(--edge)}
+.caplab{font-family:ui-monospace,monospace;font-size:.72rem;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin:var(--s3) 0 .4rem}
+.two{display:grid;grid-template-columns:1.6fr 1fr;gap:var(--s2);align-items:stretch}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+.stats{display:flex;gap:var(--s2);flex-wrap:wrap;margin-top:var(--s3)}
+.stat{flex:1;min-width:150px;background:rgba(10,14,24,.6);border:1px solid var(--edge);border-radius:12px;padding:var(--s2) var(--s3)}
+.stat .v{font-family:ui-monospace,monospace;font-size:1.7rem;font-weight:700;color:var(--gold);text-shadow:0 0 22px rgba(227,184,107,.4)}
+.stat .v.g{color:var(--green);text-shadow:0 0 22px rgba(95,227,154,.4)} .stat .v.c{color:var(--cyan);text-shadow:0 0 22px rgba(124,243,255,.4)}
+.stat .l{color:var(--dim);font-size:.78rem;letter-spacing:.5px;margin-top:.2rem}
+.bloombar{margin-top:var(--s3)}
+.bloombar .lab{font-size:.78rem;color:var(--mut);margin-bottom:.3rem;font-family:ui-monospace,monospace}
+.bloombar .track{height:16px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--edge);overflow:hidden;margin-bottom:.5rem}
+.bloombar .fill{height:100%;border-radius:8px}
+.bloombar .fill.raw{width:100%;background:linear-gradient(90deg,#5a4a80,#c79aff)}
+.bloombar .fill.seed{background:linear-gradient(90deg,var(--cyan),var(--green));box-shadow:0 0 18px rgba(124,243,255,.5)}
+.four{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s1);margin:var(--s3) 0}
+.four figure{margin:0} .four figcaption{font-size:.72rem;color:var(--dim);text-align:center;margin-top:.35rem}
+.four canvas{aspect-ratio:1/1;width:100%;display:block;border-radius:10px;border:1px solid var(--edge);background:#03060d}
+.four figure.res canvas{box-shadow:0 0 26px -6px var(--gold)}
+.btn{display:inline-block;border-radius:11px;padding:.55rem 1.15rem;font-size:.9rem;font-weight:600;cursor:pointer;
+ border:1px solid var(--cyan);color:var(--cyan);background:rgba(124,243,255,.08);transition:.15s}
+.btn:hover{background:rgba(124,243,255,.2)} .btn:disabled{opacity:.4;cursor:default}
+.btn.alt{border-color:var(--edge);color:var(--mut);background:rgba(255,255,255,.04)}
+.note{color:var(--dim);font-size:.86rem;margin-top:var(--s2);line-height:1.6}.note b{color:var(--txt)}
+.chat{background:rgba(10,14,24,.6);border:1px dashed rgba(124,243,255,.3);border-radius:12px;padding:var(--s2) var(--s3);font-size:.9rem;color:var(--mut);margin-top:var(--s3)}
+footer{text-align:center;color:var(--dim);font-size:.8rem;padding:var(--s4) 0 var(--s5)}
+@media(max-width:760px){:root{--s4:1.8rem}.trio,.four{grid-template-columns:1fr}.four{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:2rem}}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<nav><div class="row"><span class="brand">Butterfly<b>fx</b> · Geometry as Data</span><a href="/">← Portfolio</a></div></nav>
+
+<div class="shell">
+
+ <section class="panel hero">
+ <div class="kicker">small inputs, large effects</div>
+ <h1>Geometry as Data</h1>
+ <p class="lede big"><b>Data</b> stores every value. <b>Geometry</b> stores the <b>rule</b> that makes the values,
+ plus the small <b>residual</b> it can't predict, and rebuilds the rest on demand.</p>
+ <p class="lede" style="margin-top:var(--s2)">Below it runs on a real sound file and a real image - every number
+ computed live in your browser. Three parts each: the <b style="color:var(--cyan)">pattern</b> that repeats, the
+ <b style="color:var(--green)">rule</b> that generates it, the <b style="color:var(--gold)">residual</b> left over.
+ What you save is exactly the structure that was there. No structure, no win, no magic.</p>
+ </section>
+
+ <!-- ================= SOUND ================= -->
+ <section class="panel">
+ <div class="kicker">example one · sound is geometry</div>
+ <h2 class="sect-title">A wave, seen as itself</h2>
+ <p class="lede">A WAV stores the speaker's position tens of thousands of times a second. But sound <b>is waves</b> - 
+ and a wave is the shadow of a spinning helix. Look down that helix and a pure tone is a single point on a circle.
+ That is where the sound's real shape lives.</p>
+ <div class="trio">
+ <div class="t pat"><h4>Pattern</h4><p>The same few tones and harmonics repeat through the entire track.</p></div>
+ <div class="t rul"><h4>Rule</h4><p>Each wave is sin/cos at one frequency - one small equation per tone.</p></div>
+ <div class="t res"><h4>Residual</h4><p>The little the pure waves miss; the quiet detail you shed when you go small.</p></div>
+ </div>
+ <div class="caplab">the data view - every sample, up and down</div>
+ <canvas id="wave" class="viz" width="1000" height="110"></canvas>
+ <div class="two">
+ <div>
+ <div class="caplab">the geometry view - the waves over time</div>
+ <canvas id="spec" class="viz" width="640" height="300"></canvas>
+ </div>
+ <div>
+ <div class="caplab">down the helix - the dominant tones on the circle</div>
+ <canvas id="circle" class="viz" width="300" height="300"></canvas>
+ </div>
+ </div>
+ <div class="stats">
+ <div class="stat"><div class="v c" id="sRaw">…</div><div class="l">raw file (data)</div></div>
+ <div class="stat"><div class="v" id="sGzip">…</div><div class="l">a normal zip saves</div></div>
+ <div class="stat"><div class="v g" id="sGeo">…</div><div class="l">of the track in the top 3% of waves</div></div>
+ </div>
+ <div class="bloombar">
+ <div class="lab">store every value &nbsp;vs&nbsp; store the geometry</div>
+ <div class="track"><div class="fill raw" id="barRaw"></div></div>
+ <div class="track"><div class="fill seed" id="barSeed" style="width:3%"></div></div>
+ </div>
+ <p class="note" id="soundNote">Loading the track and measuring live…</p>
+ <div style="margin-top:var(--s2)"><button class="btn" id="playBtn" disabled>▶ Play the track</button></div>
+ </section>
+
+ <!-- ================= IMAGE ================= -->
+ <section class="panel">
+ <div class="kicker">example two · a picture is mostly its edges</div>
+ <h2 class="sect-title">Rule paints, residual is the lines</h2>
+ <p class="lede">Store every pixel and you're hoarding data. But most of a picture is smooth - so a rule guesses each
+ pixel from its neighbors, and only the edges it can't guess are kept.</p>
+ <div class="trio">
+ <div class="t pat"><h4>Pattern</h4><p>The smooth fill - skies, walls, gradients - areas that follow their neighbors.</p></div>
+ <div class="t rul"><h4>Rule</h4><p>A predictor: each pixel ≈ a blend of the pixels already known around it.</p></div>
+ <div class="t res"><h4>Residual</h4><p>Only the edges the rule missed. That grey emptiness is geometry, kept free.</p></div>
+ </div>
+ <div class="four">
+ <figure><canvas id="imgOrig" width="240" height="240"></canvas><figcaption>the image</figcaption></figure>
+ <figure><canvas id="imgPred" width="240" height="240"></canvas><figcaption>the rule's guess</figcaption></figure>
+ <figure class="res"><canvas id="imgRes" width="240" height="240"></canvas><figcaption>residual · edges only</figcaption></figure>
+ <figure><canvas id="imgRecon" width="240" height="240"></canvas><figcaption>rebuilt · exact</figcaption></figure>
+ </div>
+ <div class="stats">
+ <div class="stat"><div class="v c" id="iRaw">…</div><div class="l">raw pixels</div></div>
+ <div class="stat"><div class="v g" id="iGeo">…</div><div class="l">rule + residual</div></div>
+ <div class="stat"><div class="v" id="iSave">…</div><div class="l">saved · lossless</div></div>
+ </div>
+ <div style="margin-top:var(--s2)">
+ <button class="btn" id="imgShapes">Structured image</button>
+ <button class="btn alt" id="imgNoise">Random (the floor)</button>
+ </div>
+ <p class="note" id="imgNote"></p>
+ </section>
+
+ <section class="panel">
+ <div class="kicker">the honest part</div>
+ <h2 class="sect-title">The savings are exactly the geometry</h2>
+ <p class="lede">Read a recording as geometry and it beats a normal compressor many times over, because a normal
+ compressor sees bytes, not waves. Read a structured image and the residual is just the edges. Read pure noise and
+ the residual is the whole thing - nothing saved. That boundary is the proof it isn't a trick.</p>
+ <div class="chat" id="chatBox"><b>Send-to-a-friend version:</b> data stores every value; geometry stores the rule
+ plus a small leftover and rebuilds the rest. Sound is waves - <span id="chatGeo">most of a whole track lives in a
+ tiny slice of its frequencies</span>. An image is mostly smooth - keep a rule that predicts each pixel and only the
+ edges it missed. Random noise saves nothing. You save exactly as much as there was structure.</div>
+ </section>
+
+ <footer>© 2026 Kenneth W. Bingham · Butterflyfx - every number here was computed live, in your browser.</footer>
+</div>
+
+<script>
+(function(){
+ function fft(re,im){var n=re.length;for(var i=1,j=0;i<n;i++){var bit=n>>1;for(;j&bit;bit>>=1)j^=bit;j^=bit;if(i<j){var t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}}
+ for(var len=2;len<=n;len<<=1){var ang=-2*Math.PI/len,wr=Math.cos(ang),wi=Math.sin(ang);for(var a=0;a<n;a+=len){var cr=1,ci=0;for(var k=0;k<len/2;k++){var ur=re[a+k],ui=im[a+k],ix=a+k+len/2,vr=re[ix]*cr-im[ix]*ci,vi=re[ix]*ci+im[ix]*cr;re[a+k]=ur+vr;im[a+k]=ui+vi;re[ix]=ur-vr;im[ix]=ui-vi;var nc=cr*wr-ci*wi;ci=cr*wi+ci*wr;cr=nc;}}}}
+ function ramp(t){t=t<0?0:t>1?1:t;var s=[[6,7,15],[46,24,96],[124,80,200],[0,180,220],[95,227,154],[227,184,107]];
+ var f=t*(s.length-1),i=f|0,r=f-i,a=s[i],b=s[Math.min(i+1,s.length-1)];return[(a[0]+(b[0]-a[0])*r)|0,(a[1]+(b[1]-a[1])*r)|0,(a[2]+(b[2]-a[2])*r)|0];}
+ var fmt=function(b){return b<1024?b.toFixed(0)+' B':b<1048576?(b/1024).toFixed(0)+' KB':(b/1048576).toFixed(1)+' MB';};
+ function countUp(el,target,render){var t0=null,dur=900;function step(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/dur);var e=1-Math.pow(1-p,3);el.textContent=render(target*e);if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
+
+ // ---------------- animated helix backdrop ----------------
+ (function(){var cv=document.getElementById('bg'),x=cv.getContext('2d'),W,H,rot=0;
+ function fit(){W=cv.width=innerWidth;H=cv.height=innerHeight;} addEventListener('resize',fit); fit();
+ function frame(){x.clearRect(0,0,W,H);var cx=W*0.5,cy=H*0.42,R=Math.min(W,H)*0.16;
+ // a helix: (cos t, sin t, t) projected, gently rotating - sin & cos are its two shadows
+ for(var pass=0;pass<2;pass++){x.beginPath();
+ for(var i=0;i<=520;i++){var t=i/40, a=t+rot; var px=cx+Math.cos(a)*R + (t-6.5)* (W*0.055); var py=cy+Math.sin(a)*R*Math.cos(0.5);
+ if(i===0)x.moveTo(px,py);else x.lineTo(px,py);}
+ x.strokeStyle=pass?'rgba(124,243,255,.16)':'rgba(199,154,255,.10)'; x.lineWidth=pass?1.4:6; x.stroke();}
+ rot+=0.006; requestAnimationFrame(frame);}
+ frame();
+ })();
+
+ // ---------------- SOUND ----------------
+ var AC=null, samples=null, SR=44100, playBuf=null;
+ async function loadWav(){
+ var arr;
+ try{ var r=await fetch('assets/music/originalMusicFile.wav'); if(!r.ok)throw 0; arr=await r.arrayBuffer(); }
+ catch(e){ document.getElementById('soundNote').innerHTML='The sound panel auto-loads the track when the page is <b>served</b> (it can\'t read a neighbouring file when opened straight off disk). Run it through a local server or once the site is live and it fills in.'; return; }
+ var rawBytes=arr.byteLength;
+ AC=new (window.AudioContext||window.webkitAudioContext)();
+ var ab=await AC.decodeAudioData(arr.slice(0)); playBuf=ab;
+ SR=ab.sampleRate; var N=ab.length, L=ab.getChannelData(0), Rr=ab.numberOfChannels>1?ab.getChannelData(1):L;
+ samples=new Float64Array(N); for(var i=0;i<N;i++)samples[i]=(L[i]+Rr[i])/2;
+ drawWave(); drawSpec();
+ // average spectrum for the circle + top-3% energy concentration
+ var FR=2048,half=FR/2,K=Math.max(1,Math.round(half*0.03)),conc=0,nf=0; var avg=new Float64Array(half);
+ for(var f=0;f+FR<=N;f+=FR){ var re=new Float64Array(FR),im=new Float64Array(FR);
+ for(i=0;i<FR;i++)re[i]=samples[f+i]; fft(re,im);
+ var mag=new Float64Array(half),arrm=[]; for(var k=0;k<half;k++){var m=Math.sqrt(re[k]*re[k]+im[k]*im[k]);mag[k]=m;avg[k]+=m;arrm.push(m*m);}
+ var tot=0;for(k=0;k<half;k++)tot+=arrm[k]; arrm.sort(function(a,b){return b-a;}); var e=0;for(k=0;k<K;k++)e+=arrm[k];
+ conc+=tot>0?e/tot:1; nf++; }
+ conc=100*conc/nf; drawCircle(avg,K);
+ var gzPct=' - ',gzKnown=false;
+ try{ if(window.CompressionStream){var cs=new CompressionStream('gzip');var w=cs.writable.getWriter();w.write(new Uint8Array(arr));w.close();var gb=(await new Response(cs.readable).arrayBuffer()).byteLength;gzPct=(100*(1-gb/rawBytes)).toFixed(1);gzKnown=true;} }catch(e){}
+ document.getElementById('sRaw').textContent=fmt(rawBytes);
+ countUp(document.getElementById('sGeo'),conc,function(v){return v.toFixed(0)+'%';});
+ if(gzKnown)countUp(document.getElementById('sGzip'),+gzPct,function(v){return v.toFixed(1)+'%';}); else document.getElementById('sGzip').textContent=' - ';
+ document.getElementById('soundNote').innerHTML='As <b>data</b>, a normal zip barely dents it ('+(gzKnown?gzPct+'%':' - ')+') - it sees only bytes. As <b>geometry</b>, about <b>'+conc.toFixed(0)+'% of the whole track\'s energy sits in just 3% of its frequencies.</b> Keep that slice and you have the song. (Going that small is lossy by choice; keep more waves and it stays crisp.)';
+ document.getElementById('chatGeo').textContent='about '+conc.toFixed(0)+'% of a whole track lives in ~3% of its frequencies';
+ document.getElementById('playBtn').disabled=false;
+ }
+ function glowLine(x,color,w,fn){x.save();x.shadowColor=color;x.shadowBlur=14;x.strokeStyle=color;x.lineWidth=w;x.beginPath();fn();x.stroke();x.restore();}
+ function drawWave(){var cv=document.getElementById('wave'),x=cv.getContext('2d'),W=cv.width,H=cv.height;
+ x.fillStyle='#03060d';x.fillRect(0,0,W,H);var step=Math.max(1,(samples.length/W)|0);
+ glowLine(x,'#5fe39a',1,function(){for(var px=0;px<W;px++){var mn=1,mx=-1;for(var s=0;s<step;s++){var v=samples[px*step+s]||0;if(v<mn)mn=v;if(v>mx)mx=v;}x.moveTo(px,H/2-mx*H*.46);x.lineTo(px,H/2-mn*H*.46);}});}
+ function drawSpec(){var cv=document.getElementById('spec'),x=cv.getContext('2d'),W=cv.width,H=cv.height,FR=2048,half=FR/2;
+ var nf=Math.floor(samples.length/FR),img=x.createImageData(W,H);
+ for(var px=0;px<W;px++){var fi=Math.min(nf-1,(px/W*nf)|0),base=fi*FR;var re=new Float64Array(FR),im=new Float64Array(FR);
+ for(var i=0;i<FR;i++)re[i]=samples[base+i]||0;fft(re,im);
+ for(var py=0;py<H;py++){var k=((1-py/H)*(half*0.5))|0;var m=Math.sqrt(re[k]*re[k]+im[k]*im[k]);var t=Math.min(1,Math.log(1+m*40)/6);var c=ramp(t);var idx=(py*W+px)*4;img.data[idx]=c[0];img.data[idx+1]=c[1];img.data[idx+2]=c[2];img.data[idx+3]=255;}}
+ x.putImageData(img,0,0);}
+ function drawCircle(avg,K){var cv=document.getElementById('circle'),x=cv.getContext('2d'),W=cv.width,H=cv.height,cx=W/2,cy=H/2,R=Math.min(W,H)*0.4;
+ x.fillStyle='#03060d';x.fillRect(0,0,W,H);
+ x.strokeStyle='rgba(124,243,255,.35)';x.lineWidth=1;x.beginPath();x.arc(cx,cy,R,0,7);x.stroke();
+ x.strokeStyle='rgba(124,243,255,.12)';x.beginPath();x.arc(cx,cy,R*0.6,0,7);x.stroke();
+ var half=avg.length,mmax=0,i;for(i=0;i<half;i++)if(avg[i]>mmax)mmax=avg[i];if(mmax<=0)mmax=1;
+ // top-K bins as glowing points on the circle (angle = frequency, radius = loudness)
+ var idx=Array.from({length:half},function(_,k){return k;}).sort(function(a,b){return avg[b]-avg[a];}).slice(0,Math.max(40,K));
+ idx.forEach(function(k){var ang=(k/half)*Math.PI*2-Math.PI/2, rr=R*(0.32+0.68*avg[k]/mmax);
+ var px=cx+Math.cos(ang)*rr, py=cy+Math.sin(ang)*rr; var c=ramp(0.35+0.6*avg[k]/mmax);
+ x.save();x.shadowColor='rgb('+c[0]+','+c[1]+','+c[2]+')';x.shadowBlur=12;x.fillStyle='rgb('+c[0]+','+c[1]+','+c[2]+')';
+ x.beginPath();x.arc(px,py,2+5*avg[k]/mmax,0,7);x.fill();x.restore();});
+ }
+ document.getElementById('playBtn').onclick=function(){if(!AC||!playBuf)return;if(AC.state==='suspended')AC.resume();var s=AC.createBufferSource();s.buffer=playBuf;s.connect(AC.destination);s.start();var b=this;b.textContent='♪ playing…';s.onended=function(){b.textContent='▶ Play the track';};};
+
+ // ---------------- IMAGE ----------------
+ var W=240,H=240;
+ function med(a,b,c){if(c>=Math.max(a,b))return Math.min(a,b);if(c<=Math.min(a,b))return Math.max(a,b);return a+b-c;}
+ function scene(noise){var o=document.getElementById('imgOrig'),ox=o.getContext('2d');
+ if(noise){var im=ox.createImageData(W,H),s=99>>>0;for(var i=0;i<im.data.length;i+=4){s=(1103515245*s+12345)>>>0;var v=s>>>24;im.data[i]=v;im.data[i+1]=(v*2)&255;im.data[i+2]=(v*3)&255;im.data[i+3]=255;}ox.putImageData(im,0,0);return;}
+ var g=ox.createLinearGradient(0,0,0,H);g.addColorStop(0,'#0a1840');g.addColorStop(1,'#c79aff');ox.fillStyle=g;ox.fillRect(0,0,W,H);
+ ox.fillStyle='#7cf3ff';ox.beginPath();ox.arc(80,84,40,0,7);ox.fill();
+ ox.fillStyle='#5fe39a';ox.fillRect(140,120,74,66);
+ ox.fillStyle='#e3b86b';ox.beginPath();ox.moveTo(50,210);ox.lineTo(105,150);ox.lineTo(160,210);ox.closePath();ox.fill();
+ ox.strokeStyle='#f2f6fb';ox.lineWidth=3;ox.beginPath();ox.moveTo(10,36);ox.lineTo(230,60);ox.stroke();}
+ function runImage(noise){scene(noise);
+ var src=document.getElementById('imgOrig').getContext('2d').getImageData(0,0,W,H).data;
+ var pctx=document.getElementById('imgPred').getContext('2d'),rctx=document.getElementById('imgRes').getContext('2d'),cctx=document.getElementById('imgRecon').getContext('2d');
+ var P=pctx.createImageData(W,H),Rn=rctx.createImageData(W,H),C=cctx.createImageData(W,H);
+ var rebuilt=new Uint8ClampedArray(W*H*4),resid=new Uint8Array(W*H*3);
+ for(var ch=0;ch<3;ch++)for(var y=0;y<H;y++)for(var xx=0;xx<W;xx++){var idx=(y*W+xx)*4+ch;
+ var a=xx>0?rebuilt[(y*W+xx-1)*4+ch]:(y>0?rebuilt[((y-1)*W+xx)*4+ch]:128);
+ var b=y>0?rebuilt[((y-1)*W+xx)*4+ch]:a;var c=(xx>0&&y>0)?rebuilt[((y-1)*W+xx-1)*4+ch]:b;
+ var pr=med(a,b,c),act=src[idx],r=(act-pr)&0xff;resid[(y*W+xx)*3+ch]=r;rebuilt[idx]=(pr+r)&0xff;
+ P.data[idx]=pr;C.data[idx]=rebuilt[idx];var rc=r<128?r:r-256;Rn.data[idx]=Math.max(0,Math.min(255,128+rc*3));}
+ for(var i=3;i<rebuilt.length;i+=4){P.data[i]=255;Rn.data[i]=255;C.data[i]=255;}
+ pctx.putImageData(P,0,0);rctx.putImageData(Rn,0,0);cctx.putImageData(C,0,0);
+ var hist=new Float64Array(256);for(i=0;i<resid.length;i++)hist[resid[i]]++;var bits=0,n=resid.length;
+ for(var v=0;v<256;v++)if(hist[v]){var p=hist[v]/n;bits-=p*Math.log2(p);}
+ var raw=W*H*3,geo=Math.ceil(bits*n/8)+40,saved=(1-geo/raw)*100;
+ document.getElementById('iRaw').textContent=fmt(raw);
+ document.getElementById('iGeo').textContent=fmt(geo);
+ var sv=document.getElementById('iSave');countUp(sv,Math.max(0,saved),function(x){return x.toFixed(0)+'%';});sv.className='v '+(saved>25?'g':'');
+ document.getElementById('imgNote').innerHTML=noise
+ ?'Random noise has no pattern: the residual carries almost the whole image, so nothing is saved - the honest floor.'
+ :'The residual glows only on the edges. Everywhere the rule guessed right there is nothing left to store - that grey is the geometry, kept for free.';
+ }
+ document.getElementById('imgShapes').onclick=function(){runImage(false);};
+ document.getElementById('imgNoise').onclick=function(){runImage(true);};
+
+ runImage(false);
+ loadWav();
+})();
+</script>
+</body>
+</html>

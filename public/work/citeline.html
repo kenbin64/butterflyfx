@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>citeline · RAG with an enforced citation contract — Kenneth W. Bingham</title>
+<meta name="description" content="A retrieval augmented QA service over 40 CFR Part 141 that cites the exact regulation section or abstains. Hybrid retrieval, reciprocal rank fusion, a measured abstention gate, and a live demo you can query.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/work/citeline.html">
+<link rel="icon" href="/assets/butterfly.png">
+<link rel="stylesheet" href="/site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/work/citeline.html">
+<meta property="og:title" content="citeline · RAG with an enforced citation contract">
+<meta property="og:description" content="Retrieval augmented QA over federal drinking water regulations. It cites the section it used, or it abstains. Live demo.">
+<style>
+/* ---- demo panel, specific to this page ---- */
+.demo-panel {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 1.4rem 1.5rem; margin: 1.4rem 0;
+}
+.demo-form { display: flex; gap: .6rem; flex-wrap: wrap; }
+.demo-form input[type=text] {
+  flex: 1 1 320px; min-width: 0;
+  font: inherit; font-size: .98rem;
+  padding: .6rem .75rem;
+  background: var(--bg); color: var(--text);
+  border: 1px solid var(--border-2); border-radius: 8px;
+}
+.chips { display: flex; flex-wrap: wrap; gap: .4rem; margin: .9rem 0 0; padding: 0; list-style: none; }
+.chips button {
+  font: inherit; font-size: .8rem; cursor: pointer;
+  background: var(--surface-2); color: var(--text-2);
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: .2rem .68rem;
+}
+.chips button:hover { border-color: var(--accent); color: var(--accent); }
+.chips .lbl { font-size: .77rem; color: var(--text-3); align-self: center; margin-right: .2rem; }
+
+#demo-out { margin-top: 1.3rem; }
+#demo-out:empty { display: none; }
+.verdict {
+  display: flex; align-items: flex-start; gap: .7rem;
+  border-radius: 8px; padding: .85rem 1rem; margin-bottom: 1rem;
+  border: 1px solid var(--border);
+}
+.verdict.answered { background: var(--good-bg); border-color: color-mix(in srgb, var(--good) 30%, transparent); }
+.verdict.abstained { background: var(--warn-bg); border-color: color-mix(in srgb, var(--warn) 30%, transparent); }
+.verdict .txt { flex: 1; }
+.verdict h4 { margin: 0 0 .2rem; font-size: .95rem; }
+.verdict p { margin: 0; font-size: .9rem; color: var(--text-2); }
+.answer-body {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: .9rem 1.05rem; margin-bottom: 1rem;
+  font-size: .96rem; white-space: pre-wrap;
+}
+.cand { border-bottom: 1px solid var(--border); padding: .55rem 0; font-size: .89rem; }
+.cand:last-child { border-bottom: 0; }
+.cand .top { display: flex; gap: .55rem; align-items: baseline; flex-wrap: wrap; }
+.cand .ref { font-family: var(--mono); font-weight: 600; }
+.cand .ttl { color: var(--text-2); }
+.cand .sim { margin-left: auto; font-family: var(--mono); font-size: .8rem; color: var(--text-3); }
+.spin { display: inline-block; width: 13px; height: 13px; border: 2px solid var(--border-2);
+  border-top-color: var(--accent); border-radius: 50%; animation: sp .7s linear infinite; }
+@keyframes sp { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+
+.flow { font-family: var(--mono); font-size: .8rem; line-height: 1.75; color: var(--text-2); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="row">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham <span class="sub">AI Engineer</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/work/citeline.html" class="here">RAG demo</a>
+      <a href="/work/mcp-gateway.html">MCP gateway</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================ INTRO ============================ -->
+<section class="hero">
+  <div class="wrap">
+    <p class="role">Project · Python · FastAPI · Postgres + pgvector</p>
+    <h1>citeline</h1>
+    <p class="lede">
+      A retrieval augmented question answering service over the US National Primary
+      Drinking Water Regulations. It answers with a citation to the exact regulation
+      section, or it tells you it does not know. There is no third option, and that is
+      enforced in code rather than requested in a prompt.
+    </p>
+    <div class="btn-row" style="margin-top:1.5rem">
+      <a class="btn" href="#demo">Query it live</a>
+      <a class="btn ghost" href="#results">Evaluation results</a>
+      <a class="btn ghost" href="https://github.com/kenbin64" rel="noopener">Source</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== THE PROBLEM ======================== -->
+<section>
+  <div class="wrap narrow">
+    <h2>The problem</h2>
+    <p>
+      A retrieval demo that answers every question looks impressive and is nearly
+      worthless. The interesting question is not whether a system can answer when the
+      answer is present. It is what the system does when the answer is absent, because
+      that is the case that occurs constantly in real use and it is the case where a
+      language model is most confident and most wrong.
+    </p>
+    <p>
+      I picked federal regulations as the corpus for exactly that reason. Regulatory text
+      is dense with numeric thresholds, deadlines, defined terms and cross references. A
+      confidently wrong contaminant limit is not an amusing error; it is the kind of
+      error that gets a compliance tool thrown out. So the requirement is not "answer
+      well". It is <strong>never assert anything that is not in the retrieved
+      text</strong>, and prove that property rather than claim it.
+    </p>
+
+    <div class="note">
+      <strong>The corpus.</strong> 40 CFR Part 141, the National Primary Drinking Water
+      Regulations, ingested from the public eCFR API. United States federal regulations
+      are in the public domain, which makes this legally clean to host and index. The
+      edition is pinned, so a citation points at text that actually said that.
+    </div>
+  </div>
+</section>
+
+<!-- ========================= WHY IT IS HARD ====================== -->
+<section>
+  <div class="wrap narrow">
+    <h2>Why it is harder than it looks</h2>
+
+    <h3>Vector search alone quietly fails on regulations</h3>
+    <p>
+      Ask for the limit on arsenic and a dense index returns several passages about
+      arsenic monitoring, sampling schedules and treatment technology. They are all
+      genuinely about arsenic and semantically very close to the question. None of them
+      contains the number. Embeddings blur exactly the tokens that matter here: numeric
+      thresholds, units, and section identifiers.
+    </p>
+    <p>
+      So retrieval runs two ways at once. A dense vector search over pgvector handles
+      paraphrase, and a Postgres full text search pins the exact terms. Their results are
+      merged with reciprocal rank fusion, which combines by <em>rank</em> rather than
+      score and therefore needs no normalisation between two retrievers whose numbers
+      have nothing to do with each other.
+    </p>
+
+    <h3>Chunking on a fixed size destroys the answer</h3>
+    <p>
+      The contaminant limits live in tables. Slice those on a character count and you get
+      a chunk holding a contaminant name whose number landed in the next chunk, and a
+      chunk holding a number with nothing to say what it measures. Both look like fine
+      retrieval results and both are useless. The chunker splits on paragraph boundaries
+      first, falls back to sentence boundaries only when a single paragraph exceeds
+      budget, and prefixes every chunk with its own section number and heading so a
+      retrieved fragment is always attributable on its own.
+    </p>
+
+    <h3>A rank score is not a confidence score</h3>
+    <p>
+      This one cost me a rewrite, and it is the most useful thing on this page. My first
+      version gated abstention on the fused retrieval score. That is wrong twice over.
+    </p>
+    <p>
+      First, arithmetically: with a fusion constant of 60 and two retrievers, the maximum
+      achievable fused score is <code>2/61 = 0.0328</code>. I had set the threshold to
+      <code>0.045</code>, which no result can ever reach, so the service would have
+      abstained on every question ever asked.
+    </p>
+    <p>
+      Second, and worse, the approach could not have worked even with a reachable number.
+      Reciprocal rank fusion is a <em>rank</em> statistic. A dense retriever returns its k
+      nearest rows for any input whatsoever, so whatever is closest still lands at rank 1
+      and still scores <code>1/61</code>. The top fused score for
+      <em>what is the capital of France</em> looks almost identical to the top fused score
+      for a question the corpus genuinely answers. It carries essentially no information
+      about coverage.
+    </p>
+    <p>
+      The gate now tests <strong>absolute cosine similarity</strong>, which does move
+      between those two cases, plus an independent requirement that the sparse retriever
+      matched something at all. Fusion still decides the ordering. It just no longer
+      pretends to measure confidence.
+    </p>
+  </div>
+</section>
+
+<!-- ========================= ARCHITECTURE ======================== -->
+<section>
+  <div class="wrap">
+    <h2>Architecture</h2>
+    <p class="lede" style="margin-bottom:1.4rem">
+      Two paths through one system: a batch pipeline that builds the index, and a request
+      path that serves it.
+    </p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 900 250" role="img" aria-labelledby="ing-t ing-d">
+        <title id="ing-t">Ingestion pipeline</title>
+        <desc id="ing-d">The eCFR API is parsed into one document per section, then passes three
+        rejection gates (document quality, chunk quality, embedding quality) before being written to
+        Postgres in a single transaction.</desc>
+        <defs>
+          <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" class="d-arrow"/>
+          </marker>
+        </defs>
+
+        <rect x="6"   y="86" width="118" height="46" rx="8" class="d-box"/>
+        <text x="65"  y="106" text-anchor="middle" class="d-label">eCFR API</text>
+        <text x="65"  y="122" text-anchor="middle" class="d-sub">public source</text>
+
+        <rect x="160" y="86" width="128" height="46" rx="8" class="d-box"/>
+        <text x="224" y="106" text-anchor="middle" class="d-label">parse</text>
+        <text x="224" y="122" text-anchor="middle" class="d-sub">1 doc / section</text>
+
+        <rect x="324" y="86" width="128" height="46" rx="8" class="d-box-warn"/>
+        <text x="388" y="103" text-anchor="middle" class="d-label">gate 1</text>
+        <text x="388" y="119" text-anchor="middle" class="d-sub">short, reserved</text>
+
+        <rect x="488" y="86" width="128" height="46" rx="8" class="d-box-warn"/>
+        <text x="552" y="103" text-anchor="middle" class="d-label">gate 2</text>
+        <text x="552" y="119" text-anchor="middle" class="d-sub">chunk budget</text>
+
+        <rect x="652" y="86" width="128" height="46" rx="8" class="d-box-warn"/>
+        <text x="716" y="103" text-anchor="middle" class="d-label">gate 3</text>
+        <text x="716" y="119" text-anchor="middle" class="d-sub">dim, zero vector</text>
+
+        <rect x="816" y="86" width="80" height="46" rx="8" class="d-box-accent"/>
+        <text x="856" y="106" text-anchor="middle" class="d-label">upsert</text>
+        <text x="856" y="122" text-anchor="middle" class="d-sub">1 txn</text>
+
+        <path d="M124,109 H158"  class="d-line" marker-end="url(#a)"/>
+        <path d="M288,109 H322"  class="d-line" marker-end="url(#a)"/>
+        <path d="M452,109 H486"  class="d-line" marker-end="url(#a)"/>
+        <path d="M616,109 H650"  class="d-line" marker-end="url(#a)"/>
+        <path d="M780,109 H814"  class="d-line" marker-end="url(#a)"/>
+
+        <path d="M388,132 V176" class="d-line-warn" marker-end="url(#a)"/>
+        <path d="M552,132 V176" class="d-line-warn" marker-end="url(#a)"/>
+        <path d="M716,132 V176" class="d-line-warn" marker-end="url(#a)"/>
+        <rect x="300" y="178" width="500" height="40" rx="8" class="d-box-stop"/>
+        <text x="550" y="203" text-anchor="middle" class="d-label">rejected, counted, and recorded with a reason</text>
+
+        <text x="65" y="40" class="d-sub">SHA compare: an unchanged section is skipped, so a re-run is cheap</text>
+        <path d="M65,48 V84" class="d-line" marker-end="url(#a)"/>
+      </svg>
+      <figcaption>
+        <b>Ingestion.</b> Three rejection gates, not one. Bad input is refused at the earliest point
+        it can be recognised, and every rejection is counted with a reason rather than dropped
+        silently, because an index that quietly lost a section is worse than one that failed loudly.
+      </figcaption>
+    </figure>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 900 290" role="img" aria-labelledby="qp-t qp-d">
+        <title id="qp-t">Query path</title>
+        <desc id="qp-d">A question is embedded and searched two ways at once, by vector similarity and
+        by full text. The two ranked lists are fused with reciprocal rank fusion. The result passes a
+        similarity gate, and only then is an answer generated and its citations verified.</desc>
+
+        <rect x="6" y="118" width="104" height="46" rx="8" class="d-box"/>
+        <text x="58" y="145" text-anchor="middle" class="d-label">question</text>
+
+        <rect x="146" y="52" width="150" height="52" rx="8" class="d-box"/>
+        <text x="221" y="72" text-anchor="middle" class="d-label">vector search</text>
+        <text x="221" y="90" text-anchor="middle" class="d-sub">HNSW cosine, k=24</text>
+
+        <rect x="146" y="178" width="150" height="52" rx="8" class="d-box"/>
+        <text x="221" y="198" text-anchor="middle" class="d-label">full text search</text>
+        <text x="221" y="216" text-anchor="middle" class="d-sub">tsvector, k=24</text>
+
+        <rect x="336" y="115" width="130" height="52" rx="8" class="d-box-accent"/>
+        <text x="401" y="135" text-anchor="middle" class="d-label">fuse (RRF)</text>
+        <text x="401" y="153" text-anchor="middle" class="d-sub">rank, not score</text>
+
+        <rect x="506" y="115" width="140" height="52" rx="8" class="d-box-warn"/>
+        <text x="576" y="135" text-anchor="middle" class="d-label">similarity gate</text>
+        <text x="576" y="153" text-anchor="middle" class="d-sub">cosine &#8805; 0.62</text>
+
+        <rect x="686" y="52" width="200" height="52" rx="8" class="d-box-good"/>
+        <text x="786" y="72" text-anchor="middle" class="d-label">answer + verify citations</text>
+        <text x="786" y="90" text-anchor="middle" class="d-sub">invented refs rejected</text>
+
+        <rect x="686" y="178" width="200" height="52" rx="8" class="d-box-stop"/>
+        <text x="786" y="198" text-anchor="middle" class="d-label">abstain</text>
+        <text x="786" y="216" text-anchor="middle" class="d-sub">and say what it looked at</text>
+
+        <path d="M110,133 C126,133 130,78 144,78"   class="d-line" marker-end="url(#a)"/>
+        <path d="M110,149 C126,149 130,204 144,204" class="d-line" marker-end="url(#a)"/>
+        <path d="M296,78  C316,78 316,133 334,133"  class="d-line" marker-end="url(#a)"/>
+        <path d="M296,204 C316,204 316,149 334,149" class="d-line" marker-end="url(#a)"/>
+        <path d="M466,141 H504" class="d-line" marker-end="url(#a)"/>
+        <path d="M646,133 C666,133 666,78 684,78"   class="d-line-good" marker-end="url(#a)"/>
+        <path d="M646,149 C666,149 666,204 684,204" class="d-line-warn" marker-end="url(#a)"/>
+        <text x="664" y="66"  class="d-sub">pass</text>
+        <text x="660" y="238" class="d-sub">fail</text>
+      </svg>
+      <figcaption>
+        <b>Query path.</b> Two searches run against the same question because they fail differently.
+        Vector search understands that "how much lead is allowed" means the lead action level; full
+        text search is the one that reliably finds <code>0.015 mg/L</code> and <code>141.80</code>.
+        Fusing them means a passage has to satisfy only one of the two to survive, and the ones both
+        agree on rise to the top.
+      </figcaption>
+    </figure>
+
+<h3 style="margin-top:2rem">The three gates</h3>
+    <div class="grid g3" style="margin-top:.9rem">
+      <div class="card">
+        <p class="kicker">gate 1 · before the model</p>
+        <p class="small mb0">
+          If no passage is semantically close enough, or no passage contains the
+          question's terms, the language model is never invoked. This is the cheap gate
+          and it catches the common case. Its threshold was chosen by sweeping the
+          labelled set, not by judgement.
+        </p>
+      </div>
+      <div class="card">
+        <p class="kicker">gate 2 · the prompt</p>
+        <p class="small mb0">
+          The model is instructed to reply with a fixed marker when the supplied excerpts
+          do not answer the question. This is the weakest of the three, because it is the
+          only one that depends on instruction following, which is why it is not the only
+          one.
+        </p>
+      </div>
+      <div class="card">
+        <p class="kicker">gate 3 · after the model</p>
+        <p class="small mb0">
+          Every citation the model emitted is checked against the excerpts it was actually
+          handed. A citation to an excerpt that was never supplied, or a substantive
+          sentence carrying none, fails the whole answer. It is discarded, not served with
+          a warning attached.
+        </p>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:1.4rem">
+      Gate 3 is the one that matters most and it is the one people skip. Serving a
+      questionable answer with a caveat bolted on is how a system teaches its users to
+      ignore caveats. If the grounding cannot be verified, there is no answer to serve.
+    </div>
+  </div>
+</section>
+
+<!-- ============================ DEMO ============================= -->
+<section id="demo">
+  <div class="wrap">
+    <h2>Engineering trade-offs</h2>
+    <p class="lede">
+      The decisions that shaped this, and what each one cost. None of them is the
+      only defensible choice; these are the reasons for the ones I made.
+    </p>
+
+    <div class="tbl-scroll">
+    <table class="tradeoffs">
+      <thead>
+        <tr><th>Decision</th><th>Chosen</th><th>Instead of</th><th>Why, and what it costs</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Fusion</td>
+          <td>Reciprocal rank fusion</td>
+          <td>A cross-encoder re-ranker</td>
+          <td>
+            RRF combines <em>ranks</em>, so it needs no shared score scale between a cosine
+            distance and a lexical relevance score, and no model. A re-ranker would likely order
+            the top few better, but it adds a second model to the request path on a host that
+            already cannot afford the first one. The cost is real: RRF cannot tell that the third
+            result is much better than the fourth, only that it ranked higher.
+          </td>
+        </tr>
+        <tr>
+          <td>Abstention threshold</td>
+          <td>Cosine 0.62, measured</td>
+          <td>A tuned guess</td>
+          <td>
+            Swept against the eval set and chosen where out-of-scope questions were blocked
+            without starting to block answerable ones. The first attempt gated on the fused RRF
+            score, which was wrong: the highest possible fused score was lower than the threshold
+            being asked for, so nothing could ever pass. Raw cosine is comparable between
+            questions; a fused rank score is not.
+          </td>
+        </tr>
+        <tr>
+          <td>Chunking</td>
+          <td>On section boundaries</td>
+          <td>Fixed character windows</td>
+          <td>
+            A citation is only useful if it names something a reader can look up. Fixed windows
+            split a limit away from the contaminant it applies to and produce citations that
+            point at nothing. The cost is uneven chunk sizes and a few sections too long for
+            one chunk.
+          </td>
+        </tr>
+        <tr>
+          <td>Embeddings</td>
+          <td>Local, nomic-embed-text</td>
+          <td>A hosted embedding API</td>
+          <td>
+            No key to leak, no per token cost, and no corpus text leaving the host, which is the
+            posture a regulated customer will ask about. The cost is quality: a larger hosted
+            model would almost certainly retrieve better.
+          </td>
+        </tr>
+        <tr>
+          <td>Generation on demand</td>
+          <td>Off, answers precomputed</td>
+          <td>Generating per request</td>
+          <td>
+            Measured on this host, one grounded answer ran past four minutes. The CPU is a
+            virtual one with no AVX or SSE4.2, so llama.cpp falls back to scalar arithmetic and
+            no amount of tuning closes that gap. Retrieval stays live because it is fast and it
+            is the part worth showing.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h2>Query it</h2>
+    <p class="lede">
+      This is the running service, not a recording. Try a question the regulations answer,
+      then try one they do not, and watch it decline.
+    </p>
+
+    <div class="demo-panel play">
+      <form class="play-form" id="demo-form">
+        <label class="sr" for="q">Your question</label>
+        <input type="text" id="q" name="q" maxlength="500" autocomplete="off"
+               placeholder="What is the maximum contaminant level for arsenic?">
+        <button class="btn" type="submit" id="go">Ask both</button>
+      </form>
+
+      <ul class="examples">
+        <li><button type="button" data-q="What is the maximum contaminant level for arsenic in drinking water?">arsenic limit</button></li>
+        <li><button type="button" data-q="At what concentration is the lead action level exceeded?">lead action level</button></li>
+        <li><button type="button" data-q="How quickly must a system issue a Tier 1 public notice?">Tier 1 notice</button></li>
+        <li><button type="button" class="oos" data-q="What is the national ambient air quality standard for benzene?">benzene in AIR</button></li>
+        <li><button type="button" class="oos" data-q="What is the drinking water MCL for PFOA?">PFOA</button></li>
+        <li><button type="button" class="oos" data-q="What is the capital of France?">capital of France</button></li>
+      </ul>
+      <p class="small muted" style="margin-top:.7rem">
+        The dashed ones are outside the corpus. The last two are the interesting ones: benzene
+        <em>is</em> in these regulations with a drinking water limit, so asking for its air
+        standard is a near miss, and PFOA is a real contaminant that this edition of the corpus
+        genuinely does not cover. A keyword filter is fooled by both.
+      </p>
+
+      <div class="compare" id="compare" hidden aria-live="polite">
+        <div class="side naive">
+          <header>
+            <h4>Retrieval alone</h4>
+            <p>What any RAG service has at this point</p>
+          </header>
+          <div class="body" id="naive-body"></div>
+        </div>
+        <div class="side gated">
+          <header>
+            <h4>With the gate and the citation contract</h4>
+            <p>What this service does with it</p>
+          </header>
+          <div class="body" id="gated-body"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================== RESULTS ============================ -->
+<section id="results">
+  <div class="wrap">
+    <h2>Evaluation</h2>
+    <p class="lede" style="margin-bottom:1.4rem">
+      A labelled set of 28 questions: 20 the regulations answer, with the section that
+      answers each one, and 8 they do not. Scoring asserts specific strings rather than
+      asking a model to grade, so the result is reproducible and cannot drift with a
+      grader's mood.
+    </p>
+
+    <div id="eval-block">
+      <p class="muted">Evaluation figures are generated by <code>eval/run_eval.py</code> and inserted here after each run.</p>
+    </div>
+
+    <h3 style="margin-top:2rem">What is measured, and why both halves matter</h3>
+    <div class="grid g2" style="margin-top:.9rem">
+      <div class="card">
+        <h3>Retrieval quality</h3>
+        <ul class="clean small">
+          <li><b>recall@k</b> — did the correct section appear in the top k at all</li>
+          <li><b>hit@1</b> — was it ranked first</li>
+          <li><b>MRR</b> — mean reciprocal rank of the correct section</li>
+          <li><b>latency</b> — p50 and p95, measured end to end</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Answer integrity</h3>
+        <ul class="clean small">
+          <li><b>accuracy</b> — answered, contained the required fact, cited the right section</li>
+          <li><b>abstention recall</b> — share of unanswerable questions correctly refused</li>
+          <li><b>false answer rate</b> — unanswerable questions that got an answer anyway. This is the hallucination rate, and it is the number the whole design exists to hold down</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:1.4rem">
+      The two error types are not weighted equally, on purpose. A wrong answer to a
+      question the corpus cannot answer undermines trust in every other answer the system
+      gives. A refusal on a question it could have answered is visible, annoying and
+      recoverable. So the threshold sweep picks the point that eliminates false answers
+      first, then keeps as many real answers as it can.
+    </div>
+  </div>
+</section>
+
+<!-- ====================== RUN IT YOURSELF ======================== -->
+<section>
+  <div class="wrap narrow">
+    <h2>Run it yourself</h2>
+    <p>
+      The repository is self contained. Docker brings up Postgres with pgvector; the models
+      run locally through Ollama, so there is no API key and nothing leaves the machine.
+    </p>
+    <pre><code>git clone https://github.com/kenbin64
+cd citeline
+
+docker compose up -d              # postgres 16 + pgvector
+ollama pull nomic-embed-text      # embeddings, 768-d
+ollama pull llama3.2:3b           # generation
+
+make install                      # venv + dependencies
+make migrate                      # apply the schema
+make ingest                       # fetch, gate, chunk, embed, index
+
+make check                        # ruff + mypy + 31 unit tests
+make eval                         # regenerate the numbers above
+
+citeline search "MCL for arsenic" # retrieval only
+citeline ask    "MCL for arsenic" # full pipeline</code></pre>
+    <p class="small muted">
+      <code>make ingest</code> is idempotent. Run it twice and the second run writes
+      nothing, reporting every chunk as skipped, because each document is compared by
+      content hash before any work is done.
+    </p>
+  </div>
+</section>
+
+<!-- ========================= HONEST LIMITS ======================= -->
+<section>
+  <div class="wrap narrow">
+    <h2>Limits</h2>
+    <p>Things this does not do, stated plainly so nobody has to discover them.</p>
+
+    <div class="note limit">
+      <strong>The host CPU is weak, and it shows.</strong>
+      This VPS is a QEMU virtual CPU with no AVX, SSE4.2 or POPCNT exposed. Modern numpy
+      and ONNX runtime wheels will not execute on it at all, which ruled out the faster
+      embedding path and forced everything through Ollama's generic CPU build. Measured on
+      this host: embedding a passage takes about 4.5 seconds, so the full corpus build runs
+      for over an hour, and generation takes tens of seconds per answer. Short query
+      embedding stays near 200 ms, which is why the interactive demo defaults to the
+      retrieval path. On any ordinary machine these numbers change completely. The
+      architecture is not the bottleneck; this particular processor is.
+    </div>
+
+    <ul class="clean">
+      <li>
+        <b>No reranker.</b> A cross encoder would likely improve ranking, but it cannot run
+        on this CPU for the reason above. The interface for it exists; the model does not.
+      </li>
+      <li>
+        <b>The eval set is small.</b> 28 questions written by one person. It is enough to
+        catch a broken gate and to set a threshold, and not enough to claim a general
+        accuracy figure. Treat the numbers as a regression baseline, not a benchmark.
+      </li>
+      <li>
+        <b>One corpus, one part.</b> Part 141 only. Nothing about the design is specific to
+        it, but no other body of text has been tested, so no claim is made about them.
+      </li>
+      <li>
+        <b>Gate 3 verifies grounding, not correctness.</b> It proves every claim carries a
+        citation to a passage that was actually supplied. It does not prove the model read
+        that passage correctly. That is a real gap, and it is why the answer always shows
+        its sources for a human to check.
+      </li>
+      <li>
+        <b>Abstention has a cost.</b> A tighter gate refuses some questions the corpus
+        genuinely answers. That trade is deliberate and the sweep table shows exactly what
+        it costs at each threshold.
+      </li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span>© 2026 Kenneth W. Bingham</span>
+      <a href="/">Home</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">Source</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* The comparison playground.
+
+   Both columns are driven by ONE real request to the live service. The left
+   column shows the passages retrieval found, which is what any RAG system would
+   be holding at that moment. The right column shows what this service decided to
+   do with them.
+
+   No strawman: the left column is not a fabricated bad answer, it is the real
+   retrieval. The difference on show is the decision, which is the part that
+   actually differs. */
+(function () {
+  var API = '/api/citeline';
+  var form  = document.getElementById('demo-form');
+  var input = document.getElementById('q');
+  var btn   = document.getElementById('go');
+  var wrap  = document.getElementById('compare');
+  var naive = document.getElementById('naive-body');
+  var gated = document.getElementById('gated-body');
+  if (!form) return;
+
+  /* The service is the authority on its own decision. An earlier version of
+     this page hardcoded the threshold and recomputed pass/fail in the browser,
+     which is a second implementation of a rule that already exists server side
+     and is free to disagree with it. The page now reports what the service
+     decided and why. The constant below is used only to tint individual
+     passages, never to decide the outcome. */
+  var TINT_AT = 0.62;
+
+  function esc(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function passage(c, passes) {
+    var sim = (typeof c.similarity === 'number') ? c.similarity.toFixed(3) : '--';
+    var how = { both: 'meaning + exact terms', vector: 'meaning', lexical: 'exact terms' }[c.found_by] || c.found_by || '';
+    return '<div class="passage ' + (passes ? 'over' : 'under') + '">' +
+      '<span class="ref">' + esc(c.ref) + '</span>' +
+      '<span class="ttl">' + esc(c.title || '') + '</span>' +
+      '<span class="sim">similarity ' + sim + ' &middot; ' + esc(how) + '</span>' +
+      '</div>';
+  }
+
+  function render(data) {
+    var cands = data.considered || data.candidates || [];
+    var top = cands.length ? cands[0] : null;
+    var best = top && typeof top.similarity === 'number' ? top.similarity : 0;
+
+    var left = '';
+    if (!cands.length) {
+      left = '<p class="muted">Nothing came back.</p>';
+    } else {
+      left += '<p class="small muted" style="margin-top:0">' +
+        'These are the ' + cands.length + ' passages the retriever ranked highest. ' +
+        'A service without a gate hands them to a model and asks for an answer, ' +
+        'whatever their similarity happens to be.</p>';
+      for (var i = 0; i < cands.length; i++) left += passage(cands[i], cands[i].similarity >= TINT_AT);
+    }
+    naive.innerHTML = left;
+
+    var right = '';
+    if (data.abstained) {
+      right += '<div class="verdict"><span class="pill stop">abstained</span></div>';
+      right += '<p>' + esc(data.answer) + '</p>';
+    } else if (data.precomputed) {
+      right += '<div class="verdict"><span class="pill good">answered</span>' +
+               '<span class="pill">precomputed</span></div>';
+      right += '<p>' + esc(data.answer) + '</p>';
+    } else {
+      right += '<div class="verdict"><span class="pill good">passed the gate</span></div>';
+      right += '<p>' + esc(data.answer) + '</p>';
+    }
+    right += '<p class="small muted"><b>Why:</b> ' + esc(data.reason) + '</p>';
+    right += '<p class="small muted">Best passage similarity <b>' + best.toFixed(3) + '</b>. ' +
+             'The thresholds behind this decision were set by sweeping the eval set, not by taste.</p>';
+    gated.innerHTML = right;
+  }
+
+  function ask(q) {
+    if (!q) return;
+    wrap.hidden = false;
+    naive.innerHTML = '<div class="verdict"><span class="spin"></span> retrieving</div>';
+    gated.innerHTML = '<div class="verdict"><span class="spin"></span> deciding</div>';
+    btn.disabled = true;
+
+    fetch(API + '/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: q })
+    })
+    .then(function (r) {
+      if (r.status === 429) throw new Error('Rate limited. Give it a minute.');
+      if (!r.ok) throw new Error('The service returned ' + r.status + '.');
+      return r.json();
+    })
+    .then(render)
+    .catch(function (e) {
+      naive.innerHTML = '<p class="muted">' + esc(e.message) + '</p>';
+      gated.innerHTML = '<p class="muted">No decision to show.</p>';
+    })
+    .finally(function () { btn.disabled = false; });
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    ask(input.value.trim());
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.examples button'), function (b) {
+    b.addEventListener('click', function () {
+      input.value = b.getAttribute('data-q');
+      ask(input.value);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,393 @@
+/* ============================================================
+   butterflyfx.us
+
+   A portfolio read by hiring managers and engineers, so the design
+   has one job: make the work legible fast.
+
+   The colour rule: colour carries MEANING, it does not decorate.
+   Green is a verified answer, amber is an abstention, red is a
+   blocked one, teal is the primary path through the site. Once
+   colour means something, more of it reads as clarity rather than
+   noise, which is the difference between a modern page and a busy
+   one.
+
+   Everything is token driven and defined in both schemes, so the
+   page follows the reader's system preference instead of imposing
+   a choice on them.
+   ============================================================ */
+
+:root {
+  --bg:        #fbfbfa;
+  --bg-tint:   #f4f7f9;
+  --surface:   #ffffff;
+  --surface-2: #f7f9fb;
+  --border:    #e2e5ea;
+  --border-strong: #ccd2db;
+
+  --text:      #14171c;
+  --text-2:    #3d4450;
+  --muted:     #5b6472;
+
+  /* Primary path. */
+  --accent:    #0f6d94;
+  --accent-2:  #12869b;
+  --accent-bg: #e8f3f8;
+
+  /* Secondary, used for depth and for the second project so the two
+     flagship pieces are distinguishable at a glance. */
+  --violet:    #5b4bc4;
+  --violet-bg: #eeecfb;
+
+  /* Semantic. These are the important ones. */
+  --good:      #14713f;
+  --good-bg:   #e6f4ec;
+  --warn:      #8a5a00;
+  --warn-bg:   #fdf3df;
+  --stop:      #a3282d;
+  --stop-bg:   #fbeaea;
+
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+
+  --maxw: 1080px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgba(16, 22, 32, .04), 0 4px 16px -8px rgba(16, 22, 32, .10);
+  --shadow-lift: 0 2px 4px rgba(16, 22, 32, .05), 0 12px 32px -12px rgba(16, 22, 32, .18);
+
+  /* Aliases for names used by pages written against the earlier palette.
+     Kept so a rename here cannot quietly blank out text or borders on a page
+     that was not part of this redesign. */
+  --border-2: #ccd2db;
+  --text-3:   #5b6472;
+  --card:     #ffffff;
+  --fg:       #14171c;
+  --blue:     #0f6d94;
+  --green:    #14713f;
+  --red:      #a3282d;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        #0e1116;
+    --bg-tint:   #121721;
+    --surface:   #151a21;
+    --surface-2: #1a2028;
+    --border:    #272e38;
+    --border-strong: #39424f;
+
+    --text:      #e9edf2;
+    --text-2:    #c3ccd8;
+    --muted:     #94a1b2;
+
+    --accent:    #5cc2e8;
+    --accent-2:  #7fd4ef;
+    --accent-bg: #102a36;
+
+    --violet:    #a99bf5;
+    --violet-bg: #1d1a35;
+
+    --good:      #62d69a;
+    --good-bg:   #102b1e;
+    --warn:      #e0b155;
+    --warn-bg:   #2e2413;
+    --stop:      #f0888c;
+    --stop-bg:   #2e1618;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 4px 16px -8px rgba(0, 0, 0, .5);
+    --shadow-lift: 0 2px 4px rgba(0, 0, 0, .35), 0 12px 32px -12px rgba(0, 0, 0, .6);
+
+    --border-2: #39424f;
+    --text-3:   #94a1b2;
+    --card:     #151a21;
+    --fg:       #e9edf2;
+    --blue:     #5cc2e8;
+    --green:    #62d69a;
+    --red:      #f0888c;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16.5px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 1.4rem; }
+
+/* A narrow column must keep the SAME left edge as a full width one, or the
+   page appears to shift sideways as you scroll from the hero into the body.
+   Constraining the children rather than the container caps line length without
+   re-centring the column. */
+.wrap.narrow { max-width: var(--maxw); }
+.wrap.narrow > * { max-width: 760px; }
+.narrow:not(.wrap) { max-width: 760px; }
+
+a { color: var(--accent); text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--accent); }
+
+h1, h2, h3 { line-height: 1.25; letter-spacing: -0.015em; }
+h1 { font-size: clamp(1.9rem, 4.5vw, 2.7rem); font-weight: 700; margin: 0 0 .8rem; }
+h2 { font-size: clamp(1.35rem, 2.6vw, 1.7rem); font-weight: 650; margin: 3rem 0 1rem; }
+h3 { font-size: 1.08rem; font-weight: 640; margin: 0 0 .5rem; }
+
+p { margin: 0 0 1rem; color: var(--text-2); }
+.lede { font-size: 1.1rem; color: var(--text-2); }
+.muted { color: var(--muted); }
+.small { font-size: .88rem; }
+.mono { font-family: var(--mono); }
+.mt0 { margin-top: 0; }
+.mb0 { margin-bottom: 0; }
+.clean { list-style: none; padding: 0; margin: 0; }
+
+code, kbd, pre { font-family: var(--mono); }
+code { font-size: .88em; background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: .1em .38em; }
+pre { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem 1.1rem; overflow-x: auto; font-size: .86rem; line-height: 1.6; }
+pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+/* ---------- masthead ---------- */
+
+.masthead {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+/* Some pages wrap the masthead in .row rather than .wrap. Both are laid out
+   identically here so the brand lines up with the page content instead of
+   sitting against the window edge. */
+.masthead .wrap, .masthead .row {
+  max-width: var(--maxw); margin: 0 auto; padding: 0 1.4rem;
+  display: flex; align-items: center; gap: 1.3rem; height: 58px;
+}
+.brand .sub {
+  font-weight: 450; font-size: .82rem; color: var(--muted);
+  margin-left: .5rem; letter-spacing: 0;
+}
+@media (max-width: 620px) { .brand .sub { display: none; } }
+.brand { font-weight: 660; color: var(--text); text-decoration: none; letter-spacing: -0.02em; margin-right: auto; }
+.masthead nav { display: flex; gap: 1.15rem; flex-wrap: wrap; }
+.masthead nav a { color: var(--muted); text-decoration: none; font-size: .93rem; padding: .2rem 0; border-bottom: 2px solid transparent; }
+.masthead nav a:hover { color: var(--text); }
+.masthead nav a.here { color: var(--text); border-bottom-color: var(--accent); }
+
+/* ---------- hero ---------- */
+
+.hero {
+  padding: 4rem 0 3rem;
+  background:
+    radial-gradient(1100px 380px at 12% -10%, var(--accent-bg) 0%, transparent 62%),
+    radial-gradient(900px 340px at 88% -20%, var(--violet-bg) 0%, transparent 60%);
+  border-bottom: 1px solid var(--border);
+}
+.hero h1 { max-width: 20ch; }
+.hero .lede { max-width: 62ch; }
+
+.btn-row { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.6rem; }
+.btn {
+  display: inline-flex; align-items: center; gap: .45rem;
+  background: var(--accent); color: #fff; border: 1px solid transparent;
+  padding: .62rem 1.05rem; border-radius: var(--radius-sm);
+  font-size: .93rem; font-weight: 560; text-decoration: none;
+  cursor: pointer; font-family: inherit;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lift); background: var(--accent-2); }
+.btn.ghost { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
+.btn.ghost:hover { background: var(--surface-2); border-color: var(--accent); }
+
+/* ---------- layout ---------- */
+
+section { padding: .5rem 0; }
+.grid { display: grid; gap: 1.1rem; }
+.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 780px) { .g2, .g3 { grid-template-columns: 1fr; } }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.3rem;
+  box-shadow: var(--shadow);
+}
+/* A card that is a link to a project gets a coloured edge, so the two
+   flagship projects are told apart before a word is read. */
+.card.accent { border-top: 3px solid var(--accent); }
+.card.accent-2 { border-top: 3px solid var(--violet); }
+a.card, .card-link { text-decoration: none; color: inherit; display: block; transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
+a.card:hover, .card-link:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); border-color: var(--border-strong); }
+
+.feature {
+  background: linear-gradient(150deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.7rem 1.8rem;
+  box-shadow: var(--shadow);
+}
+
+.kicker {
+  font-family: var(--mono); font-size: .7rem; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--muted); margin: 0 0 .45rem;
+}
+
+.pill {
+  display: inline-flex; align-items: center; gap: .35rem;
+  font-family: var(--mono); font-size: .72rem; letter-spacing: .04em;
+  padding: .2rem .55rem; border-radius: 999px;
+  background: var(--accent-bg); color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.pill.good { background: var(--good-bg); color: var(--good); border-color: color-mix(in srgb, var(--good) 25%, transparent); }
+.pill.warn { background: var(--warn-bg); color: var(--warn); border-color: color-mix(in srgb, var(--warn) 25%, transparent); }
+.pill.stop { background: var(--stop-bg); color: var(--stop); border-color: color-mix(in srgb, var(--stop) 25%, transparent); }
+.pill.violet { background: var(--violet-bg); color: var(--violet); border-color: color-mix(in srgb, var(--violet) 25%, transparent); }
+
+.tags { display: flex; flex-wrap: wrap; gap: .4rem; margin: .8rem 0 0; padding: 0; list-style: none; }
+.tags li {
+  font-family: var(--mono); font-size: .72rem; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 999px; padding: .15rem .55rem;
+  background: var(--surface-2);
+}
+
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .9rem; margin: 1.4rem 0; }
+.metric { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: .85rem 1rem; }
+.metric .n { font-family: var(--mono); font-size: 1.42rem; font-weight: 600; color: var(--text); display: block; }
+.metric .l { font-size: .8rem; color: var(--muted); }
+
+.note {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-bg);
+  padding: .85rem 1.1rem; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin: 1.4rem 0;
+}
+.note.warn { border-left-color: var(--warn); background: var(--warn-bg); }
+.note p:last-child { margin-bottom: 0; }
+
+/* A callout that separates one body of work from another, so a reader
+   is never left guessing which is the career and which is the curiosity. */
+.callout {
+  display: flex; gap: .9rem; align-items: flex-start;
+  border: 1px solid var(--border); border-left: 3px solid var(--violet);
+  background: var(--violet-bg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1rem 1.2rem; margin: 1.4rem 0;
+}
+.callout .ico { font-size: 1.1rem; line-height: 1.5; }
+.callout p { margin: 0; color: var(--text-2); }
+.callout strong { color: var(--text); }
+
+.flow { font-family: var(--mono); font-size: .84rem; line-height: 1.85; color: var(--text-2); }
+
+.avail { display: inline-flex; align-items: center; gap: .45rem; font-size: .9rem; color: var(--muted); }
+.avail::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 3px var(--good-bg); }
+
+.stack { display: flex; flex-direction: column; gap: .35rem; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tbl-scroll { overflow-x: auto; }
+.aside-research { border-top: 1px solid var(--border); margin-top: 3rem; padding-top: 1.6rem; }
+
+/* ---------- diagrams ---------- */
+/* Inline SVG rather than an image, so it themes with the page, stays
+   crisp at any zoom, and is readable by a screen reader. */
+
+.diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  margin: 1.2rem 0;
+  overflow-x: auto;
+  box-shadow: var(--shadow);
+}
+.diagram svg { display: block; width: 100%; height: auto; min-width: 520px; }
+.diagram figcaption { font-size: .84rem; color: var(--muted); margin-top: .8rem; }
+
+.d-box { fill: var(--surface-2); stroke: var(--border-strong); }
+.d-box-accent { fill: var(--accent-bg); stroke: var(--accent); }
+.d-box-good { fill: var(--good-bg); stroke: var(--good); }
+.d-box-warn { fill: var(--warn-bg); stroke: var(--warn); }
+.d-box-stop { fill: var(--stop-bg); stroke: var(--stop); }
+.d-label { fill: var(--text); font-family: var(--sans); font-size: 12.5px; font-weight: 560; }
+.d-sub { fill: var(--muted); font-family: var(--mono); font-size: 10.5px; }
+.d-line { stroke: var(--border-strong); stroke-width: 1.6; fill: none; }
+.d-line-good { stroke: var(--good); stroke-width: 1.8; fill: none; }
+.d-line-warn { stroke: var(--warn); stroke-width: 1.8; fill: none; }
+.d-arrow { fill: var(--border-strong); }
+.d-arrow-good { fill: var(--good); }
+.d-arrow-warn { fill: var(--warn); }
+
+/* ---------- trade-off table ---------- */
+
+.tradeoffs { width: 100%; border-collapse: collapse; margin: 1.2rem 0; font-size: .92rem; }
+.tradeoffs th, .tradeoffs td { text-align: left; padding: .75rem .9rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.tradeoffs th { font-size: .75rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; }
+.tradeoffs td:first-child { font-weight: 570; color: var(--text); white-space: nowrap; }
+.tradeoffs tr:last-child td { border-bottom: 0; }
+
+/* ---------- the comparison playground ---------- */
+
+.play { margin: 1.4rem 0; }
+.play-form { display: flex; gap: .6rem; flex-wrap: wrap; }
+.play-form input[type=text] {
+  flex: 1 1 340px; min-width: 0;
+  font-family: inherit; font-size: .95rem;
+  padding: .62rem .8rem; border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong); background: var(--surface); color: var(--text);
+}
+.play-form input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+
+.examples { display: flex; flex-wrap: wrap; gap: .4rem; margin: .8rem 0 0; padding: 0; list-style: none; }
+.examples button {
+  font-family: inherit; font-size: .8rem; cursor: pointer;
+  background: var(--surface-2); color: var(--text-2);
+  border: 1px solid var(--border); border-radius: 999px; padding: .28rem .7rem;
+}
+.examples button:hover { border-color: var(--accent); color: var(--accent); }
+.examples button.oos { border-style: dashed; }
+
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.2rem; }
+@media (max-width: 820px) { .compare { grid-template-columns: 1fr; } }
+
+.side { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.side > header { padding: .7rem 1rem; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+.side > header h4 { margin: 0; font-size: .93rem; font-weight: 620; }
+.side > header p { margin: .15rem 0 0; font-size: .8rem; color: var(--muted); }
+.side .body { padding: 1rem; font-size: .9rem; }
+.side.naive > header { border-bottom-color: color-mix(in srgb, var(--warn) 30%, var(--border)); }
+.side.gated > header { border-bottom-color: color-mix(in srgb, var(--good) 30%, var(--border)); }
+
+.passage { border-left: 2px solid var(--border-strong); padding: .3rem 0 .3rem .7rem; margin-bottom: .7rem; }
+.passage .ref { font-family: var(--mono); font-size: .82rem; color: var(--accent); }
+.passage .ttl { display: block; font-size: .85rem; color: var(--text-2); }
+.passage .sim { font-family: var(--mono); font-size: .74rem; color: var(--muted); }
+.passage.over { border-left-color: var(--good); }
+.passage.under { border-left-color: var(--warn); }
+
+.verdict { display: flex; align-items: center; gap: .5rem; margin-bottom: .8rem; font-weight: 570; }
+.spin { display: inline-block; width: 13px; height: 13px; border: 2px solid var(--border-strong); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- footer ---------- */
+
+footer.site {
+  margin-top: 4rem; border-top: 1px solid var(--border);
+  padding: 2rem 0 3rem; color: var(--muted); font-size: .9rem;
+  background: var(--bg-tint);
+}
+footer.site a { color: var(--muted); }
+footer.site a:hover { color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  html { scroll-behavior: auto; }
+}

@@ -1,96 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About &middot; Kenneth W. Bingham, AI Engineer</title>
-  <meta name="description"
-    content="About Kenneth W. Bingham, AI Engineer and Backend / Platform Engineer: 10+ years building reliable systems, now focused on the reliability layer around AI.">
-  <link rel="canonical" href="https://butterflyfx.us/about.html">
-  <link rel="stylesheet" href="fonts.css">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="carousel.css">
-  <link rel="stylesheet" href="theme.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About · Kenneth W. Bingham — AI Engineer</title>
+<meta name="description" content="How I approach AI engineering: determinism around a nondeterministic model, verified grounding, measured cost, and end to end ownership.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/about.html">
+<link rel="icon" href="/assets/butterfly.png">
+<link rel="stylesheet" href="/site.css">
 </head>
-
 <body>
-  <canvas id="spiral-bg"></canvas>
 
-  <nav class="navbar glass">
-    <a href="index.html">Home</a>
-    <a href="about.html" class="active">About</a>
-    <a href="method.html">Method</a>
-    <a href="resume.html">Resume</a>
-    <a href="research.html">Research</a>
-    <a href="contact.html">Contact</a>
-    <a href="https://github.com/kenbin64" target="_blank" rel="noopener">GitHub</a>
-  </nav>
-
-  <div class="content">
-
-    <header>
-      <img src="kennethbingham.webp" alt="Kenneth W. Bingham" class="hero-photo"
-        style="width:120px;height:120px;margin-bottom:1em;" />
-      <h1>Kenneth W. Bingham</h1>
-      <h2>AI Engineer &middot; Backend &amp; Platform Engineer</h2>
-      <h3>Open to hybrid and remote</h3>
-    </header>
-
-    <section class="section glass">
-      <h2 class="section-title">Who I am</h2>
-      <div class="section-content">
-        <p>
-          I am a software engineer with more than ten years building reliable systems end to end, across regulated,
-          high-stakes domains: U.S. Air Force programs (I held a Secret clearance), healthcare and insurance, fintech,
-          and fleet payments. I work full-stack, from database and API to a modern front end and the cloud deploy that
-          puts it in production.
-        </p>
-        <p>
-          Since August 2025, on my own initiative, I have gone deep into AI engineering: not only how to use large
-          language models, but how they work and how to make them reliable through operating directives and geometric
-          representation. I build the reliability layer around AI: deterministic pipelines, evaluation and verification
-          harnesses, and reproducible systems. I prove my work with tests and reproducible numbers, and I separate what is
-          established from what is a model from what is still a conjecture under test, so the bold ideas stay credible.
-        </p>
-      </div>
-    </section>
-
-    <section class="section glass">
-      <h2 class="section-title">What I optimize for</h2>
-      <div class="section-content">
-        <ul>
-          <li><b>Determinism over fluency.</b> The model is nondeterministic; the system around it must not be. Schema-validated outputs, retry budgets, and verifier passes, so malformed or drifting output never reaches the next stage.</li>
-          <li><b>Cost where it counts.</b> Route cheap calls to cheap models, cache byte-identical context, budget tokens, so frontier spend goes only where frontier reasoning is required.</li>
-          <li><b>Reproducibility and provenance.</b> Content-addressed, hash-verified, deterministic replay, so you can prove exactly what a system did and recreate it on any machine.</li>
-          <li><b>Ownership end to end.</b> I run my own Linux infrastructure with zero-downtime, auto-rollback deploys, and I own problems from architecture through production.</li>
-        </ul>
-      </div>
-    </section>
-
-    <section class="section glass">
-      <h2 class="section-title">Beyond the keyboard</h2>
-      <div class="section-content">
-        <p>
-          I am a drummer, a singer, and an acrylic painter, and an independent researcher in geometric, representation-based
-          computation. The same instinct runs through all of it: find the structure underneath, and let it carry the work.
-        </p>
-        <div class="hero-cta" style="margin-top:1.2em;">
-          <a href="resume.html" class="cta-btn">Full resume</a>
-          <a href="method.html" class="cta-btn alt">How I work</a>
-          <a href="research.html" class="cta-btn alt">Research and writing</a>
-          <a href="contact.html" class="cta-btn alt">Contact</a>
-        </div>
-      </div>
-    </section>
-
-    <footer>
-      <p>&copy; 2026 Kenneth W. Bingham &middot; ButterflyFx</p>
-    </footer>
+<header class="masthead">
+  <div class="row">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham <span class="sub">AI Engineer</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/work/citeline.html">RAG demo</a>
+      <a href="/work/mcp-gateway.html">MCP gateway</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/about.html" class="here">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </nav>
   </div>
+</header>
 
-  <script src="manifold-bg.js" defer></script>
-<script src="/nav.js" data-page="About" defer></script>
+<main>
+
+<section class="hero">
+  <div class="wrap narrow">
+    <p class="role">About</p>
+    <h1>Reliability is the product</h1>
+    <p class="lede">
+      A language model is a component with a failure mode, not a finished system. Most of
+      the engineering worth doing is in what surrounds it: what gets retrieved, what the
+      model is permitted to assert, what happens when it is wrong, and how you would know.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>How I work</h2>
+    <div class="grid g2" style="margin-top:1.3rem">
+
+      <div class="card">
+        <p class="kicker">01</p>
+        <h3>Determinism around a nondeterministic core</h3>
+        <p class="small mb0">
+          The model is nondeterministic; the system around it must not be. Schema
+          validated outputs, temperature zero where an answer must be auditable, retry
+          budgets, and a verification pass, so malformed or drifting output never reaches
+          the next stage. If the same question and the same corpus can give two different
+          answers, the system cannot be audited.
+        </p>
+      </div>
+
+      <div class="card">
+        <p class="kicker">02</p>
+        <h3>Grounding is verified, not requested</h3>
+        <p class="small mb0">
+          Asking a model in a prompt to cite its sources is a hope. Checking afterwards
+          that every citation points at a passage the model was actually given is a
+          guarantee. When grounding cannot be verified, the right output is no output.
+          Serving a shaky answer with a disclaimer attached only teaches people to skip
+          disclaimers.
+        </p>
+      </div>
+
+      <div class="card">
+        <p class="kicker">03</p>
+        <h3>Measured, not asserted</h3>
+        <p class="small mb0">
+          Thresholds get chosen by sweeping labelled data and reading the separation, not
+          by picking a number that sounds confident. Claims come with the test that
+          produced them and the conditions it ran under. When something has not been
+          measured, I say that instead of rounding it up to a claim.
+        </p>
+      </div>
+
+      <div class="card">
+        <p class="kicker">04</p>
+        <h3>Cost where it counts</h3>
+        <p class="small mb0">
+          Route cheap calls to cheap models, cache byte identical context, budget tokens
+          deliberately, so frontier spend goes only where frontier reasoning is genuinely
+          required. Most prompts send far more than the model needs, and that is a
+          solvable engineering problem rather than a fact of life.
+        </p>
+      </div>
+
+      <div class="card">
+        <p class="kicker">05</p>
+        <h3>Pipelines you can leave running</h3>
+        <p class="small mb0">
+          A batch job is finished when it is idempotent, incremental, gated on data
+          quality, and observable enough that a failure is loud. Anything less is a job
+          somebody has to babysit, and babysitting does not scale.
+        </p>
+      </div>
+
+      <div class="card">
+        <p class="kicker">06</p>
+        <h3>Ownership end to end</h3>
+        <p class="small mb0">
+          I run my own Linux infrastructure with zero downtime, auto rollback deploys, and
+          I own problems from architecture through production. Everything linked from this
+          site is deployed and operated by me, which is also why the limits pages are
+          specific.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <h2>Background</h2>
+    <p>
+      Ten years of backend engineering before the current focus: hazardous materials
+      management for the U.S. Air Force in C# and .NET under a Secret clearance,
+      healthcare interoperability pipelines at Humana in HL7 and FHIR, aircraft parts
+      systems in Java and Spring Boot, financial data aggregation, and locomotive
+      optimisation at Norfolk Southern.
+    </p>
+    <p>
+      The through line is regulated environments where being wrong has consequences and
+      somebody eventually audits the trail. That is the same instinct behind the AI work:
+      an answer you cannot trace is not an answer yet.
+    </p>
+    <div class="btn-row" style="margin-top:1.4rem">
+      <a class="btn" href="/resume.html">Full resume</a>
+      <a class="btn ghost" href="/work/citeline.html">See the work</a>
+    </div>
+
+    <p class="aside-research">
+      I also keep independent research on geometric data representation at
+      <a href="https://dimensionalprogramming.com" rel="noopener">dimensionalprogramming.com</a>.
+      It is a separate interest and none of the engineering above depends on it.
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span>© 2026 Kenneth W. Bingham</span>
+      <a href="/">Home</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/kenneth-bingham-11378b10" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</footer>
+
 </body>
-
 </html>

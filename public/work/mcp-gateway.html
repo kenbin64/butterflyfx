@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mcp-gateway · an audited tool server for language models — Kenneth W. Bingham</title>
+<meta name="description" content="A Model Context Protocol server that gives a language model a closed set of read only tools over internal services. Validated arguments, an audit trail for every call, and failures that cannot leak internals. Live on this site.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/work/mcp-gateway.html">
+<link rel="icon" href="/assets/butterfly.png">
+<link rel="stylesheet" href="/site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/work/mcp-gateway.html">
+<meta property="og:title" content="mcp-gateway · an audited tool server for language models">
+<meta property="og:description" content="Connecting a model to internal data is the easy part. This is built around the questions a security review asks afterwards.">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham</a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/work/citeline.html">RAG demo</a>
+      <a href="/work/mcp-gateway.html" class="here">MCP gateway</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">case study · python · deployed</p>
+    <h1>A tool server a security review would pass.</h1>
+    <p class="lede">
+      <b>mcp-gateway</b> gives a language model a closed set of read only tools over internal
+      services. It validates every argument against a declared schema, logs every call including
+      the ones it refused, and makes sure a crash cannot tell the model anything it should not know.
+    </p>
+    <div class="btn-row">
+      <a class="btn" href="#try">Try it live</a>
+      <a class="btn ghost" href="https://github.com/kenbin64/mcp-gateway" rel="noopener">Source on GitHub</a>
+      <a class="btn ghost" href="/work/citeline.html">The service behind it</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <h2>The problem</h2>
+    <p>
+      Connecting a model to internal data is what nearly every company is trying to do right now,
+      and the demo takes an afternoon. The hard part arrives immediately afterwards, in the form of
+      four questions:
+    </p>
+    <ul>
+      <li>What exactly can it reach, and who decided that?</li>
+      <li>What happens when the model sends arguments that are wrong, or hostile?</li>
+      <li>What did it actually do last Tuesday, and can you show me?</li>
+      <li>When something breaks, does the error tell the model more than it should know?</li>
+    </ul>
+    <p>
+      A gateway that cannot answer those is not going into production anywhere that has an audit.
+      This one is built around them rather than around the demo.
+    </p>
+
+    <h2>Architecture</h2>
+    <p class="lede">
+      Every call passes the same four checks, in the same order, and leaves a record whether it
+      succeeded or not.
+    </p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 900 300" role="img" aria-labelledby="g-t g-d">
+        <title id="g-t">Request path through the gateway</title>
+        <desc id="g-d">A JSON-RPC call passes authentication, rate limiting, tool lookup against a
+        closed registry, and schema validation before the tool runs under a timeout. Every outcome,
+        including each refusal, is written to the audit trail.</desc>
+        <defs>
+          <marker id="ga" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" class="d-arrow"/>
+          </marker>
+        </defs>
+
+        <rect x="4" y="96" width="104" height="48" rx="8" class="d-box"/>
+        <text x="56" y="116" text-anchor="middle" class="d-label">model</text>
+        <text x="56" y="132" text-anchor="middle" class="d-sub">JSON-RPC 2.0</text>
+
+        <rect x="140" y="96" width="112" height="48" rx="8" class="d-box-warn"/>
+        <text x="196" y="116" text-anchor="middle" class="d-label">auth</text>
+        <text x="196" y="132" text-anchor="middle" class="d-sub">constant time</text>
+
+        <rect x="284" y="96" width="112" height="48" rx="8" class="d-box-warn"/>
+        <text x="340" y="116" text-anchor="middle" class="d-label">rate limit</text>
+        <text x="340" y="132" text-anchor="middle" class="d-sub">per client</text>
+
+        <rect x="428" y="96" width="120" height="48" rx="8" class="d-box-warn"/>
+        <text x="488" y="116" text-anchor="middle" class="d-label">registry</text>
+        <text x="488" y="132" text-anchor="middle" class="d-sub">closed list</text>
+
+        <rect x="580" y="96" width="120" height="48" rx="8" class="d-box-warn"/>
+        <text x="640" y="116" text-anchor="middle" class="d-label">validate args</text>
+        <text x="640" y="132" text-anchor="middle" class="d-sub">no coercion</text>
+
+        <rect x="732" y="96" width="164" height="48" rx="8" class="d-box-good"/>
+        <text x="814" y="116" text-anchor="middle" class="d-label">tool runs</text>
+        <text x="814" y="132" text-anchor="middle" class="d-sub">under a timeout</text>
+
+        <path d="M108,120 H138" class="d-line" marker-end="url(#ga)"/>
+        <path d="M252,120 H282" class="d-line" marker-end="url(#ga)"/>
+        <path d="M396,120 H426" class="d-line" marker-end="url(#ga)"/>
+        <path d="M548,120 H578" class="d-line" marker-end="url(#ga)"/>
+        <path d="M700,120 H730" class="d-line" marker-end="url(#ga)"/>
+
+        <path d="M196,144 V186" class="d-line-warn" marker-end="url(#ga)"/>
+        <path d="M340,144 V186" class="d-line-warn" marker-end="url(#ga)"/>
+        <path d="M488,144 V186" class="d-line-warn" marker-end="url(#ga)"/>
+        <path d="M640,144 V186" class="d-line-warn" marker-end="url(#ga)"/>
+        <path d="M814,144 V186" class="d-line-good" marker-end="url(#ga)"/>
+
+        <rect x="120" y="188" width="776" height="46" rx="8" class="d-box-accent"/>
+        <text x="508" y="207" text-anchor="middle" class="d-label">audit trail: tool, client, outcome, duration, argument fingerprint</text>
+        <text x="508" y="224" text-anchor="middle" class="d-sub">refusals are recorded too, because a rejected call is usually the interesting one</text>
+
+        <text x="56" y="56" class="d-sub">a backend credential never travels outbound; the model only ever sees tool output</text>
+        <path d="M56,64 V94" class="d-line" marker-end="url(#ga)"/>
+      </svg>
+      <figcaption>
+        <b>One path, four refusal points.</b> A call can be turned away for being unauthorised,
+        too frequent, naming a tool that does not exist, or carrying arguments that do not match
+        the declared schema. All five outcomes land in the same audit trail.
+      </figcaption>
+    </figure>
+
+    <h2>Engineering trade-offs</h2>
+    <div class="tbl-scroll">
+    <table class="tradeoffs">
+      <thead><tr><th>Decision</th><th>Chosen</th><th>Instead of</th><th>Why, and what it costs</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Tool discovery</td>
+          <td>A closed registry in code</td>
+          <td>Reflection over a module</td>
+          <td>
+            There is no path by which a caller names a function and has it run. Adding a tool is a
+            code change and a review. The cost is that adding one is a deploy, not configuration.
+          </td>
+        </tr>
+        <tr>
+          <td>Argument handling</td>
+          <td>Validate and refuse</td>
+          <td>Coerce helpfully</td>
+          <td>
+            A model sending <code>"5"</code> where an integer belongs has made a mistake worth
+            surfacing. Guessing what it meant is how a validator stops being one. The cost is
+            occasional friction when a model is nearly right.
+          </td>
+        </tr>
+        <tr>
+          <td>Unknown fields</td>
+          <td>Dropped, not rejected</td>
+          <td>Rejecting the whole call</td>
+          <td>
+            Models invent a plausible extra field often enough that failing the call is unhelpful
+            when every declared argument is valid. Dropping keeps the schema an accurate
+            description of what the handler receives.
+          </td>
+        </tr>
+        <tr>
+          <td>Audit contents</td>
+          <td>A fingerprint of arguments</td>
+          <td>The arguments themselves</td>
+          <td>
+            Arguments are model generated text containing whatever a user typed, so logging them
+            verbatim makes the log a second copy of the data the gateway exists to be careful with.
+            A hash still answers "was this the same call", "how often does it repeat", and "did the
+            arguments change between the failure and the retry". The cost is that the log alone
+            cannot reconstruct a request.
+          </td>
+        </tr>
+        <tr>
+          <td>Write tools</td>
+          <td>Refused at registration</td>
+          <td>Allowed with a flag</td>
+          <td>
+            A tool that changes something needs a conversation about consent and blast radius that
+            has not happened. The registry refuses one outright rather than leaving that judgement
+            to whoever adds the next tool in a hurry.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="note">
+      <p>
+        <b>The failure that matters most.</b> An unexpected exception is logged in full and reported
+        to the model as <code>&lt;tool&gt; failed</code>, nothing more. There is a test that raises an
+        error containing a database password and asserts it never reaches the response, because
+        anything handed to a model can end up in a transcript and out of your hands.
+      </p>
+    </div>
+
+    <h2 id="try">Try it</h2>
+    <p class="lede">
+      The running service, not a recording. It fronts
+      <a href="/work/citeline.html">citeline</a>, so the tools search real federal regulations.
+    </p>
+
+    <pre><code>curl -s https://butterflyfx.us/api/mcp/healthz
+
+curl -s https://butterflyfx.us/api/mcp/mcp \
+  -H 'content-type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+
+curl -s https://butterflyfx.us/api/mcp/mcp \
+  -H 'content-type: application/json' \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{
+        "name":"regulations.search",
+        "arguments":{"question":"What is the lead action level?","limit":3}}}'</code></pre>
+
+    <p class="small muted">
+      Send <code>"limit":"lots"</code> instead and it answers <code>limit must be an integer</code>
+      rather than guessing.
+    </p>
+
+    <h2>Protocol details worth getting right</h2>
+    <p>Three rules that are easy to miss and that a strict client will punish, each covered by a test:</p>
+    <ul>
+      <li>A <b>notification</b>, a request with no <code>id</code>, receives no response at all, not even an error.</li>
+      <li>A <b>tool failure is not a JSON-RPC error</b>. The call succeeded and the tool reported a
+          problem, so the result carries <code>isError</code> and the model can read it and try
+          something else. Only protocol faults are errors.</li>
+      <li>An <b>unknown tool</b> does not list the available ones. The model already has them from
+          <code>tools/list</code>, and echoing the inventory into every error is free reconnaissance.</li>
+    </ul>
+
+    <h2>Limits</h2>
+    <ul>
+      <li>Bearer auth is a single shared secret. Appropriate for one trusted caller, and not an
+          identity system. Per client keys with rotation would be the next step.</li>
+      <li>The rate limiter is in process, so behind more than one replica the real limit is the sum.</li>
+      <li>The argument validator understands only the schema shapes these tools declare, and refuses
+          anything else rather than waving it through. Past that, the right move is a real JSON
+          Schema library, not more clauses.</li>
+      <li>Read only by design.</li>
+    </ul>
+
+    <div class="metrics">
+      <div class="metric"><span class="n">29</span><span class="l">tests</span></div>
+      <div class="metric"><span class="n">2</span><span class="l">tools exposed</span></div>
+      <div class="metric"><span class="n">5</span><span class="l">audited outcomes</span></div>
+      <div class="metric"><span class="n">0</span><span class="l">write tools</span></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <p>
+      <a href="/">Home</a> &middot;
+      <a href="/work/citeline.html">citeline</a> &middot;
+      <a href="https://github.com/kenbin64/mcp-gateway" rel="noopener">Source</a> &middot;
+      <a href="/contact.html">Contact</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
