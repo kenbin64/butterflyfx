@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>valuesai · measuring whether a model knows or is improvising — Kenneth W. Bingham</title>
+<meta name="description" content="A reliability engine that answers your question several times, embeds the answers, and measures whether they agree. A real fact scores 91 of 100. An invented town scores 32 and abstains. Live, and you can enter anything.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/work/valuesai.html">
+<link rel="icon" href="/assets/butterfly.png">
+<link rel="stylesheet" href="/site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/work/valuesai.html">
+<meta property="og:title" content="valuesai · does the model know, or is it improvising?">
+<meta property="og:description" content="Self-consistency scoring over a panel of answers. Ask it anything; watch the panel agree or scatter.">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham <span class="sub">AI Engineer</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/work/citeline.html">RAG demo</a>
+      <a href="/work/mcp-gateway.html">MCP gateway</a>
+      <a href="/work/valuesai.html" class="here">Reliability</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">case study · node · deployed</p>
+    <h1>Does the model know, or is it improvising?</h1>
+    <p class="lede">
+      <b>valuesai</b> answers your question several times over, embeds the answers, and measures
+      whether they agree with each other. A panel that converges is something the model knows. A
+      panel that scatters is something it is inventing, and the score says so before you act on it.
+    </p>
+    <div class="btn-row">
+      <a class="btn" href="https://valuesai.online" rel="noopener">Ask it anything</a>
+      <a class="btn ghost" href="#numbers">What the numbers look like</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+
+    <h2>The problem</h2>
+    <p>
+      A language model gives you the same confident tone whether it is recalling something it has
+      seen ten thousand times or filling a gap with something plausible. The prose does not change.
+      That is the whole difficulty: the failure mode is invisible at exactly the moment it matters.
+    </p>
+    <p>
+      Asking the model how confident it is does not help, because it will answer that question with
+      the same machinery it used for the first one. So the measurement has to come from somewhere
+      the model does not control.
+    </p>
+    <p>
+      <b>Ask it more than once.</b> If it knows, the answers land in the same place. If it is
+      improvising, each attempt improvises differently. Agreement across independent attempts is
+      evidence you can measure without needing to know the right answer yourself.
+    </p>
+
+    <h2>How it works</h2>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 900 300" role="img" aria-labelledby="v-t v-d">
+        <title id="v-t">How a prompt is scored</title>
+        <desc id="v-d">One prompt is answered several times, the first greedily as an anchor and the
+        rest sampled. Every answer is embedded. Two independent measures are taken: topic collapse,
+        the length of the resultant of the unit vectors, and fact collapse, agreement on the decisive
+        value. The two combine into a reliability score.</desc>
+        <defs>
+          <marker id="va" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" class="d-arrow"/>
+          </marker>
+        </defs>
+
+        <rect x="4" y="120" width="104" height="48" rx="8" class="d-box"/>
+        <text x="56" y="140" text-anchor="middle" class="d-label">a prompt</text>
+        <text x="56" y="156" text-anchor="middle" class="d-sub">anything</text>
+
+        <rect x="150" y="30"  width="150" height="38" rx="8" class="d-box-accent"/>
+        <text x="225" y="54"  text-anchor="middle" class="d-sub">answer 1 · greedy anchor</text>
+        <rect x="150" y="80"  width="150" height="38" rx="8" class="d-box"/>
+        <text x="225" y="104" text-anchor="middle" class="d-sub">answer 2 · sampled</text>
+        <rect x="150" y="130" width="150" height="38" rx="8" class="d-box"/>
+        <text x="225" y="154" text-anchor="middle" class="d-sub">answer 3 · sampled</text>
+        <rect x="150" y="180" width="150" height="38" rx="8" class="d-box"/>
+        <text x="225" y="204" text-anchor="middle" class="d-sub">answer 4 · sampled</text>
+        <rect x="150" y="230" width="150" height="38" rx="8" class="d-box"/>
+        <text x="225" y="254" text-anchor="middle" class="d-sub">answer 5 · sampled</text>
+
+        <rect x="342" y="120" width="118" height="48" rx="8" class="d-box"/>
+        <text x="401" y="140" text-anchor="middle" class="d-label">embed each</text>
+        <text x="401" y="156" text-anchor="middle" class="d-sub">nomic-embed-text</text>
+
+        <rect x="500" y="70"  width="190" height="52" rx="8" class="d-box-good"/>
+        <text x="595" y="90"  text-anchor="middle" class="d-label">topic collapse</text>
+        <text x="595" y="108" text-anchor="middle" class="d-sub">same question at all?</text>
+
+        <rect x="500" y="166" width="190" height="52" rx="8" class="d-box-good"/>
+        <text x="595" y="186" text-anchor="middle" class="d-label">fact collapse</text>
+        <text x="595" y="204" text-anchor="middle" class="d-sub">same decisive value?</text>
+
+        <rect x="730" y="118" width="164" height="52" rx="8" class="d-box-accent"/>
+        <text x="812" y="138" text-anchor="middle" class="d-label">reliability score</text>
+        <text x="812" y="156" text-anchor="middle" class="d-sub">and abstain, or not</text>
+
+        <path d="M108,138 C126,138 130,49  148,49"  class="d-line" marker-end="url(#va)"/>
+        <path d="M108,142 C126,142 130,99  148,99"  class="d-line" marker-end="url(#va)"/>
+        <path d="M108,144 H148" class="d-line" marker-end="url(#va)"/>
+        <path d="M108,146 C126,146 130,199 148,199" class="d-line" marker-end="url(#va)"/>
+        <path d="M108,150 C126,150 130,249 148,249" class="d-line" marker-end="url(#va)"/>
+
+        <path d="M300,49  C320,49  322,138 340,138" class="d-line" marker-end="url(#va)"/>
+        <path d="M300,99  C320,99  322,142 340,142" class="d-line" marker-end="url(#va)"/>
+        <path d="M300,144 H340" class="d-line" marker-end="url(#va)"/>
+        <path d="M300,199 C320,199 322,148 340,148" class="d-line" marker-end="url(#va)"/>
+        <path d="M300,249 C320,249 322,152 340,152" class="d-line" marker-end="url(#va)"/>
+
+        <path d="M460,138 C480,138 480,96  498,96"  class="d-line-good" marker-end="url(#va)"/>
+        <path d="M460,150 C480,150 480,192 498,192" class="d-line-good" marker-end="url(#va)"/>
+        <path d="M690,96  C710,96  712,138 728,138" class="d-line" marker-end="url(#va)"/>
+        <path d="M690,192 C710,192 712,150 728,150" class="d-line" marker-end="url(#va)"/>
+      </svg>
+      <figcaption>
+        <b>Two independent measures, not one.</b> They can disagree, and when they do that is the
+        interesting case: a panel can be talking about the same subject while contradicting itself on
+        the one detail the question actually asked for.
+      </figcaption>
+    </figure>
+
+    <h3>Topic collapse</h3>
+    <p>
+      Embed each answer, normalise to unit vectors, sum them, and divide the length of that
+      resultant by the number of answers. Answers pointing the same way reinforce and give a
+      resultant near 1. Answers pointing in different directions partly cancel. It asks a blunt
+      question: are these even answers to the same thing?
+    </p>
+
+    <h3>Fact collapse</h3>
+    <p>
+      Whether the answers agree on the thing the question turns on, which is often not the prose.
+      The engine routes on the question itself:
+    </p>
+    <ul>
+      <li>A question asking for a <b>quantity</b> collapses the numbers, so varied wording cannot
+          outvote the one figure that matters.</li>
+      <li>A <b>yes/no or verification</b> question collapses the verdicts, so a correct call
+          surrounded by different supporting detail reads as agreement rather than as noise.</li>
+      <li>Anything else collapses shared content, weighted by how widely the panel shares each part,
+          so the panel itself decides what is common scaffolding and what is lone invention. No
+          stopword list.</li>
+    </ul>
+
+    <h2 id="numbers">What the numbers look like</h2>
+    <p class="lede">Measured on the live service, not illustrative.</p>
+
+    <div class="tbl-scroll">
+    <table class="tradeoffs">
+      <thead><tr><th>Asked</th><th>Score</th><th>Topic</th><th>Fact</th><th>What happened</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Boiling point of water</td>
+          <td><span class="pill good">91 · reliable</span></td>
+          <td>99</td><td>92</td>
+          <td>Every answer said 100&nbsp;degrees Celsius. Nothing to disagree about.</td>
+        </tr>
+        <tr>
+          <td>Moons of Mars</td>
+          <td><span class="pill good">76 · reliable</span></td>
+          <td>&mdash;</td><td>&mdash;</td>
+          <td>Phobos and Deimos every time, with the wording varying around the agreed facts.</td>
+        </tr>
+        <tr>
+          <td>Population of a town that does not exist</td>
+          <td><span class="pill stop">32 · fabrication risk</span></td>
+          <td>96</td><td>33</td>
+          <td>
+            The interesting one. Topic collapse stayed high because every answer was clearly about
+            the same question, while fact collapse fell through the floor: each attempt invented a
+            <em>different</em> correction of the invented name. The engine abstained.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="note">
+      <p>
+        That third row is the entire product. The model did not refuse and did not sound unsure. It
+        produced three fluent, differently wrong answers, and the disagreement between them is what
+        gave it away.
+      </p>
+    </div>
+
+    <h2>Engineering trade-offs</h2>
+    <div class="tbl-scroll">
+    <table class="tradeoffs">
+      <thead><tr><th>Decision</th><th>Chosen</th><th>Instead of</th><th>Why, and what it costs</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Confidence signal</td>
+          <td>Agreement across a panel</td>
+          <td>Asking the model how sure it is</td>
+          <td>
+            Self-reported confidence is produced by the same machinery that produced the answer, so
+            it fails in the same places. Agreement is measured from outside. The cost is that it
+            takes several generations instead of one.
+          </td>
+        </tr>
+        <tr>
+          <td>Comparing answers</td>
+          <td>Embeddings</td>
+          <td>A model judging the answers</td>
+          <td>
+            An LLM judge is another model with the same failure mode, and it is slow. Embedding is
+            fast, deterministic, and cheap. The cost is that it compares meaning rather than
+            reasoning about it.
+          </td>
+        </tr>
+        <tr>
+          <td>Request shape</td>
+          <td>A job you watch</td>
+          <td>One request that returns an answer</td>
+          <td>
+            Measured on this host: 3.6 tokens per second, so a panel takes minutes. Hiding that
+            behind a spinner reads as broken. Showing each answer as it lands turns the wait into
+            the demonstration. The cost is a queue, polling, and more moving parts.
+          </td>
+        </tr>
+        <tr>
+          <td>Panel generation</td>
+          <td>Sequential</td>
+          <td>All at once</td>
+          <td>
+            The engine's own entry point fires the whole panel with <code>Promise.all</code>. With a
+            single Ollama already using every core, that makes each answer slower and none of them
+            arrive sooner. Sequential is no slower overall and lets each answer be shown on arrival.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h2>Honest limits</h2>
+    <ul>
+      <li><b>Self-consistency is not truth.</b> A model that is confidently and consistently wrong
+          scores as reliable here. This catches improvisation, not shared error, and no amount of
+          panel size fixes that.</li>
+      <li>The first answer is greedy and the rest are sampled. Change the sampling and the scores
+          move, so they are comparable within one configuration rather than across configurations.</li>
+      <li>A panel of three to five is small. It is what the hardware affords, and enough to separate
+          "knows it" from "making it up" while being too few for fine grained ranking.</li>
+      <li>Answers are capped at 96 tokens to keep a panel inside a few minutes.</li>
+    </ul>
+
+    <div class="btn-row">
+      <a class="btn" href="https://valuesai.online" rel="noopener">Try it, enter anything</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <p>
+      <a href="/">Home</a> &middot;
+      <a href="/work/citeline.html">citeline</a> &middot;
+      <a href="/work/mcp-gateway.html">mcp-gateway</a> &middot;
+      <a href="/contact.html">Contact</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
