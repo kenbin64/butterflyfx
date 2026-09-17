@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self-Healing Lattice &middot; Kenneth W. Bingham</title>
+<meta name="description" content="Data held as a shape can detect and repair its own corruption, because the rule that generates the values also constrains them. Damage the lattice and watch the neighbours vote it back, with no central copy and no checksum file.">
+<meta name="author" content="Kenneth W. Bingham">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/self-healing.html">
+<link rel="icon" href="assets/butterfly.png">
+<link rel="stylesheet" href="site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/self-healing.html">
+<meta property="og:title" content="Self-Healing Lattice &middot; Kenneth W. Bingham">
+<meta property="og:description" content="Corrupt the data and watch it repair itself from neighbour agreement alone. No master copy, no checksum, no central authority.">
+<meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  .board { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.2rem; }
+  @media (max-width: 760px) { .board { grid-template-columns: 1fr; } }
+  .cell { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .85rem; }
+  .cell canvas { width: 100%; height: auto; display: block; border-radius: var(--radius-sm); image-rendering: pixelated; background: var(--surface-2); }
+  .cell h3 { margin: 0 0 .5rem; font-size: .95rem; }
+  .cell p { font-size: .84rem; color: var(--muted); margin: .5rem 0 0; }
+  .controls { display: flex; gap: .8rem; align-items: center; flex-wrap: wrap; margin: 1.2rem 0; }
+  .controls label { font-size: .88rem; color: var(--muted); display: flex; gap: .5rem; align-items: center; }
+  .log { font-family: var(--mono); font-size: .8rem; color: var(--text-2); background: var(--surface-2);
+         border: 1px solid var(--border); border-radius: var(--radius-sm); padding: .8rem 1rem;
+         margin-top: 1rem; min-height: 5.5rem; white-space: pre-wrap; line-height: 1.6; }
+  .ok { color: var(--good); font-weight: 600; }
+  .bad { color: #e0a06a; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="row">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham <span class="sub">AI Engineer</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/geometry-as-data.html">Geometry as data</a>
+      <a href="/self-healing.html" class="here">Self-healing</a>
+      <a href="/paint-by-numbers.html">Paint by numbers</a>
+      <a href="/geometry-bench.html">Benchmark</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="role">Not a compression story</p>
+    <h1>Data that repairs itself, because the shape knows what it should be.</h1>
+    <p class="lede">
+      Hold values as a shape rather than as a list and something else comes free.
+      Every 2&times;2 patch of the surface <code>z = a&middot;x&middot;y + b&middot;x + c&middot;y + d</code>
+      obeys one small identity. A cell that has been damaged no longer agrees with what its
+      neighbours imply, so the damage is <strong>visible from the outside</strong> &mdash; with
+      no master copy, no checksum file and nobody in charge. The neighbours notice, they vote,
+      and the lattice puts itself back.
+    </p>
+    <p class="lede" style="margin-top:1rem">
+      Break it below and watch. Then break it badly, and watch it refuse to guess.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="controls">
+      <button class="btn" id="scatter">Damage 2% at random</button>
+      <button class="btn ghost" id="heavy">Damage 20%</button>
+      <button class="btn ghost" id="block">Destroy a solid block</button>
+      <button class="btn" id="repair" disabled>Let the neighbours repair it</button>
+      <button class="btn ghost" id="reset">Reset</button>
+    </div>
+
+    <div class="board">
+      <div class="cell">
+        <h3>The field</h3>
+        <canvas id="field" width="200" height="200"></canvas>
+        <p>Values drawn as colour. Damage shows up as noise against the smooth surface.</p>
+      </div>
+      <div class="cell">
+        <h3>What the neighbours can see is wrong</h3>
+        <canvas id="errors" width="200" height="200"></canvas>
+        <p id="err-cap">Bright means this cell disagrees with the identity its neighbours satisfy. No cell is told the answer; each one only compares notes locally.</p>
+      </div>
+    </div>
+
+    <div class="score" style="display:flex; gap:1.4rem; flex-wrap:wrap; margin-top:1.2rem">
+      <div class="metric"><span class="n" id="m-damaged">0</span><span class="l">cells damaged</span></div>
+      <div class="metric"><span class="n" id="m-rounds">0</span><span class="l">repair rounds</span></div>
+      <div class="metric"><span class="n" id="m-fixed">&mdash;</span><span class="l">repaired</span></div>
+      <div class="metric"><span class="n" id="m-left">&mdash;</span><span class="l">still wrong</span></div>
+    </div>
+
+    <div class="log" id="log">Ready. The lattice is intact.</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Why this happens at all</h2>
+    <div class="grid g3" style="margin-top:1.2rem">
+      <div class="card">
+        <p class="kicker">the identity</p>
+        <h3>The rule constrains the values</h3>
+        <p>
+          For this surface, every 2&times;2 block satisfies
+          <code>f(x+1,y+1) &minus; f(x+1,y) &minus; f(x,y+1) + f(x,y) = a</code>.
+          It holds everywhere, so any cell can be predicted from three neighbours. A list of
+          numbers has no such property; a shape does.
+        </p>
+      </div>
+      <div class="card">
+        <p class="kicker">the witnesses</p>
+        <h3>Four blocks see every cell</h3>
+        <p>
+          Each interior cell sits in four different 2&times;2 blocks, so four independent
+          predictions exist for it. When three or more agree with each other and disagree with
+          the stored value, the stored value is the thing that is wrong.
+        </p>
+      </div>
+      <div class="card">
+        <p class="kicker">the limit</p>
+        <h3>Witnesses can be destroyed too</h3>
+        <p>
+          Damage a solid block and every witness to those cells is damaged as well. Then the
+          neighbourhood genuinely does not know, and the right behaviour is to stop rather than
+          invent something. That is what the third button demonstrates.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <strong>Where this sits in the established world.</strong>
+        This is the same shape of idea as erasure coding and RAID: you recover while enough
+        independent witnesses survive, and you lose when a single failure takes out a cell and
+        all of its witnesses together. The engineering question it raises is the familiar one
+        &mdash; how far apart to place things so that one accident cannot reach both. What is
+        unusual here is that no parity was added to the data. The geometry was already carrying
+        it, because the rule that generates the values also constrains them.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What this is evidence for</h2>
+    <p class="lede">
+      Storing data as a shape is usually argued about on size, and on measured data the size
+      argument is modest &mdash; my own
+      <a href="/geometry-bench.html">benchmarks</a> put it at a few percent over gzip, and I
+      publish the cases where it loses. This page is the other half of the story. A shape brings
+      properties a compressed blob does not have: it can be queried without being unpacked, it
+      can be produced at runtime instead of stored, and it can notice when it has been damaged
+      and fix itself. None of those are compression, and none of them show up in a size
+      comparison.
+    </p>
+    <div class="btn-row" style="margin-top:1.3rem">
+      <a class="btn" href="/geometry-as-data.html">The technical write-up</a>
+      <a class="btn ghost" href="/paint-by-numbers.html">Where the information lives</a>
+      <a class="btn ghost" href="/geometry-bench.html">The honest benchmarks</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span>&copy; 2026 Kenneth W. Bingham</span>
+      <a href="/contact.html">Contact</a>
+      <a href="/resume.html">Resume</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var N = 200, A = 3, B = -5, C = 7, D = 11;
+  var truth = new Int32Array(N * N);
+  var grid = new Int32Array(N * N);
+  var damagedCount = 0, rounds = 0;
+
+  var fieldCv = document.getElementById("field");
+  var errCv = document.getElementById("errors");
+  var fieldCtx = fieldCv.getContext("2d");
+  var errCtx = errCv.getContext("2d");
+  var logEl = document.getElementById("log");
+
+  function build() {
+    for (var y = 0; y < N; y++) {
+      for (var x = 0; x < N; x++) truth[y * N + x] = A * x * y + B * x + C * y + D;
+    }
+    grid.set(truth);
+    damagedCount = 0;
+    rounds = 0;
+  }
+
+  // Colour ramp across the value range, so the surface reads as a surface.
+  var lo = 0, hi = 1;
+  function computeRange() {
+    lo = Infinity; hi = -Infinity;
+    for (var i = 0; i < truth.length; i++) {
+      if (truth[i] < lo) lo = truth[i];
+      if (truth[i] > hi) hi = truth[i];
+    }
+  }
+
+  function drawField() {
+    var img = fieldCtx.createImageData(N, N);
+    for (var i = 0, o = 0; i < grid.length; i++, o += 4) {
+      var t = (grid[i] - lo) / (hi - lo);
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      img.data[o] = Math.round(30 + 200 * t);
+      img.data[o + 1] = Math.round(70 + 120 * t);
+      img.data[o + 2] = Math.round(150 - 60 * t);
+      img.data[o + 3] = 255;
+    }
+    fieldCtx.putImageData(img, 0, 0);
+  }
+
+  // What three neighbours imply this cell should be, from each block it sits in.
+  function opinions(x, y) {
+    var v = function (px, py) { return grid[py * N + px]; };
+    var out = [];
+    if (x > 0 && y > 0) out.push(A + v(x - 1, y) + v(x, y - 1) - v(x - 1, y - 1));
+    if (x < N - 1 && y > 0) out.push(v(x + 1, y) + v(x, y - 1) - v(x + 1, y - 1) - A);
+    if (x > 0 && y < N - 1) out.push(v(x - 1, y) + v(x, y + 1) - v(x - 1, y + 1) - A);
+    if (x < N - 1 && y < N - 1) out.push(A + v(x + 1, y) + v(x, y + 1) - v(x + 1, y + 1));
+    return out;
+  }
+
+  function drawErrors() {
+    var img = errCtx.createImageData(N, N);
+    var flagged = 0;
+    for (var y = 0; y < N; y++) {
+      for (var x = 0; x < N; x++) {
+        var i = y * N + x, o = i * 4;
+        var ops = opinions(x, y);
+        var disagree = 0;
+        for (var k = 0; k < ops.length; k++) if (ops[k] !== grid[i]) disagree++;
+        var lit = ops.length ? disagree / ops.length : 0;
+        if (disagree > 0) flagged++;
+        img.data[o] = Math.round(255 * lit);
+        img.data[o + 1] = Math.round(170 * lit);
+        img.data[o + 2] = Math.round(120 * lit);
+        img.data[o + 3] = 255;
+      }
+    }
+    errCtx.putImageData(img, 0, 0);
+    return flagged;
+  }
+
+  function wrongCount() {
+    var wrong = 0;
+    for (var i = 0; i < grid.length; i++) if (grid[i] !== truth[i]) wrong++;
+    return wrong;
+  }
+
+  function repairRound() {
+    var fixes = [];
+    for (var y = 1; y < N - 1; y++) {
+      for (var x = 1; x < N - 1; x++) {
+        var ops = opinions(x, y);
+        var tally = {}, best = null, bestCount = 0;
+        for (var k = 0; k < ops.length; k++) {
+          var key = ops[k];
+          tally[key] = (tally[key] || 0) + 1;
+          if (tally[key] > bestCount) { bestCount = tally[key]; best = key; }
+        }
+        // Act only when the neighbours agree with each other and not with the cell.
+        if (bestCount >= 3 && best !== grid[y * N + x]) fixes.push([y * N + x, best]);
+      }
+    }
+    for (var f = 0; f < fixes.length; f++) grid[fixes[f][0]] = fixes[f][1];
+    return fixes.length;
+  }
+
+  function setMetrics(fixedPct, left) {
+    document.getElementById("m-damaged").textContent = damagedCount.toLocaleString();
+    document.getElementById("m-rounds").textContent = rounds;
+    var f = document.getElementById("m-fixed");
+    f.textContent = fixedPct;
+    f.className = "n " + (parseFloat(fixedPct) >= 99 ? "ok" : parseFloat(fixedPct) > 0 ? "" : "bad");
+    document.getElementById("m-left").textContent = left;
+  }
+
+  function log(text) { logEl.textContent = text; }
+
+  function damage(fraction) {
+    build();
+    var target = Math.round(N * N * fraction);
+    var hit = {};
+    while (damagedCount < target) {
+      var x = 2 + ((Math.random() * (N - 4)) | 0);
+      var y = 2 + ((Math.random() * (N - 4)) | 0);
+      var i = y * N + x;
+      if (hit[i]) continue;
+      hit[i] = 1;
+      grid[i] = (Math.random() * 100000) | 0;
+      damagedCount++;
+    }
+    drawField();
+    var flagged = drawErrors();
+    setMetrics("—", damagedCount.toLocaleString());
+    document.getElementById("repair").disabled = false;
+    log("Damaged " + damagedCount.toLocaleString() + " of " + (N * N).toLocaleString() + " cells at random.\n" +
+      "The neighbours can already see " + flagged.toLocaleString() + " cells that do not fit the surface.\n" +
+      "Nothing has told them the correct values. Press repair.");
+  }
+
+  function damageBlock() {
+    build();
+    var side = 12, x0 = 90, y0 = 90;
+    for (var y = y0; y < y0 + side; y++) {
+      for (var x = x0; x < x0 + side; x++) { grid[y * N + x] = 999999; damagedCount++; }
+    }
+    drawField();
+    drawErrors();
+    setMetrics("—", damagedCount.toLocaleString());
+    document.getElementById("repair").disabled = false;
+    log("Destroyed a solid " + side + "×" + side + " block: " + damagedCount + " cells.\n" +
+      "Notice the error map only lights up at the edges of the hole. Inside it, every witness\n" +
+      "was destroyed as well, so the neighbourhood has nobody left who remembers. Press repair.");
+  }
+
+  function repair() {
+    var before = wrongCount();
+    var moved = 0, guard = 0;
+    var step = function () {
+      var fixed = repairRound();
+      rounds++;
+      moved += fixed;
+      drawField();
+      drawErrors();
+      var left = wrongCount();
+      setMetrics(((before - left) / before * 100).toFixed(1) + "%", left.toLocaleString());
+      guard++;
+      if (fixed > 0 && guard < 14) {
+        setTimeout(step, 120);
+      } else {
+        var pct = (before - left) / before * 100;
+        if (left === 0) {
+          log("Fully repaired in " + rounds + " rounds, from neighbour agreement alone.\n" +
+            "No master copy was consulted. No checksum was stored. The shape knew what it\n" +
+            "should have been, because the rule that makes the values also constrains them.");
+        } else if (pct > 0) {
+          log("Repaired " + pct.toFixed(1) + "% in " + rounds + " rounds. " + left.toLocaleString() +
+            " cells remain wrong.\nWhere damage is dense, a cell and its witnesses were hit together and the\n" +
+            "neighbourhood genuinely cannot know. It stops rather than inventing a value.");
+        } else {
+          log("Nothing was repaired, and that is the correct outcome.\n" +
+            "Every witness to the damaged cells was destroyed in the same event. With no\n" +
+            "independent evidence left, the honest move is to refuse to guess rather than to\n" +
+            "fabricate a plausible surface. This is the same limit erasure coding runs into.");
+        }
+      }
+    };
+    step();
+  }
+
+  document.getElementById("scatter").addEventListener("click", function () { damage(0.02); });
+  document.getElementById("heavy").addEventListener("click", function () { damage(0.20); });
+  document.getElementById("block").addEventListener("click", damageBlock);
+  document.getElementById("repair").addEventListener("click", function () {
+    this.disabled = true;
+    repair();
+  });
+  document.getElementById("reset").addEventListener("click", function () {
+    build(); drawField(); drawErrors();
+    setMetrics("—", "—");
+    document.getElementById("repair").disabled = true;
+    log("Reset. The lattice is intact.");
+  });
+
+  build();
+  computeRange();
+  drawField();
+  drawErrors();
+})();
+</script>
+
+</body>
+</html>

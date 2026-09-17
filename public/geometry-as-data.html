@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geometry as a Data Source &middot; Kenneth W. Bingham</title>
+<meta name="description" content="Instead of storing every bit and byte, store the geometric shape that represents them. Every expression has a geometry; seal the rule and rebuild the data losslessly. Measured 524x on geometry, 1.0x on random, with the limits stated.">
+<meta name="author" content="Kenneth W. Bingham">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/geometry-as-data.html">
+<link rel="icon" href="assets/butterfly.png">
+<link rel="stylesheet" href="site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/geometry-as-data.html">
+<meta property="og:title" content="Geometry as a Data Source &middot; Kenneth W. Bingham">
+<meta property="og:description" content="Every expression has a geometry. Store the shape instead of the bytes, rebuild losslessly, and gain exactly as much as the data has geometry.">
+<meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="row">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham <span class="sub">AI Engineer</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/work/citeline.html">RAG demo</a>
+      <a href="/work/mcp-gateway.html">MCP gateway</a>
+      <a href="/work/valuesai.html">Reliability</a>
+      <a href="/geometry-as-data.html" class="here">Geometry as data</a>
+      <a href="/self-healing.html">Self-healing</a>
+      <a href="/shape-of-a-file.html">Shape of a file</a>
+      <a href="/paint-by-numbers.html">Paint by numbers</a>
+      <a href="/geometry-bench.html">Benchmark</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="role">Independent research &middot; tested, labeled, reproducible</p>
+    <h1>Geometry as a data source.</h1>
+    <p class="lede">
+      Every mathematical expression has a geometry. Evaluate it and you get a shape. Turn that
+      around and it becomes a way to hold data: instead of storing every bit and byte, find
+      the shape that represents them and <strong>store the shape</strong>. The data is then
+      read back off the geometry on demand, exactly, rather than kept. How much you gain is
+      exactly how much geometry the data actually has, and where it has none you gain nothing
+      &mdash; measured below, including the case where it loses.
+    </p>
+    <div class="btn-row" style="margin-top:1.6rem">
+      <a class="btn" href="#proof">The proof suite</a>
+      <a class="btn ghost" href="#limits">What it does not claim</a>
+      <a class="btn ghost" href="/geometry-bench.html">Run the benchmark yourself</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Every expression has a shape</h2>
+    <p class="lede" style="margin-bottom:1.4rem">
+      This is the hinge the whole idea turns on, and it is not a metaphor.
+      <code>z = x&middot;y</code> evaluated over real values is a saddle whose level sets are
+      hyperbolas. <code>z = x/y</code> is the same relationship run backwards, separating one
+      thing into its parts. <code>z = x&middot;y&sup2;</code> holds one axis straight and bends
+      the other into a parabola. Sine and cosine are not waves at all; they are the two
+      shadows of a helix, and looking down its axis gives you the unit circle.
+    </p>
+    <p class="lede" style="margin-bottom:1.4rem">
+      So the question stops being "how do I compress these bytes" and becomes
+      <strong>"which shape is this data already"</strong>. The saddle covers a great many
+      cases, but it is one pattern among many: some data carries its own geometry, and the job
+      is to find the expression whose shape matches it.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Store the shape, not the bytes</h2>
+    <p class="lede" style="margin-bottom:1.2rem">
+      A packet on the wire carries the literal contents of what it represents, byte for byte,
+      and storage holds those same bytes at rest. The alternative is to seal <em>a rule that
+      constructs the data</em>, plus a correction for whatever the rule does not get exactly
+      right, and let the far end build it at runtime. The correction is what makes it
+      <strong>lossless</strong>: the rule guesses, the correction fixes, and the result is
+      verified byte-identical by SHA-256.
+    </p>
+
+    <table class="tradeoffs">
+      <thead>
+        <tr><th>256&times;256 field</th><th>Raw</th><th>gzip</th><th>Sealed as a shape</th><th>vs raw</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Saddle field (is geometry)</td><td>65,536</td><td>13,424</td><td>125 bytes</td><td>524&times;</td></tr>
+        <tr><td>Schwarz-D slice (is geometry)</td><td>65,536</td><td>21,939</td><td>134 bytes</td><td>489&times;</td></tr>
+        <tr><td>Saddle + ripple (geometry + structure)</td><td>65,536</td><td>18,199</td><td>475 bytes</td><td>138&times;</td></tr>
+        <tr><td>Random bytes (no geometry)</td><td>65,536</td><td>65,576</td><td>65,605 bytes</td><td>1.0&times;</td></tr>
+      </tbody>
+    </table>
+
+    <p class="small muted">
+      Every row lossless, SHA-256 verified, from one run of <code>geometric-transport.js</code>.
+      Read the table as a single curve rather than four points: the capsule tracks how much
+      geometry the data has. A Mandelbrot image elsewhere in the suite reconstructs from a
+      100-byte rule with no correction needed at all, 502&times;, byte-identical after being
+      deleted and rebuilt.
+    </p>
+
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <strong>The last row is the whole honesty of it.</strong>
+        Random data has no short rule, so it wins nothing and the correction becomes the entire
+        payload. The capsule is currently 0.105% <em>larger</em> than raw in that case; a
+        one-bit flag to fall back to carrying the bytes is specified but not yet implemented,
+        so I state it as a design, not as a delivered guarantee. Nothing here beats the
+        Kolmogorov boundary, and on real photographic images PNG beat every scheme I tested.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What happens on real data</h2>
+    <p class="lede" style="margin-bottom:1.2rem">
+      The synthetic numbers above are honest, and they are also the easy case. Here is the same
+      machinery on data measured from the world, every row lossless and verified by hash.
+    </p>
+
+    <table class="tradeoffs">
+      <thead>
+        <tr><th>Real data</th><th>Best baseline</th><th>As a shape</th><th>Result</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>A year of hourly temperature, 8,760 readings</td><td>11,231 (gzip)</td><td>9,332</td><td>1.20&times;</td></tr>
+        <tr><td>A 40&times;40 elevation grid, real terrain</td><td>2,607 (gzip)</td><td>2,478</td><td>1.05&times;</td></tr>
+        <tr><td>A photograph, decoded to pixels</td><td>356,179 (PNG)</td><td>337,192</td><td>1.06&times;</td></tr>
+        <tr><td>A text document</td><td>1,470 (gzip)</td><td>1,743</td><td>loses</td></tr>
+        <tr><td>Synthetic saddle field, for contrast</td><td>12,218 (gzip)</td><td>151</td><td>81&times;</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <strong>The conclusion I have to draw from my own numbers.</strong>
+        When data is <em>generated</em> by a rule, sealing the rule wins by two orders of
+        magnitude. When data is <em>measured from the world</em>, it wins by a few percent or
+        loses, because measurement carries real entropy and entropy is incompressible. No
+        change of representation gets around that, mine included. So the storage argument
+        cannot rest on compressing recorded data, and anyone who tells you otherwise is selling
+        something.
+      </p>
+    </div>
+
+    <p class="lede" style="margin-top:1.2rem">
+      Which leaves the argument standing exactly where it should: <strong>the saving is in the
+      files that never need to exist</strong>. Derived data &mdash; thumbnails, tiles, rollups,
+      rendered reports, cached variants, procedural assets &mdash; is generated by a rule by
+      definition, and generated data is the case that wins by orders of magnitude. Not because
+      it compresses well, but because it does not have to be kept at all.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Why it works, mechanically</h2>
+    <p class="lede" style="margin-bottom:1.4rem">
+      None of this is new physics or a new mathematics. It is one established result applied
+      with discipline, and the result is Shannon's: <strong>compression is prediction</strong>.
+      If you can predict the next byte, you do not have to send it, and what you pay for is
+      only the part you got wrong.
+    </p>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>1. A rule is a predictor</h3>
+        <p>
+          A generating rule predicts every value in the field. Subtract the prediction from the
+          truth and you get a correction whose values cluster near zero instead of spreading
+          across all 256. Clustered values have <strong>lower entropy</strong>, and entropy is
+          exactly what a compressor charges you for. The rule does not compress anything by
+          itself; it makes the leftovers cheap.
+        </p>
+      </div>
+      <div class="card">
+        <h3>2. Exactness comes from keeping the error</h3>
+        <p>
+          The correction is the arithmetic difference, so rule plus correction reconstructs the
+          original byte for byte. That is what separates this from lossy methods: there is no
+          approximation anywhere, only a change of representation, and a hash proves it.
+        </p>
+      </div>
+      <div class="card">
+        <h3>3. Smooth data is predictable data</h3>
+        <p>
+          Why geometry specifically? Because a surprising amount of real signal is a sampled
+          smooth function: fields, waveforms, gradients, trajectories. Smooth means neighbouring
+          samples are strongly correlated, which means a low-order expression predicts them
+          closely, which means a small correction. Geometry is a compact vocabulary for
+          smoothness.
+        </p>
+      </div>
+      <div class="card">
+        <h3>4. Why it must fail on random data</h3>
+        <p>
+          A counting argument settles it: there are far more possible files of length n than
+          descriptions shorter than n, so most inputs have no shorter description and no method
+          can give them one. This is the Kolmogorov boundary. When the rule predicts nothing,
+          the correction is the whole file, and the capsule is the file plus a wrapper.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <strong>The same reasoning explains the query result.</strong>
+        Scanning a stored field to find its steepest point is O(n): every point must be
+        visited, because a table of numbers has no structure to exploit. Differentiating the
+        rule and solving is O(1): you are answering from the expression rather than from the
+        data. The speedup is not clever engineering, it is the difference between searching a
+        list and evaluating a function, and it exists only while the rule stays analytically
+        tractable.
+      </p>
+    </div>
+
+    <h3 style="margin-top:2rem">The computation already happened</h3>
+    <p class="lede" style="margin-bottom:1rem">
+      This is the part that is easy to say loosely and worth saying exactly. When a
+      relationship is written down, its consequences are fixed at that moment.
+      <code>z = x&middot;y</code> is a saddle before anyone evaluates it: its contours are
+      hyperbolas, its critical point is at the origin, its steepest direction at any point is
+      <code>(y, x)</code>. Those are <strong>invariants of the shape</strong>, true of every
+      instance, and they were settled when the expression was written, not when a query
+      arrived. In that sense the answers are embedded in the shape rather than produced by
+      searching it.
+    </p>
+    <p class="lede" style="margin-bottom:1rem">
+      The honest qualifier, because a careful reader will ask for it: reading an answer off the
+      shape is not <em>zero</em> work, it is <strong>O(1) work instead of O(n)</strong>. You
+      still evaluate a derivative or solve an equation. What disappears is the enumeration:
+      nothing is materialised, no point is visited, and the symbolic effort was spent once, up
+      front, rather than once per query. The cost moved from runtime to derivation time and is
+      then amortised across every question you ever ask of that field.
+    </p>
+    <p class="small muted">
+      Which is why "it is not faster" and "it is millions of times faster" are both true and
+      not in conflict. Reproducing a value you already have stored is slower by about
+      4.5&times;, because you pay compute to avoid memory. Asking what the whole field
+      <em>does</em> is where the shape answers immediately, because a closed form holds the
+      answer for every input at once and a table holds none of them.
+    </p>
+
+    <p class="small muted" style="margin-top:1.2rem">
+      Honest prior art: procedural generation, demoscene intros, analysis-synthesis coding and
+      modern neural codecs all send a compact code plus a residual. A trained generative model
+      <em>is</em> a learned version of this, which is why "compression, prediction and
+      generation are the same thing" is the sentence the whole field rests on. What I am
+      claiming is a protocol discipline around that idea and a measured honesty curve, not the
+      discovery of it.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The idea, in three lines</h2>
+    <div class="grid g3" style="margin-top:1.3rem">
+      <div class="card">
+        <p class="kicker">01 &middot; operation</p>
+        <h3>A rule is the asset</h3>
+        <p>
+          An operation is a generator. Stored once, it is small, exact and versionable.
+          A million derived values are none of those things.
+        </p>
+      </div>
+      <div class="card">
+        <p class="kicker">02 &middot; field</p>
+        <h3>Applied, it becomes a field</h3>
+        <p>
+          Evaluate the rule across a space and you get a value at every point. Operations are
+          not fields; they create fields. This is ordinary lazy evaluation, and that is the
+          point: nothing here is exotic.
+        </p>
+      </div>
+      <div class="card">
+        <p class="kicker">03 &middot; lens</p>
+        <h3>You read it through a lens</h3>
+        <p>
+          Gradient, contour, colour, tone. The lens changes the view and never the fact,
+          which is the line every claim on this page has to stay on the right side of.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The shape is the data</h2>
+    <p class="lede" style="margin-bottom:1.4rem">
+      This is the part that sounds odd until you see it. Evaluate <code>z = x&middot;y</code> over
+      real values and it is not arithmetic any more, it is a surface: a saddle, whose level
+      sets are hyperbolas. Its algebraic cousins are the same trick with a different geometry.
+      <code>z = x/y</code> separates one thing back into its parts. <code>z = x&middot;y&sup2;</code>
+      keeps one axis straight and bends the other into a parabola.
+    </p>
+    <p class="lede" style="margin-bottom:1.4rem">
+      Once a set of values is a shape rather than a list, the shape already holds answers, and
+      you read them off instead of storing them.
+    </p>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Read directly off the geometry</h3>
+        <p>
+          <strong>Inflections</strong> mark where curvature changes sign, so a turning point is
+          a solved equation rather than a search. <strong>Angles and vectors</strong> give the
+          steepest direction at any point from the gradient. <strong>Coordinates and
+          distance</strong> are positional facts: near means alike when the layout is chosen
+          that way. <strong>Level sets</strong> answer "where does this value occur" as a
+          curve, not a filter over rows.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Or derived through a lens</h3>
+        <p>
+          The same field is agnostic about how you read it. Map height to
+          <strong>colour</strong> and you have a heat map; to <strong>tone</strong> and it is
+          audible; to characters and it is <strong>ASCII</strong>; to a schema and it is
+          <strong>typed values</strong>. One stored rule, many renderings, and none of the
+          renderings has to be kept: the lens changes the view, never the fact.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Ask the structure instead of scanning it</h2>
+    <p class="lede" style="margin-bottom:1.2rem">
+      A stored grid can only be searched. A rule can be <em>solved</em>. That difference is
+      measurable, and it cuts both ways depending on the question.
+    </p>
+
+    <table class="tradeoffs">
+      <thead>
+        <tr><th>Question</th><th>Scan the stored field</th><th>Solve the rule</th><th>Difference</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Where is the steepest gradient?</td><td>174.02 ms</td><td>0.0059 ms</td><td>29,495&times; faster</td></tr>
+        <tr><td>Where does the boundary lie?</td><td>1,199.9 ms</td><td>0.0003 ms</td><td>4,000,000&times; faster</td></tr>
+        <tr><td>Does 0.5 occur on row 2000?</td><td>0.18 ms</td><td>0.0015 ms</td><td>120&times; faster</td></tr>
+        <tr><td>100,000 arbitrary point lookups</td><td>8.47 ms</td><td>16.09 ms</td><td>storage wins, about 2&times;</td></tr>
+      </tbody>
+    </table>
+
+    <p class="small muted">
+      The last row is the honest one and it belongs in the same table. For bulk production of
+      unstructured points, storage is simply better, and a scan is never <em>wrong</em>, only
+      expensive. Solving also needs a rule that is analytically tractable: a neural field
+      offers none, and then this whole approach has nothing to say.
+    </p>
+
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <strong>This is not a contradiction of "it is not faster".</strong>
+        Producing a value you already have stored is slower when you derive it, measured at
+        about 4.5&times;. Answering a question <em>about</em> the whole field is where solving
+        wins, because the scan has to visit every point and the solve does not visit any.
+        Different question, different answer, and both get reported.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Every rule is a renamed, well-understood practice</h2>
+    <p class="lede" style="margin-bottom:1.4rem">
+      This is the credibility of the whole approach, and the reason a team can adopt it on a
+      Tuesday with no migration risk. There is no technical moat here, and that is a feature.
+    </p>
+
+    <div class="compare">
+      <div class="side">
+        <header><strong>The rule, in my words</strong></header>
+        <div style="padding:1rem 1.1rem">
+          <p class="small mb0">No duplication: identical values stored once, referenced everywhere</p>
+          <p class="small mb0">Record only deltas; the top of the stack is now, the rest is history</p>
+          <p class="small mb0">Derive, do not store; keep the rule, compute the field when observed</p>
+          <p class="small mb0">Point straight at the data; each thing knows its neighbours</p>
+          <p class="small mb0">Near means alike; position carries meaning</p>
+          <p class="small mb0">A whole becomes a single point at the next level up</p>
+        </div>
+      </div>
+      <div class="side">
+        <header><strong>The established name</strong></header>
+        <div style="padding:1rem 1.1rem">
+          <p class="small mb0">content-addressed storage</p>
+          <p class="small mb0">event sourcing / MVCC</p>
+          <p class="small mb0">lazy evaluation</p>
+          <p class="small mb0">index-free adjacency (graph databases)</p>
+          <p class="small mb0">spatial index / manifold layout</p>
+          <p class="small mb0">encapsulation / information hiding</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="proof">
+  <div class="wrap">
+    <h2>Proof through software</h2>
+    <p class="lede" style="margin-bottom:1.4rem">
+      A dependency-free suite verifies the properties <em>and the honest limits in the same
+      run</em>. A test that cannot fail proves nothing, so this one was built to be able to
+      fail. The real parts held; the boundaries are reported in the same breath.
+    </p>
+
+    <div class="metrics" style="margin:1.3rem 0">
+      <div class="metric"><span class="n">14 / 14</span><span class="l">proofs pass, limits included</span></div>
+      <div class="metric"><span class="n">4.5&times;</span><span class="l">slower than a local read</span></div>
+      <div class="metric"><span class="n">114&times;</span><span class="l">faster than a network fetch</span></div>
+      <div class="metric"><span class="n">6.3 Gbit/s</span><span class="l">where those two cross over</span></div>
+    </div>
+
+    <p class="small muted">
+      Re-run it yourself: <code>node dimensional-programming.test.js</code>. It covers
+      derive-not-store, operations creating fields, deduplication, deltas as a fold, pointers,
+      a level collapsing to a point, the saddle and its hyperbolic contours, sine and cosine
+      as a helix's two shadows, i&#8308; = 1, and nested 3D spaces adding rather than
+      multiplying.
+    </p>
+
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <strong>Every claim carries a label.</strong>
+        <em>[Established]</em> means standard and proven. <em>[Framing]</em> means a chosen
+        convention, useful but not a discovery. <em>[Observation]</em> commits to nothing.
+        <em>[Not claimed]</em> is an explicit boundary. The labels exist because the failure
+        mode of this kind of work is a confident overstatement, and labeling is the cheapest
+        defence against it.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="limits">
+  <div class="wrap">
+    <h2>What it does not claim</h2>
+    <p class="lede" style="margin-bottom:1.4rem">
+      The boundary matters more than the pitch. Each of these was tested and reported against
+      my own interest.
+    </p>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>It is not faster</h3>
+        <p>
+          Derive-not-store saves memory and costs compute. Measured at realistic sizes it runs
+          about 4.5&times; slower than reading the value from local disk. The trade only
+          inverts against a network fetch, where deriving beat the link by 114&times;, with the
+          crossover near 6.3 Gbit/s. Both halves get stated, always.
+        </p>
+      </div>
+      <div class="card">
+        <h3>It does not make a model smarter</h3>
+        <p>
+          The honest pitch is grounded, cited and measured, never "no hallucinations". What it
+          can do is cut the bytes crossing the boundary to a model, and bytes are tokens are
+          money.
+        </p>
+      </div>
+      <div class="card">
+        <h3>It borrows nothing from physics</h3>
+        <p>
+          Being a field is trivially true of every function. The power is in derive-not-store,
+          not in prestige borrowed from physical fields. No cosmic step-counts, no mysticism.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Claims I tested and rejected</h3>
+        <p>
+          Some ideas did not survive contact with a test suite, and the paper documents them
+          rather than quietly dropping them. That section is the one I would read first if I
+          were evaluating this work.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Where it actually pays</h2>
+    <div class="grid g2" style="margin-top:1.2rem">
+      <div class="feature">
+        <h3>The value</h3>
+        <p class="small mb0">
+          A single source of truth, so a change lands once and everything follows. A complete
+          audit trail for free, because the delta stack <em>is</em> the history and replays to
+          any past state. Reproducibility, because the same deltas produce the same state. No
+          duplication. And fewer tokens at the boundary with a language model, because you
+          derive and send only the fields it needs.
+        </p>
+      </div>
+      <div class="feature">
+        <h3>The costs</h3>
+        <p class="small mb0">
+          Compute to rebuild the present from deltas. Pointer maintenance on write. Less
+          ad-hoc flexibility than a relational query planner. And it only networks cleanly
+          where state is a deterministic function of a shared expression. It is not for speed,
+          and a project that needs speed should not reach for it.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:1.6rem">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <strong>Published: the concept and the measured results. Withheld: the method.</strong>
+        The rule-finding procedure and its application stay private, and the numbers above are
+        reproducible without them. Obscurity is a head start rather than a wall, and I would
+        rather be straight about which half you are reading.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Why this sits on an engineering portfolio</h2>
+    <p class="lede">
+      Because the habit is the transferable part. Label every claim by how well it is
+      supported, build the test that could embarrass you, report the limit next to the
+      result, and say plainly which parts are unproven. That is the same discipline that makes
+      a retrieval system safe to deploy: an abstention gate is just this habit expressed in
+      code.
+    </p>
+    <div class="btn-row" style="margin-top:1.4rem">
+      <a class="btn" href="/work/valuesai.html">See it applied: a system that abstains</a>
+      <a class="btn ghost" href="https://dimensionalprogramming.com" rel="noopener">The longer write-up</a>
+      <a class="btn ghost" href="/contact.html">Get in touch</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span>&copy; 2026 Kenneth W. Bingham</span>
+      <a href="/contact.html">Contact</a>
+      <a href="/resume.html">Resume</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/kenneth-bingham-11378b10" rel="noopener">LinkedIn</a>
+    </div>
+    <div class="aside-research">
+      <div class="callout">
+        <span class="ico" aria-hidden="true">&#9633;</span>
+        <p>
+          <strong>Ideas and direction are mine.</strong>
+          AI assisted the implementation and verification; it did not originate the work. The
+          numbers on this page come from a suite you can run yourself.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

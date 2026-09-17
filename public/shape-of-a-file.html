@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shape of a File &middot; Kenneth W. Bingham</title>
+<meta name="description" content="Drop in any file and watch it drawn as a shape, with the curve that best fits it and the part it cannot explain. A plain-language look at storing data as geometry instead of bytes.">
+<meta name="author" content="Kenneth W. Bingham">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/shape-of-a-file.html">
+<link rel="icon" href="assets/butterfly.png">
+<link rel="stylesheet" href="site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/shape-of-a-file.html">
+<meta property="og:title" content="Shape of a File &middot; Kenneth W. Bingham">
+<meta property="og:description" content="Every file has a shape. Drop one in and see yours, with the curve that fits it and the part that refuses to be explained.">
+<meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  .stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem; margin: 1.2rem 0; }
+  .stage canvas { width: 100%; height: auto; display: block; border-radius: var(--radius-sm); background: var(--surface-2); }
+  .stage h3 { margin: 0 0 .3rem; font-size: 1rem; }
+  .stage .cap { font-size: .86rem; color: var(--muted); margin: .5rem 0 0; }
+  .drop {
+    border: 1px dashed var(--border-strong); border-radius: var(--radius);
+    padding: 1.8rem 1.2rem; text-align: center; color: var(--muted);
+    background: var(--surface); margin: 1.2rem 0; cursor: pointer; display: block;
+  }
+  .drop.over { border-color: var(--accent); color: var(--accent); }
+  .drop input { display: none; }
+  .score { display: flex; gap: 1.4rem; flex-wrap: wrap; margin: 1.2rem 0; }
+  .score .metric { min-width: 9rem; }
+  .verdict { font-size: 1.05rem; }
+  .legend { display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: .84rem; color: var(--muted); margin-top: .6rem; }
+  .sw { display: inline-block; width: 12px; height: 3px; vertical-align: middle; margin-right: .35rem; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 720px) { .pair { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="row">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham <span class="sub">AI Engineer</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/geometry-as-data.html">Geometry as data</a>
+      <a href="/self-healing.html">Self-healing</a>
+      <a href="/shape-of-a-file.html" class="here">Shape of a file</a>
+      <a href="/paint-by-numbers.html">Paint by numbers</a>
+      <a href="/geometry-bench.html">Benchmark</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="role">Try it &middot; nothing is uploaded, it all happens in your browser</p>
+    <h1>Every file has a shape.</h1>
+    <p class="lede">
+      A file is just a long row of numbers. Draw those numbers as heights and you get a
+      landscape: hills, valleys, ridges, noise. Some files turn out to be a smooth curve
+      wearing a disguise. Others are a mess with no pattern at all. Drop one in and see which
+      yours is.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <label class="drop" id="drop">
+      <input type="file" id="file">
+      <strong>Drop a file here</strong>, or click to pick one.<br>
+      <span class="small">A photo, a spreadsheet, a song, a document. It never leaves this page.</span>
+    </label>
+    <div class="btn-row">
+      <button class="btn ghost" id="try-photo">Try a photograph</button>
+      <button class="btn ghost" id="try-wave">Try a recorded tone</button>
+      <button class="btn ghost" id="try-text">Try a text document</button>
+    </div>
+    <p class="small muted" id="status">Waiting for a file.</p>
+
+    <div class="stage" id="stage" hidden>
+      <h3 id="fname">&nbsp;</h3>
+      <canvas id="plot" width="1200" height="320" aria-label="Your file drawn as a landscape, with the fitted curve over it"></canvas>
+      <div class="legend">
+        <span><span class="sw" style="background:#7fb4d0"></span>your file</span>
+        <span><span class="sw" style="background:#e0a06a"></span>the shape that fits it best</span>
+        <span><span class="sw" style="background:#5fc491"></span>what the shape could not explain</span>
+      </div>
+      <p class="cap" id="caption"></p>
+
+      <div class="score">
+        <div class="metric"><span class="n" id="s-shape">&mdash;</span><span class="l">of the file follows the shape</span></div>
+        <div class="metric"><span class="n" id="s-rule">&mdash;</span><span class="l">bytes to describe the shape</span></div>
+        <div class="metric"><span class="n" id="s-left">&mdash;</span><span class="l">left over to store exactly</span></div>
+        <div class="metric"><span class="n" id="s-size">&mdash;</span><span class="l">file size</span></div>
+      </div>
+
+      <p class="verdict" id="verdict"></p>
+
+      <div id="imgpair" hidden>
+        <div class="pair" style="margin-top:1rem">
+          <div>
+            <canvas id="orig" width="360" height="360"></canvas>
+            <p class="cap">Your image</p>
+          </div>
+          <div>
+            <canvas id="painted" width="360" height="360"></canvas>
+            <p class="cap" id="paintcap">What the shape alone paints, before the corrections are added back</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Music that was never recorded</h2>
+    <p class="lede" style="margin-bottom:1.2rem">
+      Here is the same idea with your ears instead of your eyes. The notes below are read
+      straight off the surface of <code>z = x&middot;y</code>: the bar number is x, the voice is
+      y, and the height of the surface at that point picks the note. The bass line comes from
+      <code>z = x/y</code>, the same relationship running the other way. Nothing is stored. The
+      audio does not exist until you press play, and it is gone again afterwards.
+    </p>
+
+    <div class="stage">
+      <div class="btn-row" style="margin-bottom:.9rem">
+        <button class="btn" id="play">Play the surface</button>
+        <button class="btn ghost" id="stop" disabled>Stop</button>
+        <span class="small muted" id="audio-status">44,100 samples a second, generated as it plays.</span>
+      </div>
+
+      <canvas id="wave" width="1200" height="180" aria-label="The generated waveform"></canvas>
+
+      <div class="score">
+        <div class="metric"><span class="n" id="a-rule">&mdash;</span><span class="l">bytes of rule</span></div>
+        <div class="metric"><span class="n" id="a-samples">&mdash;</span><span class="l">samples produced</span></div>
+        <div class="metric"><span class="n" id="a-wav">&mdash;</span><span class="l">as a WAV file</span></div>
+        <div class="metric"><span class="n" id="a-ratio">&mdash;</span><span class="l">rule against recording</span></div>
+      </div>
+
+      <p class="cap" id="a-rule-text"></p>
+    </div>
+
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <strong>What this does and does not show.</strong>
+        It shows that when music is <em>defined</em> by a rule, the rule is the only thing that
+        has to exist: a few dozen bytes standing in for a few megabytes of samples, rendered on
+        demand. It does not show that a recording of a real performance can be shrunk to that
+        size, because a recording is not a rule &mdash; it is the sound of a room, and the
+        <a href="/geometry-bench.html">benchmark</a> measures what happens when you try. The
+        synthesizer that turns the rule into sound is shared code, the same way a codec sits on
+        both ends of an MP3 and is not counted in the file's size.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What you are looking at</h2>
+    <div class="grid g3" style="margin-top:1.2rem">
+      <div class="card">
+        <h3>The blue line is your file</h3>
+        <p>
+          Each byte becomes a height between the floor and the ceiling. Reading left to right is
+          reading the file from beginning to end. Music looks like waves. Photographs look like
+          rolling terrain. A zip file looks like static.
+        </p>
+      </div>
+      <div class="card">
+        <h3>The orange line is a guess</h3>
+        <p>
+          A handful of simple shapes are tried against your file &mdash; a flat line, a slope, a
+          curve, a wave &mdash; and the closest one is drawn. That shape can be written down in
+          a few dozen characters, which is the entire point.
+        </p>
+      </div>
+      <div class="card">
+        <h3>The green band is the difference</h3>
+        <p>
+          Wherever the guess missed, the exact difference is kept. Shape plus difference
+          rebuilds your file perfectly, byte for byte. Nothing is thrown away, ever. The only
+          question is how much of the work the shape did.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Why bother, in everyday terms</h2>
+    <p class="lede" style="margin-bottom:1.2rem">
+      A recipe is shorter than a cooked meal. If I send you the recipe, you can make the meal
+      yourself, and I never had to ship the food. A circle is another example: you could list a
+      million points along its edge, or you could write down one number, the radius, and
+      redraw it whenever you like. Same circle, wildly different amount of storage.
+    </p>
+    <p class="lede" style="margin-bottom:1.2rem">
+      That is the whole idea. Where data follows a pattern, keep the pattern instead of the
+      data, and rebuild it when someone actually asks. A smooth sensor reading, a tone, a
+      gradient, a fractal &mdash; those are recipes wearing a disguise, and the recipe is tiny.
+    </p>
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <strong>And where it does not work, it says so.</strong>
+        A photograph is not a simple curve, and a zip file is deliberately patternless. For
+        those, the shape explains almost nothing and ordinary compression does better. That is
+        not a flaw being admitted quietly; it is the honest boundary, and the
+        <a href="/geometry-bench.html">benchmark page</a> measures exactly where it sits on
+        real files, including ones where this approach loses outright.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The one trick underneath</h2>
+    <p class="lede">
+      If you can guess what comes next, you do not have to store it. You only have to store how
+      wrong your guess was. A good guess leaves small corrections, small corrections squeeze
+      down to almost nothing, and the rule that made the guess is a few dozen characters. That
+      is the mechanism in one breath, and the
+      <a href="/geometry-as-data.html">technical write-up</a> takes it apart properly.
+    </p>
+    <div class="btn-row" style="margin-top:1.3rem">
+      <a class="btn" href="/geometry-as-data.html">The technical version</a>
+      <a class="btn ghost" href="/geometry-bench.html">The measured version</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span>&copy; 2026 Kenneth W. Bingham</span>
+      <a href="/contact.html">Contact</a>
+      <a href="/resume.html">Resume</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var statusEl = document.getElementById("status");
+  var stage = document.getElementById("stage");
+  var plot = document.getElementById("plot");
+  var ctx = plot.getContext("2d");
+
+  var SAMPLE = 4096;   // how many points are drawn; the fit uses the whole file
+
+  /* ---------- fits: a deliberately small library of simple shapes ---------- */
+
+  function fitConstant(v) {
+    var s = 0;
+    for (var i = 0; i < v.length; i++) s += v[i];
+    var m = s / v.length;
+    return { name: "a flat line", coeffs: [Math.round(m)], at: function () { return m; } };
+  }
+
+  function fitPoly(v, degree) {
+    var n = v.length, m = degree + 1, A = [], b = [];
+    for (var r = 0; r < m; r++) { A.push(new Float64Array(m)); b.push(0); }
+    for (var i = 0; i < n; i++) {
+      var t = i / n, p = [1, t, t * t, t * t * t].slice(0, m);
+      for (var r2 = 0; r2 < m; r2++) {
+        for (var c = 0; c < m; c++) A[r2][c] += p[r2] * p[c];
+        b[r2] += p[r2] * v[i];
+      }
+    }
+    for (var k = 0; k < m; k++) {
+      var piv = A[k][k] || 1e-9;
+      for (var c2 = k; c2 < m; c2++) A[k][c2] /= piv;
+      b[k] /= piv;
+      for (var r3 = 0; r3 < m; r3++) {
+        if (r3 === k) continue;
+        var f = A[r3][k];
+        for (var c3 = k; c3 < m; c3++) A[r3][c3] -= f * A[k][c3];
+        b[r3] -= f * b[k];
+      }
+    }
+    var co = b.map(function (x) { return Math.round(x * 1000) / 1000; });
+    return {
+      name: degree === 1 ? "a straight slope" : "a curve",
+      coeffs: co,
+      at: function (i) { var t = i / n, s = 0, tp = 1; for (var d = 0; d < co.length; d++) { s += co[d] * tp; tp *= t; } return s; }
+    };
+  }
+
+  function fitWave(v) {
+    var n = v.length, mean = 0, i;
+    for (i = 0; i < n; i++) mean += v[i];
+    mean /= n;
+    // Audio repeats thousands of times across a buffer, so the search must reach
+    // far past a handful of cycles. Skipping samples to go faster would alias a
+    // high frequency into a false low one, so the coarse pass instead analyses a
+    // contiguous window at full resolution and scales the answer to the whole file.
+    var win = Math.min(n, 16384);
+
+    function powerIn(k, length, stride) {
+      var re = 0, im = 0;
+      for (var j = 0; j < length; j += stride) {
+        var a = 2 * Math.PI * k * j / length;
+        re += (v[j] - mean) * Math.cos(a);
+        im += (v[j] - mean) * Math.sin(a);
+      }
+      return re * re + im * im;
+    }
+
+    var bestP = -1, bestWinK = 1;
+    var maxWinK = Math.floor(win / 2);
+    var candidates = 320;
+    for (var c = 0; c < candidates; c++) {
+      var k = Math.round(Math.pow(maxWinK, c / (candidates - 1)));
+      if (k < 1) k = 1;
+      var p = powerIn(k, win, 1);
+      if (p > bestP) { bestP = p; bestWinK = k; }
+    }
+
+    // Scale cycles-per-window up to cycles-per-file, then refine on the whole signal.
+    var bestK = Math.max(1, Math.round(bestWinK * n / win));
+    var span = Math.max(2, Math.round(bestK * 0.03));
+    var fullStride = Math.max(1, Math.floor(n / 60000));   // cheap, and never above Nyquist
+    bestP = -1;
+    for (var k2 = Math.max(1, bestK - span); k2 <= bestK + span; k2++) {
+      var p2 = powerIn(k2, n, fullStride);
+      if (p2 > bestP) { bestP = p2; bestK = k2; }
+    }
+    var re2 = 0, im2 = 0;
+    for (i = 0; i < n; i++) {
+      var a2 = 2 * Math.PI * bestK * i / n;
+      re2 += (v[i] - mean) * Math.cos(a2);
+      im2 += (v[i] - mean) * Math.sin(a2);
+    }
+    var amp = 2 * Math.sqrt(re2 * re2 + im2 * im2) / n;
+    var ph = Math.atan2(-im2, re2);
+    return {
+      name: "a wave",
+      coeffs: [Math.round(mean), Math.round(amp * 100) / 100, bestK, Math.round(ph * 100) / 100],
+      at: function (i) { return mean + amp * Math.cos(2 * Math.PI * bestK * i / n + ph); }
+    };
+  }
+
+  function bestFit(bytes) {
+    var candidates = [fitConstant(bytes), fitPoly(bytes, 1), fitPoly(bytes, 2), fitWave(bytes)];
+    var flatErr = null, best = null;
+
+    for (var c = 0; c < candidates.length; c++) {
+      var err = 0;
+      for (var i = 0; i < bytes.length; i++) {
+        var d = bytes[i] - candidates[c].at(i);
+        err += d * d;
+      }
+      candidates[c].err = err;
+      if (candidates[c].name === "a flat line") flatErr = err;
+      if (!best || err < best.err) best = candidates[c];
+    }
+    // "Explained" is measured against the flat line, which is the do-nothing baseline.
+    best.explained = flatErr > 0 ? Math.max(0, 1 - best.err / flatErr) : 0;
+    best.ruleBytes = new TextEncoder().encode(JSON.stringify([best.name, best.coeffs])).length;
+    return best;
+  }
+
+  async function gzipSize(bytes) {
+    if (typeof CompressionStream === "undefined") return null;
+    var cs = new CompressionStream("gzip");
+    var w = cs.writable.getWriter();
+    w.write(bytes);
+    w.close();
+    return (await new Response(cs.readable).arrayBuffer()).byteLength;
+  }
+
+  /* ---------- drawing ---------- */
+
+  function draw(bytes, fit) {
+    var w = plot.width, h = plot.height;
+    ctx.clearRect(0, 0, w, h);
+
+    var n = bytes.length;
+    var stride = Math.max(1, Math.floor(n / SAMPLE));
+    var pts = Math.floor(n / stride);
+
+    // the file itself
+    ctx.strokeStyle = "#7fb4d0";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (var i = 0; i < pts; i++) {
+      var x = (i / (pts - 1)) * w;
+      var y = h - (bytes[i * stride] / 255) * h;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // the difference, drawn as a band around the middle
+    ctx.strokeStyle = "rgba(95,196,145,.55)";
+    ctx.beginPath();
+    for (var j = 0; j < pts; j++) {
+      var idx = j * stride;
+      var diff = bytes[idx] - fit.at(idx);
+      var x2 = (j / (pts - 1)) * w;
+      var y2 = h / 2 - (diff / 255) * h * 0.5;
+      j === 0 ? ctx.moveTo(x2, y2) : ctx.lineTo(x2, y2);
+    }
+    ctx.stroke();
+
+    // the fitted shape
+    ctx.strokeStyle = "#e0a06a";
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    for (var k = 0; k < pts; k++) {
+      var idx2 = k * stride;
+      var x3 = (k / (pts - 1)) * w;
+      var y3 = h - (Math.max(0, Math.min(255, fit.at(idx2))) / 255) * h;
+      k === 0 ? ctx.moveTo(x3, y3) : ctx.lineTo(x3, y3);
+    }
+    ctx.stroke();
+  }
+
+  function paintImage(file) {
+    // For an image, show what the shape alone reconstructs: a smooth wash, with
+    // all the detail living in the corrections.
+    var pair = document.getElementById("imgpair");
+    var img = new Image();
+    img.onload = function () {
+      pair.hidden = false;
+      var size = 360;
+      var oc = document.getElementById("orig"), pc = document.getElementById("painted");
+      var octx = oc.getContext("2d"), pctx = pc.getContext("2d");
+      var scale = Math.min(size / img.naturalWidth, size / img.naturalHeight);
+      var w = Math.max(1, Math.round(img.naturalWidth * scale));
+      var h = Math.max(1, Math.round(img.naturalHeight * scale));
+      oc.width = pc.width = w; oc.height = pc.height = h;
+      octx.drawImage(img, 0, 0, w, h);
+
+      var data = octx.getImageData(0, 0, w, h);
+      var px = data.data;
+      var channel = new Uint8Array(w * h);
+      for (var i = 0, p = 0; i < px.length; i += 4, p++) channel[p] = px[i];
+      var fit = bestFit(channel);
+
+      var out = pctx.createImageData(w, h);
+      for (var q = 0, o = 0; q < channel.length; q++, o += 4) {
+        var v = Math.max(0, Math.min(255, Math.round(fit.at(q))));
+        out.data[o] = out.data[o + 1] = out.data[o + 2] = v;
+        out.data[o + 3] = 255;
+      }
+      pctx.putImageData(out, 0, 0);
+      document.getElementById("paintcap").textContent =
+        "What the shape alone paints (" + fit.name + "). Every bit of detail you can see missing " +
+        "is stored exactly in the corrections, which is why the rebuild is perfect and why a " +
+        "photograph saves almost nothing this way.";
+      URL.revokeObjectURL(img.src);
+    };
+    img.src = URL.createObjectURL(file);
+  }
+
+  /* ---------- the run ---------- */
+
+  async function analyse(name, bytes, fileForImage) {
+    stage.hidden = false;
+    document.getElementById("imgpair").hidden = true;
+    document.getElementById("fname").textContent = name;
+
+    var slice = bytes.length > 2000000 ? bytes.slice(0, 2000000) : bytes;
+    var fit = bestFit(slice);
+    draw(slice, fit);
+
+    var correction = new Uint8Array(slice.length);
+    for (var i = 0; i < slice.length; i++) correction[i] = (slice[i] - Math.round(fit.at(i))) & 255;
+
+    var packedCorrection = await gzipSize(correction);
+    var gz = await gzipSize(slice);
+
+    document.getElementById("s-shape").textContent = Math.round(fit.explained * 100) + "%";
+    document.getElementById("s-rule").textContent = fit.ruleBytes;
+    document.getElementById("s-left").textContent =
+      packedCorrection === null ? "n/a" : packedCorrection.toLocaleString();
+    document.getElementById("s-size").textContent = slice.length.toLocaleString();
+
+    var capsule = packedCorrection === null ? null : fit.ruleBytes + packedCorrection;
+    var verdict;
+    if (capsule === null) {
+      verdict = "This browser cannot compress in-page, so only the picture above is available.";
+    } else if (fit.explained > 0.5 && capsule < gz) {
+      verdict = "Strong result: " + fit.name + " explains most of this file, and describing it as a shape " +
+        "takes " + capsule.toLocaleString() + " bytes against " + gz.toLocaleString() + " for ordinary compression.";
+    } else if (capsule < gz) {
+      verdict = "A modest win: " + capsule.toLocaleString() + " bytes as a shape against " +
+        gz.toLocaleString() + " compressed normally.";
+    } else {
+      verdict = "Ordinary compression wins here: " + gz.toLocaleString() + " bytes against " +
+        capsule.toLocaleString() + " as a shape. " + fit.name.charAt(0).toUpperCase() + fit.name.slice(1) +
+        " explains only " + Math.round(fit.explained * 100) + "% of it, which is the usual outcome for " +
+        "photographs, documents and anything already compressed. Nothing was lost either way.";
+    }
+    document.getElementById("verdict").textContent = verdict;
+    document.getElementById("caption").textContent =
+      "Drawn from " + slice.length.toLocaleString() + " bytes. The best of four simple shapes was " +
+      fit.name + ", written down in " + fit.ruleBytes + " characters.";
+
+    if (fileForImage && /^image\//.test(fileForImage.type)) paintImage(fileForImage);
+    statusEl.textContent = "Done. Drop another file whenever you like.";
+  }
+
+  async function handleFile(file) {
+    if (!file) return;
+    statusEl.textContent = "Reading " + file.name + "…";
+    var bytes = new Uint8Array(await file.arrayBuffer());
+    await analyse(file.name, bytes, file);
+  }
+
+  var drop = document.getElementById("drop");
+  var input = document.getElementById("file");
+
+  ["dragenter", "dragover"].forEach(function (e) {
+    drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.add("over"); });
+  });
+  ["dragleave", "drop"].forEach(function (e) {
+    drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.remove("over"); });
+  });
+  drop.addEventListener("drop", function (ev) { handleFile(ev.dataTransfer.files[0]); });
+  input.addEventListener("change", function () { handleFile(input.files[0]); });
+
+  /* ---------- the three samples ---------- */
+
+  document.getElementById("try-photo").addEventListener("click", async function () {
+    statusEl.textContent = "Loading a photograph…";
+    var r = await fetch("/bench-data/photo.jpg");
+    var blob = await r.blob();
+    var file = new File([blob], "photo.jpg", { type: "image/jpeg" });
+    handleFile(file);
+  });
+
+  document.getElementById("try-text").addEventListener("click", async function () {
+    statusEl.textContent = "Loading a text document…";
+    var r = await fetch("/bench-data/sample-text.txt");
+    var bytes = new Uint8Array(await r.arrayBuffer());
+    analyse("sample-text.txt", bytes, null);
+  });
+
+  document.getElementById("try-wave").addEventListener("click", function () {
+    // A tone, built here so you can see what a file with real geometry looks like.
+    // A steady 220 Hz tone: the clearest case of a file that is really a rule.
+    var n = 120000, bytes = new Uint8Array(n);
+    for (var i = 0; i < n; i++) {
+      var t = i / 8000;
+      bytes[i] = Math.round(128 + 100 * Math.sin(2 * Math.PI * 220 * t));
+    }
+    analyse("a steady 220 Hz tone (generated here)", bytes, null);
+  });
+
+  if (typeof CompressionStream === "undefined") {
+    statusEl.textContent = "This browser cannot compress in-page, so sizes will read n/a. The picture still works.";
+  }
+
+  /* ==================================================================
+     Music read off the surface of z = x*y.
+
+     The whole composition is the object below. Nothing else is stored:
+     no samples, no notes, no file. The synthesizer walks the surface and
+     the audio exists only while it plays.
+     ================================================================== */
+
+  var SONG = {
+    lens: "z=x*y",
+    bpm: 96,
+    bars: 16,
+    voices: 3,
+    scale: [0, 2, 4, 7, 9],     // pentatonic degrees
+    root: 220,                  // A3
+    decay: 0.25
+  };
+
+  var audioCtx = null, source = null;
+
+  function noteFor(bar, voice) {
+    // The surface: height at (x, y) picks a degree of the scale.
+    var x = (bar / SONG.bars) * 2 - 1;
+    var y = (voice + 1) / SONG.voices;
+    var z = x * y;                                   // the saddle
+    var idx = Math.round((z + 1) / 2 * (SONG.scale.length * 2 - 1));
+    var degree = SONG.scale[idx % SONG.scale.length];
+    var octave = Math.floor(idx / SONG.scale.length);
+    return SONG.root * Math.pow(2, (degree + 12 * octave) / 12);
+  }
+
+  function bassFor(bar) {
+    // z = x/y: the same relationship run the other way, an octave down.
+    var x = (bar / SONG.bars) * 2 - 1;
+    var y = 0.55 + (bar % 4) * 0.15;
+    var z = x / y;
+    var idx = Math.abs(Math.round(z * 2)) % SONG.scale.length;
+    return SONG.root / 2 * Math.pow(2, SONG.scale[idx] / 12);
+  }
+
+  function renderSong(sampleRate) {
+    var secondsPerBar = 60 / SONG.bpm * 2;
+    var total = Math.floor(secondsPerBar * SONG.bars * sampleRate);
+    var out = new Float32Array(total);
+
+    for (var bar = 0; bar < SONG.bars; bar++) {
+      var start = Math.floor(bar * secondsPerBar * sampleRate);
+      var len = Math.floor(secondsPerBar * sampleRate);
+
+      for (var v = 0; v < SONG.voices; v++) {
+        var freq = noteFor(bar, v);
+        var offset = Math.floor(v * len / SONG.voices / 2);
+        for (var i = 0; i < len - offset; i++) {
+          var t = i / sampleRate;
+          var env = Math.exp(-t / SONG.decay) * 0.16;
+          var s = Math.sin(2 * Math.PI * freq * t) + 0.3 * Math.sin(4 * Math.PI * freq * t);
+          var at = start + offset + i;
+          if (at < total) out[at] += s * env;
+        }
+      }
+
+      var bf = bassFor(bar);
+      for (var j = 0; j < len; j++) {
+        var bt = j / sampleRate;
+        var benv = Math.exp(-bt / (SONG.decay * 3)) * 0.22;
+        var idx2 = start + j;
+        if (idx2 < total) out[idx2] += Math.sin(2 * Math.PI * bf * bt) * benv;
+      }
+    }
+
+    for (var k = 0; k < total; k++) out[k] = Math.max(-1, Math.min(1, out[k]));
+    return out;
+  }
+
+  function drawWave(samples) {
+    var cv = document.getElementById("wave"), c = cv.getContext("2d");
+    var w = cv.width, h = cv.height;
+    c.clearRect(0, 0, w, h);
+    c.strokeStyle = "#7fb4d0";
+    c.lineWidth = 1;
+    c.beginPath();
+    var stride = Math.max(1, Math.floor(samples.length / w));
+    for (var x = 0; x < w; x++) {
+      var peak = 0;
+      for (var i = 0; i < stride; i++) {
+        var s = samples[x * stride + i] || 0;
+        if (Math.abs(s) > Math.abs(peak)) peak = s;
+      }
+      var y = h / 2 - peak * (h / 2) * 0.95;
+      x === 0 ? c.moveTo(x, y) : c.lineTo(x, y);
+    }
+    c.stroke();
+  }
+
+  document.getElementById("play").addEventListener("click", function () {
+    var statusA = document.getElementById("audio-status");
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    } catch (e) {
+      statusA.textContent = "This browser will not give the page an audio context.";
+      return;
+    }
+
+    statusA.textContent = "Rendering from the rule…";
+    var t0 = performance.now();
+    var samples = renderSong(audioCtx.sampleRate);
+    var ms = Math.round(performance.now() - t0);
+
+    var buffer = audioCtx.createBuffer(1, samples.length, audioCtx.sampleRate);
+    buffer.copyToChannel(samples, 0);
+
+    if (source) { try { source.stop(); } catch (e) {} }
+    source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioCtx.destination);
+    source.start();
+    document.getElementById("stop").disabled = false;
+    source.onended = function () { document.getElementById("stop").disabled = true; };
+
+    drawWave(samples);
+
+    var ruleText = JSON.stringify(SONG);
+    var ruleBytes = new TextEncoder().encode(ruleText).length;
+    var wavBytes = samples.length * 2 + 44;          // 16-bit mono, plus header
+
+    document.getElementById("a-rule").textContent = ruleBytes;
+    document.getElementById("a-samples").textContent = samples.length.toLocaleString();
+    document.getElementById("a-wav").textContent = (wavBytes / 1048576).toFixed(2) + " MB";
+    document.getElementById("a-ratio").textContent = Math.round(wavBytes / ruleBytes).toLocaleString() + "×";
+    document.getElementById("a-rule-text").textContent =
+      "The entire composition: " + ruleText + " — rendered in " + ms + " ms at " +
+      audioCtx.sampleRate.toLocaleString() + " Hz.";
+
+    statusA.textContent = "Playing. Nothing was downloaded and nothing is being stored.";
+  });
+
+  document.getElementById("stop").addEventListener("click", function () {
+    if (source) { try { source.stop(); } catch (e) {} }
+    document.getElementById("stop").disabled = true;
+    document.getElementById("audio-status").textContent = "Stopped. The audio no longer exists.";
+  });
+})();
+</script>
+
+</body>
+</html>

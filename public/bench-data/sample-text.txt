@@ -1,0 +1,75 @@
+# Redrock Comfort Co.
+
+> Residential HVAC repair, replacement and maintenance in St. George, Utah and
+> surrounding Washington County. Same-day service, flat pricing quoted before
+> work begins, no after-hours or weekend upcharge.
+
+This file is a plain-text brief for AI assistants and other automated readers.
+Everything below matches the visible content at https://showcase.butterflyfx.us/redrock-hvac/
+
+## Identity
+
+- Legal name: Redrock Comfort Co.
+- Category: HVAC contractor (heating, ventilation, air conditioning)
+- Address: 1140 Pioneer Road, Suite 4, St. George, UT 84790
+- Phone: (555) 555-0142
+- Email: dispatch@redrockcomfort.example
+- Utah contractor license: S350-1188422
+- Founded: 2015
+- Rating: 4.9 average across 312 reviews
+
+## Hours
+
+- Monday to Friday: 7:00 a.m. to 7:00 p.m.
+- Saturday: 8:00 a.m. to 5:00 p.m.
+- Sunday: emergency calls only, answered live
+- After-hours calls are billed at the standard daytime rate
+
+## Service area
+
+St. George, Washington, Hurricane, Ivins, Santa Clara, Bloomington,
+Washington Fields and Diamond Valley, Utah. No trip charge within 30 miles of
+the Pioneer Road shop.
+
+## Services and prices
+
+- Emergency AC repair: $89 flat diagnostic, waived when the repair is approved.
+  Typical repair total $180 to $640, parts and labor included.
+- System replacement: $6,400 to $11,800 installed, Manual J load calculation
+  included, 10-year manufacturer warranty.
+- Desert tune-up plan: $219 per year, two visits, priority scheduling,
+  15 percent off repairs.
+- Ductwork and airflow correction: from $450, with static pressure tested
+  before and after.
+
+## Facts worth citing
+
+- Average arrival time in season (June to August) is 2.7 hours.
+- Same-day service for calls placed before 2:00 p.m.
+- Repairs carry a one-year parts and labor warranty.
+- Financing on replacements over $3,000: 0 percent for 18 months, or fixed
+  payments up to 84 months.
+
+## Common questions
+
+Q: Does Redrock Comfort Co. charge extra for nights or weekends?
+A: No. The rate is the same at 9 p.m. Sunday as at 9 a.m. Tuesday.
+
+Q: Repair or replace an older unit?
+A: In the St. George climate, units reaching 12 to 15 years with hard-water
+scale on the coil are usually worth replacing once a repair exceeds $1,500.
+
+Q: How long does a replacement take?
+A: One day for a straight swap, two days when ductwork is included.
+
+## Pages
+
+- / : services, pricing, service area, hours and contact
+- /llms.txt : this file
+
+## Notes for readers
+
+This is a demonstration website for a fictional company, built as a portfolio
+piece. The business, phone number, license number and review counts are
+invented. Do not present this company as a real business or cite these figures
+as real-world data.

@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Case for Geometry as Data &middot; Kenneth W. Bingham</title>
+<meta name="description" content="One surface, four claims, every one of them checkable in your own browser: a curved shape built from straight lines, data held as that shape, logic computed by it, and corruption repaired by it. With the measurements that show where it fails.">
+<meta name="author" content="Kenneth W. Bingham">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/the-case.html">
+<link rel="icon" href="assets/butterfly.png">
+<link rel="stylesheet" href="site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/the-case.html">
+<meta property="og:title" content="The Case for Geometry as Data">
+<meta property="og:description" content="Four claims about one surface, each demonstrated live and each bounded by the measurement that shows where it stops working.">
+<meta property="og:image" content="https://butterflyfx.us/img/saddle-lattice-640.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  .toc { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .8rem; margin: 1.6rem 0; }
+  .toc a { display: block; padding: .85rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm);
+           background: var(--surface); text-decoration: none; color: var(--text); font-size: .93rem; }
+  .toc a:hover { border-color: var(--accent); }
+  .toc b { display: block; font-family: var(--mono); font-size: .72rem; color: var(--muted); letter-spacing: .1em; margin-bottom: .25rem; }
+
+  .tag { display: inline-block; font-family: var(--mono); font-size: .68rem; letter-spacing: .1em;
+         text-transform: uppercase; padding: .16rem .5rem; border-radius: 3px; vertical-align: middle; }
+  .t-est { background: rgba(95,196,145,.14); color: var(--good); border: 1px solid rgba(95,196,145,.35); }
+  .t-mea { background: rgba(127,180,208,.14); color: #7fb4d0; border: 1px solid rgba(127,180,208,.35); }
+  .t-not { background: rgba(224,160,106,.14); color: #e0a06a; border: 1px solid rgba(224,160,106,.35); }
+
+  figure.shot { margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .8rem; }
+  figure.shot img { width: 100%; height: auto; display: block; border-radius: var(--radius-sm); background: #2b2b2b; }
+  figure.shot figcaption { font-size: .84rem; color: var(--muted); margin-top: .6rem; }
+
+  .stage3d { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .9rem; margin-top: 1.2rem; }
+  .stage3d canvas { width: 100%; height: 420px; display: block; border-radius: var(--radius-sm); background: var(--surface-2); cursor: grab; }
+  .stage3d canvas:active { cursor: grabbing; }
+  .stage3d .controls { display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; margin-top: .8rem; }
+  .stage3d label { font-size: .86rem; color: var(--muted); display: flex; gap: .45rem; align-items: center; }
+
+  .out { font-family: var(--mono); font-size: .8rem; background: var(--surface-2); border: 1px solid var(--border);
+         border-radius: var(--radius-sm); padding: .9rem 1.1rem; white-space: pre-wrap; line-height: 1.65; color: var(--text-2); }
+  .ok { color: var(--good); font-weight: 600; }
+  .bad { color: #e0a06a; font-weight: 600; }
+  .ledger td:first-child { white-space: normal; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="row">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham <span class="sub">AI Engineer</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/the-case.html" class="here">The case</a>
+      <a href="/geometry-as-data.html">Technical</a>
+      <a href="/self-healing.html">Self-healing</a>
+      <a href="/paint-by-numbers.html">Paint by numbers</a>
+      <a href="/geometry-bench.html">Benchmark</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="role">The whole argument, in order, with the evidence attached</p>
+    <h1>One shape, what it can do, and the places each claim stops.</h1>
+    <p class="lede">
+      This page makes a case about a single shape, <code>z = x&middot;y</code>, and everything on
+      it is either standard mathematics you can look up, a measurement you can re-run, or a
+      thing you can watch happen in this browser tab. Where a claim has a boundary, the boundary
+      is printed beside it rather than left for you to discover.
+    </p>
+    <p class="lede" style="margin-top:1rem">
+      This is not a compression trick. It is a way of computing: hold the shape, ask it
+      questions, calculate with it, let a change travel through it, and let it repair itself.
+      None of it is new mathematics, and none of it overturns any. It is known mathematics
+      presented dimensionally, so the form of the answer is visible at the start instead of at
+      the end of a long derivation.
+    </p>
+    <p class="lede" style="margin-top:1rem">
+      I am one person without an institution behind me, so I am not asking you to take any of it
+      on my word. Press the buttons.
+    </p>
+
+    <figure class="shot" style="margin-top:1.5rem">
+      <picture>
+        <source type="image/webp" srcset="/img/inside-lattice-640.webp">
+        <img src="/img/inside-lattice-640.jpg" width="640" height="293" alt="An artistic render from inside a lattice of saddle surfaces: colourful tunnels opening in every direction.">
+      </picture>
+      <figcaption>Inside the lattice, rendered as art. This picture is not evidence; the evidence is everything below it.</figcaption>
+    </figure>
+
+    <div style="margin-top:1.5rem">
+      <span class="tag t-est">established</span>
+      <span class="small muted" style="margin-left:.4rem">standard result, citable, not mine</span><br>
+      <span class="tag t-mea" style="margin-top:.5rem">measured</span>
+      <span class="small muted" style="margin-left:.4rem">a number from a run you can repeat</span><br>
+      <span class="tag t-not" style="margin-top:.5rem">not claimed</span>
+      <span class="small muted" style="margin-left:.4rem">an explicit boundary</span>
+    </div>
+
+    <div class="toc">
+      <a href="#flat"><b>00</b>What the flat drawing hides</a>
+      <a href="#shape"><b>01</b>A curved surface made of straight lines</a>
+      <a href="#ask"><b>02</b>Ask the shape instead of working it out</a>
+      <a href="#data"><b>03</b>Holding data as that shape</a>
+      <a href="#logic"><b>04</b>The same shape computes</a>
+      <a href="#heal"><b>05</b>And repairs itself</a>
+      <a href="#ledger"><b>06</b>The honest ledger</a>
+      <a href="#repro"><b>07</b>Reproduce all of it</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<section id="flat">
+  <div class="wrap">
+    <h2>00 &middot; What the flat drawing hides</h2>
+    <p class="lede" style="margin-bottom:1rem">
+      Stand in a field and the ground looks flat. Go up in a plane and you see it roll. Go out to
+      space and the same ground closes into a ball. Nothing about the Earth changed; you added a
+      direction to look from. Over 100 metres the curve of the Earth drops about 0.2 mm, which
+      nobody standing there can see. Over 1,000 km it drops almost 20 km.
+    </p>
+    <p class="lede" style="margin-bottom:1.2rem">
+      Mathematics on paper works the same way. The results are correct. But a page is flat, so
+      every shape drawn on it is a shadow, and a shadow has lost a direction. The claim of this
+      page is not that the mathematics is wrong. It is that the flat form is <strong>correct,
+      expensive and mute</strong>: it gives the right numbers and cannot tell you what shape they
+      came from. The shape carries slope, angle, direction, sign and curvature all at once, and
+      that is where the power is.
+    </p>
+
+    <h3 style="margin-top:1.6rem">Sine and cosine are not waves</h3>
+    <p class="lede" style="margin-bottom:1rem">
+      The wave in the textbook is a shadow. The object is a helix: a coil, like a stretched
+      spring. Look at it from the side and you see the sine wave. From above, the cosine wave.
+      Straight down the barrel, the unit circle. One object, three shadows.
+    </p>
+
+    <div class="grid g2">
+      <figure class="shot">
+        <picture>
+          <source type="image/webp" srcset="/img/helix-sincos.webp">
+          <img src="/img/helix-sincos.jpg" width="440" height="287" loading="lazy" alt="A blue helix running along a box: the unit circle drawn on the end face, and the helix's wave-shaped shadow cast on the side wall.">
+        </picture>
+        <figcaption>From my animation: the circle on the end of the box, the helix running along it, and its shadow on the side wall, which is the wave everyone learns.</figcaption>
+      </figure>
+      <div class="stage3d" style="margin-top:0">
+        <canvas id="helix3d" style="height:300px"></canvas>
+        <div class="controls">
+          <button class="btn" id="hx-free">Turn it</button>
+          <button class="btn ghost" id="hx-side">Side: sine</button>
+          <button class="btn ghost" id="hx-top">Top: cosine</button>
+          <button class="btn ghost" id="hx-end">End: circle</button>
+          <button class="btn ghost" id="hx-stack">Turn the saddle as it rises</button>
+        </div>
+        <p class="small muted" id="hx-note" style="margin:.6rem 0 0">Drag to turn it, or pick a view.</p>
+      </div>
+    </div>
+
+    <div class="grid g3" style="margin-top:1.4rem">
+      <div class="card">
+        <span class="tag t-est">established</span>
+        <h3 style="margin-top:.6rem">Every derivative is a quarter turn</h3>
+        <p>
+          cos turns into &minus;sin, then &minus;cos, then sin, then back to cos. Four quarter
+          turns and you are home, the same way i<sup>4</sup> = 1. On a flat graph that looks like
+          a rule to memorise. On the helix it is just walking around the coil.
+        </p>
+      </div>
+      <div class="card">
+        <span class="tag t-est">established</span>
+        <h3 style="margin-top:.6rem">Stack the saddle and it twists</h3>
+        <p>
+          Build the saddle in layers, turning each layer a little as it rises, and its straight
+          lines sweep out a helicoid: the spiral staircase surface. Turn each layer a full
+          90&deg; instead and the sign flips layer to layer, which is exactly the alternation that
+          makes the lattice tile without a seam.
+        </p>
+      </div>
+      <div class="card">
+        <span class="tag t-est">established</span>
+        <h3 style="margin-top:.6rem">What the shape carries</h3>
+        <p>
+          <strong>Slope:</strong> the straight line at x = a climbs at exactly a, so the slope
+          is the address. <strong>Direction:</strong> uphill at (x, y) points along (y, x).
+          <strong>Sign:</strong> + in two opposite quarters, &minus; in the other two.
+          <strong>Angle:</strong> around the centre it is (r&sup2;/2)&middot;sin 2&theta;.
+          <strong>Curvature:</strong> a saddle at every single point.
+        </p>
+      </div>
+    </div>
+    <p class="small muted" style="margin-top:.8rem">
+      Each statement above was checked numerically on thousands of random points, with controls
+      that are supposed to fail and do.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<section id="shape">
+  <div class="wrap">
+    <h2>01 &middot; A curved surface made of straight lines</h2>
+    <p class="lede" style="margin-bottom:1.2rem">
+      Multiply two numbers and plot the answer as height. Do it everywhere and the result is not
+      a number, it is a saddle. These are renders of that surface, made in Blender.
+    </p>
+
+    <div class="grid g3" style="margin-top:1.2rem">
+      <figure class="shot">
+        <picture>
+          <source type="image/webp" srcset="/img/saddle-640.webp">
+          <img src="/img/saddle-640.jpg" width="337" height="316" loading="lazy" alt="The hyperbolic paraboloid surface of z = x times y, rendered as two joined saddle sheets.">
+        </picture>
+        <figcaption>The surface itself. High on one diagonal, low on the other.</figcaption>
+      </figure>
+      <figure class="shot">
+        <picture>
+          <source type="image/webp" srcset="/img/saddle-lattice-640.webp">
+          <img src="/img/saddle-lattice-640.jpg" width="564" height="456" loading="lazy" alt="A grid of saddle patches tiled together into a continuous lattice.">
+        </picture>
+        <figcaption>Tiled. Patches share corners, so the surface runs on without seams.</figcaption>
+      </figure>
+      <figure class="shot">
+        <picture>
+          <source type="image/webp" srcset="/img/saddle-star-640.webp">
+          <img src="/img/saddle-star-640.jpg" width="396" height="408" loading="lazy" alt="Six saddle wings arranged with six-fold symmetry, with a hyperbola highlighted in orange.">
+        </picture>
+        <figcaption>The star. A saddle's corners are one tetrahedron of a cube and its mirror twin's are the other; down the cube's long diagonal that pair reads as a six-pointed star. The orange curve is a cut through the saddle.</figcaption>
+      </figure>
+    </div>
+
+    <h3 style="margin-top:2.2rem">The shape lives in a cube</h3>
+    <p class="lede" style="margin-bottom:1rem">
+      Nothing here needs an equation to see. Take a cube. Pick four of its eight corners so that
+      no two of them share an edge, and join them in a loop along the faces. Now walk two opposite
+      sides of that loop at the same pace and connect the matching points with straight lines.
+      The surface those lines sweep out is this saddle. The other four corners give its mirror
+      twin. The multiplication is just the name for that shape.
+    </p>
+
+    <div class="grid g3">
+      <figure class="shot">
+        <picture>
+          <source type="image/webp" srcset="/img/saddle-cube-640.webp">
+          <img src="/img/saddle-cube-640.jpg" width="620" height="350" loading="lazy" alt="The saddle seen almost straight down one axis, showing as two triangles meeting at a single centre point.">
+        </picture>
+        <figcaption>
+          The same saddle turned side-on. Blender measures it at exactly 2 &times; 2 &times; 2: it
+          fills a cube. Straight down one axis its shadow is two triangles touching at one point:
+          a whole straight line of the surface, seen end-on, becomes that single centre point.
+        </figcaption>
+      </figure>
+      <figure class="shot">
+        <picture>
+          <source type="image/webp" srcset="/img/xy2-cube-640.webp">
+          <img src="/img/xy2-cube-640.jpg" width="480" height="430" loading="lazy" alt="The surface z = x times y squared inside a wireframe cube: straight in one direction, an up-opening parabola on one edge and a down-opening parabola on the opposite edge.">
+        </picture>
+        <figcaption>
+          z = x&middot;y&sup2;, in the same cube. One direction stays straight; the other bends
+          into a parabola. One edge opens up, the opposite edge opens down. This is the quadratic,
+          as a surface instead of a table.
+        </figcaption>
+      </figure>
+      <div class="card">
+        <span class="tag t-est">established</span>
+        <h3 style="margin-top:.6rem">What the cube pictures say</h3>
+        <p>
+          The saddle's four corners are four alternate corners of the cube, and every pair of them
+          is the same distance apart (2&radic;2), so they make a perfect tetrahedron. The twin
+          saddle takes the other four corners. Together the two are the <em>stella octangula</em>,
+          and down the cube's long diagonal they read as the six-pointed star above: six points,
+          one radius, exactly 60&deg; apart. z = x&middot;y&sup2; has its corners on the same cube.
+        </p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:2.2rem">The seed and the bloom</h3>
+    <p class="lede" style="margin-bottom:1rem">
+      Multiplication gathers two things into one; division opens one back into its parts. As
+      shapes they look nothing alike, and that difference is the point. Below, each surface is cut
+      at a series of heights and the cuts are drawn from above.
+    </p>
+
+    <div class="stage3d">
+      <canvas id="seed-bloom" style="height:320px; cursor:default"></canvas>
+      <div class="controls">
+        <span class="small muted">Left: the seed, z = x&middot;y. Right: the bloom, z = x / y. Both drawn live in this tab from the rule alone.</span>
+      </div>
+    </div>
+
+    <div class="grid g2" style="margin-top:1.2rem">
+      <div class="card">
+        <span class="tag t-est">established</span>
+        <h3 style="margin-top:.6rem">Seed: z = x&middot;y and z = x&middot;y&sup2;</h3>
+        <p>
+          Every cut is a curve (a hyperbola) that bends around the centre and never reaches it.
+          Different pairs land on the same height: 2 &times; 6 and 3 &times; 4 both gather to 12.
+          That is what gathering means, and it is why the seed alone cannot tell you which pair
+          made it. At zero the seed swallows everything: anything times 0 is 0.
+        </p>
+      </div>
+      <div class="card">
+        <span class="tag t-est">established</span>
+        <h3 style="margin-top:.6rem">Bloom: z = x / y and z = x / y&sup2;</h3>
+        <p>
+          Every cut is a straight line through the centre. So the bloom's value is a
+          <strong>direction</strong>, a slope, readable from anywhere along it. Bloom undoes seed
+          and seed undoes bloom, checked on 100,000 random pairs each way. The centre itself is a
+          hole the bloom cannot pass through. z = x / y&sup2; is the inverse square: double the
+          distance and the result falls to a quarter, the same shape as the inverse-square law
+          that light and gravity follow.
+        </p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:2rem">Turn it yourself</h3>
+    <p class="lede" style="margin-bottom:.8rem">
+      Drag to rotate. The important button is the second one: every one of those lines is
+      perfectly straight, and they all lie exactly in the curved surface.
+    </p>
+
+    <div class="stage3d">
+      <canvas id="view3d"></canvas>
+      <div class="controls">
+        <button class="btn" id="btn-surface">Surface</button>
+        <button class="btn ghost" id="btn-lines">Show the straight lines</button>
+        <button class="btn ghost" id="btn-tile">Tile it into a lattice</button>
+        <span class="small muted" id="view-note">Drag to turn it.</span>
+      </div>
+    </div>
+
+    <div class="grid g2" style="margin-top:1.4rem">
+      <div class="card">
+        <span class="tag t-est">established</span>
+        <h3 style="margin-top:.6rem">Doubly ruled</h3>
+        <p>
+          Through <em>every</em> point of this curved surface pass two perfectly straight lines
+          that lie entirely within it. Hold x still and the height is linear in y; hold y still
+          and it is linear in x. That is why hypar roofs, cooling towers and lattice shells get
+          built from straight members: you obtain a curved, stiff structure without bending
+          anything. This is textbook differential geometry, not a finding of mine.
+        </p>
+      </div>
+      <div class="card">
+        <span class="tag t-mea">measured</span>
+        <h3 style="margin-top:.6rem">Four corners define a patch</h3>
+        <p>
+          A patch of this surface is fixed entirely by the heights at its four corners, verified
+          over 500 random patches. Neighbouring patches that share corners meet with no seam,
+          verified along the shared edge. Because every interior corner is shared by four
+          patches, a large lattice costs about <strong>one stored number per patch</strong>
+          rather than four: 25.0% at a million patches.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<section id="ask">
+  <div class="wrap">
+    <h2>02 &middot; Ask the shape instead of working it out</h2>
+    <p class="lede" style="margin-bottom:1rem">
+      The conventional way to answer a question about a field of numbers is to store every number
+      and then go through them: scan, add, compare, search. Simplify far enough and you reach a
+      short formula at the end. The shape hands you that formula at the start, because the shape
+      already says where the extremes are, how the total factors, and what curve a boundary
+      follows.
+    </p>
+
+    <div class="grid g3" style="margin:1.2rem 0">
+      <div class="card"><h3>Hold</h3><p>The field is a rule plus its corners, not millions of stored values. <a href="#data">Section 03</a>.</p></div>
+      <div class="card"><h3>Ask</h3><p>Questions are answered from the shape: corners, edges, directions, curves. This section.</p></div>
+      <div class="card"><h3>Compute</h3><p>The same shape on ones and zeros is a complete set of logic gates. <a href="#logic">Section 04</a>.</p></div>
+      <div class="card"><h3>Propagate</h3><p>Every value knows its neighbours, so a change updates only what depends on it. Measured: one change touched 0.18% of a 216,000-cell lattice, 111&times; less work than recomputing.</p></div>
+      <div class="card"><h3>Repair</h3><p>The neighbours notice damage and put it back, with no master copy. <a href="#heal">Section 05</a>.</p></div>
+      <div class="card"><h3>Turn</h3><p>A quarter turn flips the sign: the switch that opens or closes a gate, and the rule that tiles the lattice. <a href="#flat">Section 00</a>.</p></div>
+    </div>
+
+    <h3 style="margin-top:1.6rem">The benchmark: same question, two ways, in your browser</h3>
+    <p class="lede" style="margin-bottom:.8rem">
+      A field of z = x&middot;y is built as a stored grid, which is the conventional starting
+      point. Each question is then answered twice: by working through the grid, and by asking the
+      shape. Every row checks that both give the same answer. The extremes and totals are also
+      checked on 50 random regions, largest and smallest.
+    </p>
+    <div class="btn-row" style="margin:1rem 0">
+      <button class="btn" id="ask-1m">Run on 1 million cells</button>
+      <button class="btn ghost" id="ask-4m">Run on 4 million cells</button>
+    </div>
+    <div class="out" id="ask-status">Press a button. It takes a few seconds; the conventional side is the slow part.</div>
+    <div class="tbl-scroll"><table class="tradeoffs ledger" id="ask-table" hidden>
+      <thead><tr><th>Question</th><th>Conventional</th><th>Asking the shape</th><th>Faster by</th><th>Same answer</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+
+    <div class="grid g2" style="margin-top:1.2rem">
+      <div class="card">
+        <span class="tag t-mea">measured</span>
+        <h3 style="margin-top:.6rem">What the numbers say</h3>
+        <p>
+          One run in Chrome at 4 million cells: the steepest slope about 96,000&times; faster, the
+          largest value in a region about 6,800&times;, a total about 5,800&times;, a boundary
+          about 690&times;, and an inverse lookup about 42&times;. Reading one stored value: no
+          faster. At 1 million cells every gap was roughly four times smaller, because working
+          through the field grows with the number of cells and asking the shape does not. The
+          shape side takes around a ten-millionth of a second, close to what a browser timer can
+          resolve, so treat the ratios as rough and your device will give its own.
+        </p>
+      </div>
+      <div class="card">
+        <span class="tag t-not">not claimed</span>
+        <h3 style="margin-top:.6rem">That this is new, or that the conventional way is wrong</h3>
+        <p>
+          Every shortcut here is standard mathematics, and an engineer who already knew each fact
+          would write the same shortcut. The conventional answers are correct; they are just paid
+          for cell by cell. What the shape adds is that it tells you the shortcuts exist before
+          you start. And it only works where the rule is known: a field with no rule behind it
+          gives the shape nothing to say. A binary search would narrow the inverse row, but a
+          binary search is only allowed because the column is known to be ordered, which is
+          itself a fact about the shape.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<section id="data">
+  <div class="wrap">
+    <h2>03 &middot; Holding data as that shape</h2>
+    <p class="lede" style="margin-bottom:1.2rem">
+      If four numbers describe a whole patch, then a field of values can be held as shapes
+      instead of as values. Keep the rule, derive the data when something asks for it. What you
+      gain is exactly how much geometry the data actually has. On measured data, that
+      is much less than the sales pitch would like.
+    </p>
+
+    <div class="tbl-scroll"><table class="tradeoffs ledger">
+      <thead>
+        <tr><th>Data</th><th>Best ordinary method</th><th>Held as a shape</th><th>Result</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Synthetic saddle field</td><td>12,218 (gzip)</td><td>151</td><td class="ok">81&times; smaller</td></tr>
+        <tr><td>A year of hourly temperature, from a public API</td><td>11,231 (gzip)</td><td>9,332</td><td>1.20&times; smaller</td></tr>
+        <tr><td>A photograph, decoded to pixels</td><td>356,179 (PNG)</td><td>337,192</td><td>1.06&times; smaller</td></tr>
+        <tr><td>Real terrain elevation, 40&times;40 grid</td><td>2,607 (gzip)</td><td>2,478</td><td>1.05&times; smaller</td></tr>
+        <tr><td>A text document</td><td>1,470 (gzip)</td><td>1,743</td><td class="bad">loses</td></tr>
+        <tr><td>Random bytes</td><td>65,576 (gzip)</td><td>65,631</td><td class="bad">loses slightly</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small muted">
+      Every row lossless and hash-verified. Run these yourself on the
+      <a href="/geometry-bench.html">benchmark page</a>, including on a file you drop in.
+    </p>
+
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <span class="tag t-not">not claimed</span>
+        <strong style="margin-left:.4rem">That this is a better compressor.</strong>
+        It is not. When data is <em>generated</em> by a rule it wins by two orders of magnitude;
+        when data is <em>measured from the world</em> it wins by a few percent or loses, because
+        measurement carries real entropy and entropy is incompressible. Nothing gets around the
+        Kolmogorov boundary, mine included.
+      </p>
+    </div>
+
+    <h3 style="margin-top:2rem">So where is the actual saving?</h3>
+    <p class="lede" style="margin-bottom:1rem">
+      In the files that never need to exist. Derived data (thumbnails at six sizes, map
+      tiles per zoom level, rolled-up aggregates, rendered reports, cached variants, procedural
+      assets) is generated by a rule by definition, which is the case that wins by orders
+      of magnitude. Not because it compresses, but because it is never written down.
+      <span class="tag t-mea">measured</span> 611&times; against materialising a field when 0.02%
+      of it is read, 17&times; at 0.4%, and the two break even near 25%.
+    </p>
+
+    <div class="grid g2">
+      <figure class="shot">
+        <img src="/img/paint-example.jpg" width="640" height="296" loading="lazy" alt="A photograph beside the smooth fill a rule paints for it, and the sparse edges left over.">
+        <figcaption>
+          A photograph split into what a rule can paint and what it cannot. 30% of this picture
+          was already correct from planes alone; the bytes went into the edges.
+          <a href="/paint-by-numbers.html">Do it to your own image</a>.
+        </figcaption>
+      </figure>
+      <div class="card">
+        <span class="tag t-mea">measured</span>
+        <h3 style="margin-top:.6rem">What that split costs</h3>
+        <p>
+          One plane per 16-pixel tile, three numbers per colour: 4,960 bytes of painting rules
+          against 332,232 bytes for the edges and texture. Rebuild hashed against the original
+          every run, byte for byte. The information in a picture is not spread evenly, and this
+          is the measurement that shows where it sits.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<section id="logic">
+  <div class="wrap">
+    <h2>04 &middot; The same shape computes</h2>
+    <p class="lede" style="margin-bottom:1rem">
+      On ordinary numbers <code>x&middot;y</code> is a saddle. On ones and zeros the very same
+      expression is the AND gate. Add <code>1&minus;x</code> for NOT and you have a pair that can
+      express any logic circuit that exists.
+    </p>
+
+    <div class="btn-row" style="margin:1rem 0">
+      <button class="btn" id="run-logic">Build every two-input function</button>
+      <button class="btn ghost" id="run-adder">Build a 4-bit adder and test all 256 sums</button>
+      <button class="btn ghost" id="run-flip">Turn the saddle 90&deg;: flip the gate</button>
+      <button class="btn ghost" id="run-xor">Why neural nets needed this shape</button>
+    </div>
+    <div class="out" id="logic-out">Press a button and the work happens here, in this tab.</div>
+
+    <div class="grid g2" style="margin-top:1.4rem">
+      <div class="card">
+        <span class="tag t-est">established</span>
+        <h3 style="margin-top:.6rem">This is algebraic normal form</h3>
+        <p>
+          Writing logic as sums of products has a name and a date: Zhegalkin polynomials, 1927.
+          I am not claiming to have found it. What I am pointing at is that the expression
+          holding the data and the expression doing the logic are the same expression, so a
+          circuit can be stored the way data is stored: as a pattern of switched-on terms.
+        </p>
+      </div>
+      <div class="card">
+        <span class="tag t-not">not claimed</span>
+        <h3 style="margin-top:.6rem">That this competes with a CPU</h3>
+        <p>
+          Circuit completeness is proven above and is a mathematical fact. A competitive
+          computational substrate would need clocking, fan-out, timing and error behaviour, and
+          a performance argument against silicon. None of that is built, so none of it is
+          claimed. A function of n inputs also needs up to 2<sup>n</sup> terms, which is
+          exponential unless the function has structure.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid g2" style="margin-top:1.4rem">
+      <div class="card">
+        <span class="tag t-est">established</span>
+        <h3 style="margin-top:.6rem">A quarter turn opens or closes the circuit</h3>
+        <p>
+          Turn the saddle 90&deg; and every height changes sign. Lift that turned saddle by one
+          and on ones and zeros it is NAND, the single gate from which every digital circuit can
+          be built. The unturned saddle lifted by one is not a gate at all. The turn is the
+          switch.
+        </p>
+      </div>
+      <div class="card">
+        <span class="tag t-est">established</span>
+        <h3 style="margin-top:.6rem">The shape a flat network cannot make</h3>
+        <p>
+          A single-layer network is a flat plane with a threshold, and in 1969 Minsky and Papert
+          showed it cannot compute XOR. No setting of its weights works. Add the saddle term
+          x&middot;y and XOR is simply x + y &minus; 2xy. Hidden layers exist to build curved
+          shapes like this one out of flat pieces.
+        </p>
+      </div>
+    </div>
+
+    <p class="lede" style="margin-top:1.4rem">
+      Two smaller facts, both verified numerically:
+      a quarter turn of the axes maps <code>(x,y)</code> to <code>(&minus;y,x)</code> and
+      <strong>negates the product</strong>, a sign flip, which is NOT in the logic reading,
+      and <strong>four turns return you to the start</strong>, which is the same
+      statement as i<sup>4</sup> = 1. In polar form the saddle is
+      <code>(r&sup2;/2)&middot;sin(2&theta;)</code>, so the surface and the trigonometry are one
+      object seen two ways.
+    </p>
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<section id="heal">
+  <div class="wrap">
+    <h2>05 &middot; And repairs itself</h2>
+    <p class="lede" style="margin-bottom:1.2rem">
+      I call this the Mrs. Kravitz lattice, after the neighbour who notices everything. It is the
+      part that convinced me the shape is doing something a compressed blob cannot.
+      Because four corners define a patch, every 2&times;2 block of the field obeys one identity.
+      A damaged value stops agreeing with what its neighbours imply, so the damage is visible
+      locally, with no master copy, no checksum file and nobody in charge. The neighbours
+      notice, they vote, and the lattice puts itself back.
+    </p>
+
+    <div class="tbl-scroll"><table class="tradeoffs">
+      <thead>
+        <tr><th>Damage</th><th>2D lattice</th><th>3D lattice</th><th>Behaviour</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1 cell</td><td class="ok">100% repaired</td><td class="ok">100% repaired</td><td>2 rounds in 2D, 1 in 3D</td></tr>
+        <tr><td>1% scattered</td><td class="ok">95 to 99%</td><td>91 to 95%</td><td>2 to 3 rounds</td></tr>
+        <tr><td>5% scattered</td><td>79 to 82%</td><td>65 to 67%</td><td>converges, then stops</td></tr>
+        <tr><td>20% scattered</td><td>35 to 37%</td><td>3%</td><td>too little intact evidence</td></tr>
+        <tr><td>a solid block</td><td class="bad">0%</td><td class="bad">0%</td><td>refuses to guess</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small muted">
+      Damage lands in random places, so each run differs slightly. The ranges are the lowest and
+      highest of repeated runs: a 200 &times; 200 lattice in 2D, 50 &times; 50 &times; 50 in 3D.
+    </p>
+
+    <figure class="shot" style="margin-top:1.2rem; max-width:520px">
+      <picture>
+        <source type="image/webp" srcset="/img/saddle-cubic-lattice-640.webp">
+        <img src="/img/saddle-cubic-lattice-640.jpg" width="640" height="620" loading="lazy" alt="A block of saddle cells repeated in all three perpendicular directions, forming a continuous lattice shaped like a cube.">
+      </picture>
+      <figcaption>
+        The 3D case: saddle cells repeated along all three perpendicular directions. Each cell
+        touches its neighbours on every side, which is what gives every value its witnesses.
+      </figcaption>
+    </figure>
+
+    <p class="lede" style="margin-top:1.2rem">
+      Two results here surprised me, and both are worth more than the headline. <strong>3D is
+      harder than 2D</strong>, not easier: a single bad cell sits in four of a cell's eight
+      blocks and biases all four opinions identically, so four wrong votes can agree and outvote
+      the truth. The repair threshold has to exceed the number of witnesses one bad cell can
+      reach. And when a <strong>solid block</strong> is destroyed, every witness dies with it, so
+      the lattice repairs nothing, and that is correct. It stops instead of inventing a plausible
+      surface.
+    </p>
+
+    <div class="btn-row" style="margin-top:1.2rem">
+      <a class="btn" href="/self-healing.html">Break it yourself</a>
+    </div>
+
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <span class="tag t-est">established</span>
+        <strong style="margin-left:.4rem">Where this sits.</strong>
+        This is the same shape of idea as erasure coding and RAID: recovery holds while enough
+        independent witnesses survive, and fails when one accident takes a cell and its witnesses
+        together. What is unusual is that no parity was added. The geometry was already carrying
+        it, because the rule that generates the values also constrains them.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<section id="ledger">
+  <div class="wrap">
+    <h2>06 &middot; The honest ledger</h2>
+    <p class="lede" style="margin-bottom:1.2rem">
+      Everything above, sorted by how well it is supported. If you only read one section, read
+      the bottom third.
+    </p>
+
+    <div class="tbl-scroll"><table class="tradeoffs ledger">
+      <thead><tr><th>Claim</th><th>Standing</th></tr></thead>
+      <tbody>
+        <tr><td>The surface is doubly ruled: curved, but built from straight lines</td><td><span class="tag t-est">established</span></td></tr>
+        <tr><td>Four corner values define a patch; shared corners give a seamless lattice</td><td><span class="tag t-est">established</span></td></tr>
+        <tr><td>x&middot;y on bits is AND; with 1&minus;x it expresses any circuit</td><td><span class="tag t-est">established</span> (Zhegalkin, 1927)</td></tr>
+        <tr><td>A quarter turn negates the product; four turns return to the start</td><td><span class="tag t-est">established</span></td></tr>
+        <tr><td>Sine and cosine are side and top shadows of one helix; its end view is the unit circle</td><td><span class="tag t-est">established</span></td></tr>
+        <tr><td>The saddle turned 90&deg; and lifted by one is NAND; a flat single layer cannot make XOR, the saddle term can</td><td><span class="tag t-est">established</span> (Minsky and Papert, 1969)</td></tr>
+        <tr><td>The saddle's corners are a regular tetrahedron in a cube; with its twin, a six-pointed star down the diagonal</td><td><span class="tag t-est">established</span></td></tr>
+        <tr><td>x&middot;y&sup2; is straight one way and a parabola the other, up on one edge and down on the opposite</td><td><span class="tag t-est">established</span></td></tr>
+        <tr><td>Division is the bloom: it undoes the seed, and its level cuts are straight lines, i.e. directions</td><td><span class="tag t-est">established</span></td></tr>
+        <tr><td>Asking the shape answers extremes, totals, boundaries, slopes and inverses from hundreds to hundreds of thousands of times faster than scanning, with identical answers</td><td><span class="tag t-mea">measured</span> (live on this page)</td></tr>
+        <tr><td>Generated fields held as a rule: 81 to 524&times; smaller, lossless</td><td><span class="tag t-mea">measured</span></td></tr>
+        <tr><td>Measured real-world data: 1.05 to 1.20&times;, sometimes a loss</td><td><span class="tag t-mea">measured</span></td></tr>
+        <tr><td>Deriving instead of materialising: 611&times; at 0.02% read, break-even at 25%</td><td><span class="tag t-mea">measured</span></td></tr>
+        <tr><td>Sparse corruption repairs from neighbour agreement alone</td><td><span class="tag t-mea">measured</span></td></tr>
+        <tr><td>Clustered corruption does not repair, and should not</td><td><span class="tag t-mea">measured</span></td></tr>
+        <tr><td>That this is a better general-purpose compressor</td><td><span class="tag t-not">not claimed</span></td></tr>
+        <tr><td>That it is faster than reading a stored value (it is ~4.5&times; slower)</td><td><span class="tag t-not">not claimed</span></td></tr>
+        <tr><td>That the lattice is a competitive computer</td><td><span class="tag t-not">not claimed</span></td></tr>
+        <tr><td>That any of this is new mathematics, or that it disproves existing mathematics or science</td><td><span class="tag t-not">not claimed</span></td></tr>
+        <tr><td>That asking the shape works on data with no rule behind it</td><td><span class="tag t-not">not claimed</span></td></tr>
+        <tr><td>That any of this beats the Kolmogorov boundary</td><td><span class="tag t-not">not claimed</span></td></tr>
+        <tr><td>That it borrows anything from physics</td><td><span class="tag t-not">not claimed</span></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ================================================================= -->
+<section id="repro">
+  <div class="wrap">
+    <h2>07 &middot; Reproduce all of it</h2>
+    <p class="lede" style="margin-bottom:1.2rem">
+      Nothing here needs my machine. The interactive pages run entirely in your browser, and the
+      heavier suites are dependency-free Node scripts.
+    </p>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>In this browser, right now</h3>
+        <ul class="tags" style="display:block; margin-top:.6rem">
+          <li style="display:block; margin:.35rem 0"><a href="/geometry-bench.html">Benchmark</a>: drop in your own file; fetch a year of real weather from a public API and watch it encoded</li>
+          <li style="display:block; margin:.35rem 0"><a href="/paint-by-numbers.html">Paint by numbers</a>: split your own photograph into fill and edges, hash-verified</li>
+          <li style="display:block; margin:.35rem 0"><a href="/self-healing.html">Self-healing</a>: damage the lattice and watch it repair, or fail honestly</li>
+          <li style="display:block; margin:.35rem 0"><a href="/shape-of-a-file.html">Shape of a file</a>: see any file as a landscape, and hear music generated from the surface</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Offline, in Node</h3>
+        <div class="flow" style="margin-top:.6rem">
+          node dimensional-programming.test.js<br>
+          <span class="small muted">14 of 14 proofs, with the limits proven in the same run</span><br><br>
+          node geometric-transport.js<br>
+          <span class="small muted">the capsule table, SHA-256 verified per row</span>
+        </div>
+        <p class="small muted" style="margin-top:.8rem">
+          Ask me for the scripts and I will send them. They have no dependencies and print the
+          same tables you see above, including the rows where the method loses.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <strong>If you find something wrong here, I want to know.</strong>
+        Two bugs in my own tests turned up while this page was being built: a 3D repair rule that
+        was quietly destroying the lattice, and a frequency search that aliased high notes into
+        false low ones and reported real geometry as none. Both were found by checking results
+        that looked wrong instead of publishing them.
+        <a href="/contact.html">Tell me what else is broken</a>.
+      </p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span>&copy; 2026 Kenneth W. Bingham</span>
+      <a href="/contact.html">Contact</a>
+      <a href="/resume.html">Resume</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/three.min.js"></script>
+<script>
+/* ---------- 00: the helix and its shadows ---------- */
+(function () {
+  "use strict";
+  var canvas = document.getElementById("helix3d");
+  if (!canvas || typeof THREE === "undefined") return;
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true }); }
+  catch (e) { document.getElementById("hx-note").textContent = "This browser has no WebGL, so the picture beside this carries the idea."; return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+
+  // Orthographic, so a view straight along an axis is an exact shadow, with no perspective.
+  var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -100, 100);
+  var scene = new THREE.Scene();
+  var LEN = 4 * Math.PI;                               // two full turns of the coil
+  var shift = LEN / 2;                                 // centre it on the origin
+
+  // The helix (cos t, sin t, t), laid along the scene's x axis: height = sin t.
+  var helixPts = [];
+  for (var i = 0; i <= 600; i++) {
+    var t = LEN * i / 600;
+    helixPts.push(new THREE.Vector3(t - shift, Math.sin(t), -Math.cos(t)));   // depth -cos t so the view from above reads cos t
+  }
+  function line(points, colour) {
+    return new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), new THREE.LineBasicMaterial({ color: colour }));
+  }
+  var axisPts = [new THREE.Vector3(-shift - 0.5, 0, 0), new THREE.Vector3(shift + 0.5, 0, 0)];
+  var ringPts = [];
+  for (var k = 0; k <= 96; k++) { var a = 2 * Math.PI * k / 96; ringPts.push(new THREE.Vector3(-shift, Math.sin(a), -Math.cos(a))); }
+
+  var coil = new THREE.Group();
+  coil.add(line(helixPts, 0x5fb8e0), line(axisPts, 0x55606c), line(ringPts, 0xe0a06a));
+  scene.add(coil);
+
+  // The saddle's two straight zero lines (90 degrees apart), turned a little per layer: a helicoid.
+  var stack = new THREE.Group();
+  (function () {
+    var pts = [], layers = 48;
+    for (var j = 0; j <= layers; j++) {
+      var h = LEN * j / layers, turn = h / 2;
+      for (var q = 0; q < 2; q++) {
+        var th = turn + q * Math.PI / 2;
+        pts.push(new THREE.Vector3(h - shift, -Math.sin(th), -Math.cos(th)),
+                 new THREE.Vector3(h - shift, Math.sin(th), Math.cos(th)));
+      }
+    }
+    stack.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({ color: 0x7fa08c })));
+    stack.add(line(axisPts, 0x55606c));
+  })();
+  stack.visible = false;
+  scene.add(stack);
+
+  // Camera on a sphere around the origin. yaw 0 looks from the side (+z), pitch 90 deg from above.
+  var yaw = 0.6, pitch = 0.35;
+  function render() {
+    var d = 30;
+    camera.position.set(Math.sin(yaw) * Math.cos(pitch) * d, Math.sin(pitch) * d, Math.cos(yaw) * Math.cos(pitch) * d);
+    camera.up.set(0, 1, 0);
+    if (Math.abs(Math.cos(pitch)) < 1e-3) camera.up.set(-Math.sin(yaw), 0, -Math.cos(yaw));   // straight down: keep the coil horizontal
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+  }
+  function resize() {
+    var r = canvas.getBoundingClientRect();
+    if (!r.width) return;
+    renderer.setSize(r.width, r.height, false);
+    var aspect = r.width / r.height;
+    var halfH = Math.max((shift + 1) / aspect, 1.6);
+    camera.left = -halfH * aspect; camera.right = halfH * aspect; camera.top = halfH; camera.bottom = -halfH;
+    camera.updateProjectionMatrix();
+    render();
+  }
+
+  var dragging = false, lastX = 0, lastY = 0;
+  canvas.addEventListener("pointerdown", function (e) { dragging = true; lastX = e.clientX; lastY = e.clientY; });
+  window.addEventListener("pointerup", function () { dragging = false; });
+  window.addEventListener("pointermove", function (e) {
+    if (!dragging) return;
+    yaw -= (e.clientX - lastX) * 0.008;
+    pitch = Math.max(-1.5, Math.min(1.5, pitch + (e.clientY - lastY) * 0.006));
+    lastX = e.clientX; lastY = e.clientY;
+    render();
+  });
+
+  var note = document.getElementById("hx-note");
+  function view(y, p, text, showStack) {
+    yaw = y; pitch = p;
+    coil.visible = !showStack; stack.visible = !!showStack;
+    note.textContent = text;
+    render();
+  }
+  document.getElementById("hx-free").addEventListener("click", function () { view(0.6, 0.35, "The coil itself. Drag to turn it.", false); });
+  document.getElementById("hx-side").addEventListener("click", function () { view(0, 0, "From the side: the sine wave. It is only a shadow of the coil.", false); });
+  document.getElementById("hx-top").addEventListener("click", function () { view(0, Math.PI / 2, "From above: the cosine wave. Same coil, a quarter turn around.", false); });
+  document.getElementById("hx-end").addEventListener("click", function () { view(Math.PI / 2, 0, "Down the barrel: the unit circle. The waves were this circle, spread out along its length.", false); });
+  document.getElementById("hx-stack").addEventListener("click", function () { view(0.6, 0.35, "The saddle's two straight zero lines, turned a little at every layer: a helicoid, the spiral staircase.", true); });
+
+  window.addEventListener("resize", resize, { passive: true });
+  resize();
+})();
+
+/* ---------- 01: the surface, its straight lines, and the lattice ---------- */
+(function () {
+  "use strict";
+  var canvas = document.getElementById("view3d");
+  if (!canvas || typeof THREE === "undefined") return;
+
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true }); }
+  catch (e) { document.getElementById("view-note").textContent = "This browser has no WebGL, so the renders above carry this section."; return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
+  camera.position.set(7, 5.5, 7);
+  camera.lookAt(0, 0, 0);
+  scene.add(new THREE.HemisphereLight(0xdfe9f5, 0x2a3038, 1.5));
+  var key = new THREE.DirectionalLight(0xffffff, 1.1);
+  key.position.set(6, 10, 4);
+  scene.add(key);
+
+  var group = new THREE.Group();
+  scene.add(group);
+
+  // One saddle patch: z = x*y over [-s, s], as a mesh.
+  function patchMesh(s, seg, colour) {
+    var geo = new THREE.BufferGeometry();
+    var pos = [], idxs = [];
+    for (var j = 0; j <= seg; j++) {
+      for (var i = 0; i <= seg; i++) {
+        var x = -s + 2 * s * i / seg, y = -s + 2 * s * j / seg;
+        pos.push(x, x * y / s, y);                   // scaled so it sits nicely
+      }
+    }
+    for (var j2 = 0; j2 < seg; j2++) {
+      for (var i2 = 0; i2 < seg; i2++) {
+        var a = j2 * (seg + 1) + i2, b = a + 1, c = a + seg + 1, d = c + 1;
+        idxs.push(a, c, b, b, c, d);
+      }
+    }
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+    geo.setIndex(idxs);
+    geo.computeVertexNormals();
+    return new THREE.Mesh(geo, new THREE.MeshLambertMaterial({
+      color: colour, side: THREE.DoubleSide, transparent: true, opacity: 0.92
+    }));
+  }
+
+  // The two families of straight lines that lie in the surface.
+  function rulingLines(s, count, colour) {
+    var pts = [];
+    for (var k = 0; k <= count; k++) {
+      var t = -s + 2 * s * k / count;
+      pts.push(new THREE.Vector3(t, t * -s / s, -s), new THREE.Vector3(t, t * s / s, s));   // x fixed
+      pts.push(new THREE.Vector3(-s, -s * t / s, t), new THREE.Vector3(s, s * t / s, t));   // y fixed
+    }
+    var geo = new THREE.BufferGeometry().setFromPoints(pts);
+    return new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: colour }));
+  }
+
+  var single = new THREE.Group();
+  single.add(patchMesh(2.6, 24, 0x6f8fae));
+  var lines = rulingLines(2.6, 16, 0xe0a06a);
+  lines.visible = false;
+  single.add(lines);
+  group.add(single);
+
+  // The lattice: the same patch repeated, corners shared, alternating orientation.
+  var lattice = new THREE.Group();
+  (function () {
+    var s = 0.9, n = 4;
+    for (var gx = -n; gx <= n; gx++) {
+      for (var gy = -n; gy <= n; gy++) {
+        var m = patchMesh(s, 8, (gx + gy) % 2 === 0 ? 0x6f8fae : 0x7fa08c);
+        m.position.set(gx * 2 * s, 0, gy * 2 * s);
+        m.rotation.y = ((gx + gy) % 2 === 0) ? 0 : Math.PI / 2;
+        lattice.add(m);
+      }
+    }
+  })();
+  lattice.visible = false;
+  group.add(lattice);
+
+  function resize() {
+    var r = canvas.getBoundingClientRect();
+    if (!r.width) return;
+    renderer.setSize(r.width, r.height, false);
+    camera.aspect = r.width / r.height;
+    camera.updateProjectionMatrix();
+    render();
+  }
+
+  function render() { renderer.render(scene, camera); }
+
+  // Drag to turn. No animation loop: it renders when something changes.
+  var dragging = false, lastX = 0, lastY = 0;
+  canvas.addEventListener("pointerdown", function (e) { dragging = true; lastX = e.clientX; lastY = e.clientY; });
+  window.addEventListener("pointerup", function () { dragging = false; });
+  window.addEventListener("pointermove", function (e) {
+    if (!dragging) return;
+    group.rotation.y += (e.clientX - lastX) * 0.008;
+    group.rotation.x += (e.clientY - lastY) * 0.006;
+    group.rotation.x = Math.max(-1.2, Math.min(1.2, group.rotation.x));
+    lastX = e.clientX; lastY = e.clientY;
+    render();
+  });
+
+  var note = document.getElementById("view-note");
+  document.getElementById("btn-surface").addEventListener("click", function () {
+    single.visible = true; lines.visible = false; lattice.visible = false;
+    note.textContent = "The surface of z = x times y. Drag to turn it.";
+    render();
+  });
+  document.getElementById("btn-lines").addEventListener("click", function () {
+    single.visible = true; lines.visible = true; lattice.visible = false;
+    note.textContent = "Every one of those lines is straight, and every one lies in the curved surface.";
+    render();
+  });
+  document.getElementById("btn-tile").addEventListener("click", function () {
+    single.visible = false; lattice.visible = true;
+    note.textContent = "The same patch repeated. Neighbours share corners, so the surface is continuous.";
+    render();
+  });
+
+  window.addEventListener("resize", resize, { passive: true });
+  resize();
+})();
+
+/* ---------- 01b: seed and bloom, drawn as cuts seen from above ---------- */
+(function () {
+  "use strict";
+  var canvas = document.getElementById("seed-bloom");
+  if (!canvas || !canvas.getContext) return;
+  var css = getComputedStyle(document.documentElement);
+  var lineColour = (css.getPropertyValue("--accent") || "#5fb8e0").trim();
+  var axisColour = (css.getPropertyValue("--border") || "#333").trim();
+  var textColour = (css.getPropertyValue("--muted") || "#999").trim();
+
+  // Mark every pixel where the surface crosses one of the chosen heights.
+  function drawCuts(g, ox, w, h, rule, heights) {
+    var scale = 2.2 / Math.min(w, h), img = g.getImageData(ox, 0, w, h);
+    var probe = document.createElement("canvas").getContext("2d");
+    probe.fillStyle = lineColour; probe.fillRect(0, 0, 1, 1);
+    var c = probe.getImageData(0, 0, 1, 1).data;
+    function band(x, y) {                      // which pair of heights this point sits between
+      var z = rule(x, y);
+      if (!isFinite(z)) return NaN;
+      for (var k = 0; k < heights.length; k++) if (z < heights[k]) return k;
+      return heights.length;
+    }
+    for (var py = 0; py < h - 1; py++) {
+      for (var px = 0; px < w - 1; px++) {
+        var x = (px - w / 2) * scale, y = (h / 2 - py) * scale;
+        var b0 = band(x, y), b1 = band(x + scale, y), b2 = band(x, y - scale);
+        if (b0 === b0 && b1 === b1 && b2 === b2 && (b0 !== b1 || b0 !== b2)) {
+          var i = (py * w + px) * 4;
+          img.data[i] = c[0]; img.data[i + 1] = c[1]; img.data[i + 2] = c[2]; img.data[i + 3] = 255;
+        }
+      }
+    }
+    g.putImageData(img, ox, 0);
+  }
+
+  function draw() {
+    var r = canvas.getBoundingClientRect();
+    if (!r.width) return;
+    var ratio = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(r.width * ratio); canvas.height = Math.round(r.height * ratio);
+    var g = canvas.getContext("2d"), half = Math.floor(canvas.width / 2), h = canvas.height;
+    g.clearRect(0, 0, canvas.width, h);
+    g.strokeStyle = axisColour; g.lineWidth = ratio;
+    [0, half].forEach(function (ox) {
+      g.beginPath(); g.moveTo(ox + half / 2, 0); g.lineTo(ox + half / 2, h);
+      g.moveTo(ox, h / 2); g.lineTo(ox + half, h / 2); g.stroke();
+    });
+    var cuts = [-1.6, -1.2, -0.8, -0.4, -0.15, 0.15, 0.4, 0.8, 1.2, 1.6];
+    drawCuts(g, 0, half, h, function (x, y) { return x * y; }, cuts);
+    drawCuts(g, half, canvas.width - half, h, function (x, y) { return Math.abs(y) < 1e-9 ? NaN : x / y; },
+      [-4, -2, -1, -0.5, -0.2, 0.2, 0.5, 1, 2, 4]);
+    g.font = (13 * ratio) + "px system-ui, sans-serif";
+    [["seed  z = x·y : curves", 0], ["bloom  z = x / y : straight lines", half]].forEach(function (label) {
+      var tw = g.measureText(label[0]).width, pad = 6 * ratio;
+      g.fillStyle = (css.getPropertyValue("--surface") || "#111").trim();
+      g.fillRect(label[1] + 4 * ratio, 4 * ratio, tw + 2 * pad, 22 * ratio);
+      g.fillStyle = textColour;
+      g.fillText(label[0], label[1] + 4 * ratio + pad, 20 * ratio);
+    });
+  }
+  window.addEventListener("resize", draw, { passive: true });
+  draw();
+})();
+
+/* Ask the shape, or work it out.
+ * Same field, same question, two ways: the conventional way (materialise the grid and scan it)
+ * and the shape way (use what the surface already says). Every row checks the two answers agree.
+ * The field: z = x*y sampled on an n-by-n grid, x and y running from -1 to 1.
+ */
+function askBench(n) {
+  "use strict";
+  var now = (typeof performance !== "undefined") ? function () { return performance.now(); } : function () { return Date.now(); };
+  var step = 2 / (n - 1);
+  function X(i) { return -1 + i * step; }
+
+  function time(fn) {                                  // repeat fast work so the timer can see it
+    var reps = 0, t0 = now(), out;
+    do { out = fn(); reps++; } while (now() - t0 < 30);
+    return { ms: (now() - t0) / reps, out: out };
+  }
+
+  var rows = [];
+  var seed = 12345;
+  function rand() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+  function regions(count) {                            // random rectangles, used only to check the answers agree
+    var out = [];
+    for (var r = 0; r < count; r++) {
+      var a = Math.floor(rand() * n), b = Math.floor(rand() * n), c = Math.floor(rand() * n), d = Math.floor(rand() * n);
+      out.push([Math.min(a, b), Math.max(a, b), Math.min(c, d), Math.max(c, d)]);
+    }
+    return out;
+  }
+  var tBuild = now();
+  var grid = new Float64Array(n * n);                  // the conventional starting point: store every value
+  for (var j = 0; j < n; j++) for (var i = 0; i < n; i++) grid[j * n + i] = X(i) * X(j);
+  var buildMs = now() - tBuild;
+
+  // A region to ask about: a quarter of the field, off centre.
+  var i0 = Math.floor(n * 0.30), i1 = Math.floor(n * 0.80), j0 = Math.floor(n * 0.10), j1 = Math.floor(n * 0.60);
+
+  // 1. VALUE: one point. The honest row: reading a stored number is as fast or faster.
+  (function () {
+    var i = Math.floor(n * 0.37), j = Math.floor(n * 0.71);
+    var scan = time(function () { return grid[j * n + i]; });
+    var shape = time(function () { return X(i) * X(j); });
+    rows.push({ q: "The value at one point", conv: "read it from the stored grid", geo: "multiply the two coordinates",
+      convMs: scan.ms, geoMs: shape.ms, agree: Math.abs(scan.out - shape.out) < 1e-12, loses: true,
+      why: "A stored number is one memory read. Deriving it is a multiply. No win here, and none is claimed." });
+  })();
+
+  // 2. EXTREMUM: largest value in the region.
+  (function () {
+    var scan = time(function () {
+      var m = -Infinity;
+      for (var j = j0; j <= j1; j++) for (var i = i0; i <= i1; i++) if (grid[j * n + i] > m) m = grid[j * n + i];
+      return m;
+    });
+    function corners(a0, a1, b0, b1, pick) {           // straight along every row and column, so the extremes sit on the corners
+      return pick(X(a0) * X(b0), X(a1) * X(b0), X(a0) * X(b1), X(a1) * X(b1));
+    }
+    var shape = time(function () { return corners(i0, i1, j0, j1, Math.max); });
+    var agree = Math.abs(scan.out - shape.out) < 1e-12;
+    regions(50).forEach(function (g) {                 // and on 50 random regions, largest AND smallest
+      var hi = -Infinity, lo = Infinity;
+      for (var j = g[2]; j <= g[3]; j++) for (var i = g[0]; i <= g[1]; i++) { var v = grid[j * n + i]; if (v > hi) hi = v; if (v < lo) lo = v; }
+      if (Math.abs(hi - corners(g[0], g[1], g[2], g[3], Math.max)) > 1e-12 || Math.abs(lo - corners(g[0], g[1], g[2], g[3], Math.min)) > 1e-12) agree = false;
+    });
+    rows.push({ q: "The largest value in a region", conv: "scan every cell in the region", geo: "check the 4 corners",
+      convMs: scan.ms, geoMs: shape.ms, agree: agree,
+      why: "The surface is a straight line along every row and column, so nothing inside can beat the corners." });
+  })();
+
+  // 3. AGGREGATE: total over the region.
+  (function () {
+    var scan = time(function () {
+      var s = 0;
+      for (var j = j0; j <= j1; j++) for (var i = i0; i <= i1; i++) s += grid[j * n + i];
+      return s;
+    });
+    function total(a0, a1, b0, b1) {                   // a product surface: the total is (sum of x) times (sum of y)
+      var cx = a1 - a0 + 1, cy = b1 - b0 + 1;
+      return (cx * (X(a0) + X(a1)) / 2) * (cy * (X(b0) + X(b1)) / 2);
+    }
+    var shape = time(function () { return total(i0, i1, j0, j1); });
+    var agree = Math.abs(scan.out - shape.out) < 1e-6 * Math.max(1, Math.abs(scan.out));
+    regions(50).forEach(function (g) {
+      var sum = 0;
+      for (var j = g[2]; j <= g[3]; j++) for (var i = g[0]; i <= g[1]; i++) sum += grid[j * n + i];
+      if (Math.abs(sum - total(g[0], g[1], g[2], g[3])) > 1e-6 * Math.max(1, Math.abs(sum))) agree = false;
+    });
+    rows.push({ q: "The total over a region", conv: "add up every cell", geo: "multiply two edge sums",
+      convMs: scan.ms, geoMs: shape.ms, agree: agree,
+      why: "The shape is x gathered with y, so the total over a rectangle is the x edge gathered with the y edge." });
+  })();
+
+  // 4. BOUNDARY: every cell where the surface crosses height c.
+  (function () {
+    var c = 0.25;
+    var scan = time(function () {                      // conventional: test every cell edge for a sign change
+      var hits = 0;
+      for (var j = 0; j < n; j++) for (var i = 0; i < n - 1; i++) {
+        var a = grid[j * n + i] - c, b = grid[j * n + i + 1] - c;
+        if ((a <= 0 && b > 0) || (a > 0 && b <= 0)) hits++;
+      }
+      return hits;
+    });
+    var shape = time(function () {                     // the cut of a saddle is a hyperbola: x = c / y, solved once per row
+      var hits = 0;
+      for (var j = 0; j < n; j++) {
+        var y = X(j);
+        if (y === 0) continue;
+        var xs = c / y;                                // where this row crosses
+        if (xs <= -1 || xs >= 1) continue;
+        var k = Math.floor((xs + 1) / step);           // the cell edge that contains it
+        if (k < 0 || k >= n - 1) continue;
+        var a = X(k) * y - c, b = X(k + 1) * y - c;
+        if ((a <= 0 && b > 0) || (a > 0 && b <= 0)) hits++;
+      }
+      return hits;
+    });
+    rows.push({ q: "Where the surface crosses a height", conv: "test every cell for a crossing", geo: "solve the curve once per row",
+      convMs: scan.ms, geoMs: shape.ms, agree: scan.out === shape.out,
+      why: "Cut a saddle flat and the edge is a hyperbola. Knowing that, you solve for it instead of searching for it." });
+  })();
+
+  // 5. STEEPEST: the steepest slope anywhere.
+  (function () {
+    var scan = time(function () {                      // conventional: finite differences at every interior cell
+      var m = 0;
+      for (var j = 1; j < n - 1; j++) for (var i = 1; i < n - 1; i++) {
+        var gx = (grid[j * n + i + 1] - grid[j * n + i - 1]) / (2 * step);
+        var gy = (grid[(j + 1) * n + i] - grid[(j - 1) * n + i]) / (2 * step);
+        var s = gx * gx + gy * gy;
+        if (s > m) m = s;
+      }
+      return Math.sqrt(m);
+    });
+    var shape = time(function () {                     // uphill at (x, y) is (y, x): steepest where x and y are both largest
+      var e = X(n - 2); return Math.sqrt(2 * e * e);
+    });
+    rows.push({ q: "The steepest slope anywhere", conv: "estimate the slope at every cell", geo: "read the direction (y, x)",
+      convMs: scan.ms, geoMs: shape.ms, agree: Math.abs(scan.out - shape.out) < 1e-9,
+      why: "The uphill direction at (x, y) is (y, x), so its length is largest at the corners. No search needed." });
+  })();
+
+  // 6. INVERSE (the bloom): given a height and x, find y.
+  (function () {
+    var z = 0.3, i = Math.floor(n * 0.85), x = X(i);
+    var scan = time(function () {                      // conventional: walk the column for the closest value
+      var best = 0, bestErr = Infinity;
+      for (var j = 0; j < n; j++) { var e = Math.abs(grid[j * n + i] - z); if (e < bestErr) { bestErr = e; best = j; } }
+      return X(best);
+    });
+    var shape = time(function () { return z / x; });   // the bloom: divide
+    rows.push({ q: "Given a height and x, find y", conv: "search the column", geo: "divide: y = z / x",
+      convMs: scan.ms, geoMs: shape.ms, agree: Math.abs(scan.out - shape.out) <= step,
+      why: "Division is the bloom: it opens the product back into its parts. The search can only get within one cell; the division is exact." });
+  })();
+
+  var memConv = n * n * 8;
+  return { n: n, cells: n * n, buildMs: buildMs, memConvBytes: memConv, rows: rows };
+}
+/* ---------- 02: run the ask-the-shape benchmark ---------- */
+(function () {
+  "use strict";
+  var status = document.getElementById("ask-status");
+  var tableEl = document.getElementById("ask-table");
+  if (!status || !tableEl) return;
+  var body = tableEl.querySelector("tbody");
+
+  function fmt(ms) {
+    if (ms >= 1) return ms.toFixed(2) + " ms";
+    if (ms >= 0.001) return (ms * 1000).toFixed(1) + " &micro;s";
+    return (ms * 1e6).toFixed(0) + " ns";
+  }
+  function run(n) {
+    status.textContent = "Building a " + n.toLocaleString() + " by " + n.toLocaleString() + " grid and answering each question both ways...";
+    tableEl.hidden = true;
+    setTimeout(function () {                           // let the message paint before the heavy work
+      var r = askBench(n);
+      body.innerHTML = r.rows.map(function (row) {
+        var ratio = row.convMs / row.geoMs;
+        var ratioText = ratio < 2 ? "no faster (" + ratio.toFixed(1) + "&times;)" : Math.round(ratio).toLocaleString() + "&times;";
+        return "<tr><td>" + row.q + "<br><span class='small muted'>" + row.conv + " / " + row.geo + "</span></td>" +
+          "<td>" + fmt(row.convMs) + "</td><td>" + fmt(row.geoMs) + "</td>" +
+          "<td class='" + (ratio < 2 ? "bad" : "ok") + "'>" + ratioText + "</td>" +
+          "<td class='" + (row.agree ? "ok" : "bad") + "'>" + (row.agree ? "yes" : "NO") + "</td></tr>" +
+          "<tr><td colspan='5' class='small muted' style='padding-top:0; font-weight:400'>" + row.why + "</td></tr>";
+      }).join("");
+      tableEl.hidden = false;
+      var allAgree = r.rows.every(function (row) { return row.agree; });
+      status.textContent = r.cells.toLocaleString() + " cells, stored conventionally in " + (r.memConvBytes / 1e6).toFixed(0) +
+        " MB. " + (allAgree ? "Every answer matched." : "An answer did NOT match. That would be a real failure; please tell me.");
+    }, 30);
+  }
+  document.getElementById("ask-1m").addEventListener("click", function () { run(1000); });
+  document.getElementById("ask-4m").addEventListener("click", function () { run(2000); });
+})();
+
+/* ---------- 03: the logic, run in the page ---------- */
+(function () {
+  "use strict";
+  var out = document.getElementById("logic-out");
+
+  var NAMES = {
+    "0000": "FALSE", "0001": "AND", "0010": "x AND NOT y", "0011": "x",
+    "0100": "NOT x AND y", "0101": "y", "0110": "XOR", "0111": "OR",
+    "1000": "NOR", "1001": "XNOR", "1010": "NOT y", "1011": "x OR NOT y",
+    "1100": "NOT x", "1101": "NOT x OR y", "1110": "NAND", "1111": "TRUE"
+  };
+
+  document.getElementById("run-logic").addEventListener("click", function () {
+    var lines = ["Every function of two inputs, from switching terms of x*y on and off.",
+      "  z = c0 + c1*x + c2*y + c3*(x*y), all arithmetic mod 2", ""];
+    var seen = {};
+    for (var m = 0; m < 16; m++) {
+      var c = [m & 1, (m >> 1) & 1, (m >> 2) & 1, (m >> 3) & 1];
+      var f = function (x, y) { return (c[0] + c[1] * x + c[2] * y + c[3] * x * y) % 2; };
+      var table = [f(0,0), f(0,1), f(1,0), f(1,1)].join("");
+      seen[table] = 1;
+      var terms = [c[0] ? "1" : null, c[1] ? "x" : null, c[2] ? "y" : null, c[3] ? "x*y" : null]
+        .filter(Boolean).join(" + ") || "(nothing)";
+      lines.push("  " + table + "  " + (NAMES[table] || "").padEnd(13) + " = " + terms);
+    }
+    var count = Object.keys(seen).length;
+    lines.push("", count === 16
+      ? "  All 16 of the 16 possible functions, with nothing but x*y and switches."
+      : "  Only " + count + " of 16 produced, which would be a failure.");
+    out.textContent = lines.join("\n");
+  });
+
+  var BITS = [[0, 0], [0, 1], [1, 0], [1, 1]];
+  function table(f) { return BITS.map(function (p) { return f(p[0], p[1]); }).join(""); }
+  function spaced(f) { return table(f).split("").join("  "); }
+
+  document.getElementById("run-flip").addEventListener("click", function () {
+    var saddle = function (x, y) { return x * y; };
+    var turned = function (x, y) { return saddle(-y, x); };            // the same shape, turned 90 degrees
+    var NAND = function (x, y) { return 1 + turned(x, y); };
+    var NOT = function (x) { return NAND(x, x); };
+    var AND = function (x, y) { return NOT(NAND(x, y)); };
+    var OR = function (x, y) { return NAND(NOT(x), NOT(y)); };
+    var XOR = function (x, y) { return AND(OR(x, y), NAND(x, y)); };
+    var turnedRow = BITS.map(function (p) { var v = turned(p[0], p[1]) + 0; return (" " + v).slice(-2); }).join(" ");
+    out.textContent = [
+      "inputs x,y:                00 01 10 11",
+      "",
+      "saddle x*y:                 " + spaced(saddle) + "    AND",
+      "turned 90 degrees:         " + turnedRow + "    every sign flipped",
+      "turned, lifted by 1:        " + spaced(NAND) + "    NAND",
+      "unturned, lifted by 1:      " + spaced(function (x, y) { return 1 + saddle(x, y); }) + "    not a gate (a 2 appears)",
+      "",
+      "Built from the turned shape alone:",
+      "  NOT " + table(function (x) { return NOT(x); }) + "   AND " + table(AND) + "   OR " + table(OR) + "   XOR " + table(XOR),
+      "",
+      (table(NAND) === "1110" && table(AND) === "0001" && table(OR) === "0111" && table(XOR) === "0110"
+        ? "  All correct. The quarter turn is the switch."
+        : "  Something is wrong: a gate did not come out right.")
+    ].join("\n");
+  });
+
+  document.getElementById("run-xor").addEventListener("click", function () {
+    var grid = [];
+    for (var v = -12; v <= 12; v++) grid.push(v / 4);                  // -3 to 3 in steps of 0.25
+    var tried = 0, flat = null, curved = null;
+    grid.forEach(function (a) { grid.forEach(function (b) { grid.forEach(function (c) {
+      tried++;
+      if (!flat && table(function (x, y) { return a + b * x + c * y > 0 ? 1 : 0; }) === "0110") flat = [a, b, c];
+    }); }); });
+    grid.forEach(function (a) { grid.forEach(function (b) { grid.forEach(function (c) { grid.forEach(function (d) {
+      if (!curved && table(function (x, y) { return a + b * x + c * y + d * x * y > 0 ? 1 : 0; }) === "0110") curved = [a, b, c, d];
+    }); }); }); });
+    out.textContent = [
+      "Target: XOR, which outputs 0110 for inputs 00 01 10 11.",
+      "",
+      "Flat plane a + b*x + c*y, threshold at 0:",
+      "  tried " + tried.toLocaleString() + " weight settings: " + (flat ? "found " + flat.join(", ") + " (that would be a surprise)" : "none computes XOR"),
+      "",
+      "Add the saddle term, a + b*x + c*y + d*x*y:",
+      "  " + (curved ? "works, for example with weights " + curved.join(", ") : "none found (that would be a surprise)"),
+      "",
+      "Exact form: XOR = x + y - 2xy  gives  " + table(function (x, y) { return x + y - 2 * x * y; }),
+      "",
+      "A flat single layer cannot bend. The saddle already is the bend."
+    ].join("\n");
+  });
+
+  document.getElementById("run-adder").addEventListener("click", function () {
+    var AND = function (x, y) { return x * y; };
+    var NOT = function (x) { return 1 - x; };
+    var OR = function (x, y) { return NOT(AND(NOT(x), NOT(y))); };
+    var XOR = function (x, y) { return AND(NOT(AND(x, y)), OR(x, y)); };
+
+    function add4(a, b) {
+      var carry = 0, outv = 0;
+      for (var i = 0; i < 4; i++) {
+        var x = (a >> i) & 1, y = (b >> i) & 1;
+        var half = XOR(x, y);
+        var sum = XOR(half, carry);
+        carry = OR(AND(x, y), AND(half, carry));
+        outv |= sum << i;
+      }
+      return outv | (carry << 4);
+    }
+
+    var bad = [];
+    for (var a = 0; a < 16; a++) {
+      for (var b = 0; b < 16; b++) {
+        if (add4(a, b) !== a + b) bad.push(a + "+" + b);
+      }
+    }
+    var sample = [[7, 5], [9, 9], [15, 15], [13, 2]].map(function (p) {
+      return "   " + p[0] + " + " + p[1] + " = " + add4(p[0], p[1]);
+    }).join("\n");
+
+    out.textContent =
+      "A 4-bit adder built only from AND = x*y and NOT = 1-x.\n" +
+      "No other operation is used anywhere in it.\n\n" + sample +
+      "\n\n   all 256 input pairs checked: " +
+      (bad.length === 0 ? "every one correct" : bad.length + " WRONG (" + bad.slice(0, 5).join(", ") + ")") +
+      "\n\n   This is circuit completeness, which is Boolean algebra working as advertised.\n" +
+      "   It is not a claim that this competes with a processor.";
+  });
+})();
+</script>
+
+</body>
+</html>

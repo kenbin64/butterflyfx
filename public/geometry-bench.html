@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Run the geometry benchmark &middot; Kenneth W. Bingham</title>
+<meta name="description" content="A live benchmark for storing data as a geometric rule instead of bytes. Runs in your browser on real files, including one you drop in yourself, verifies losslessness with SHA-256, and reports the cases where gzip wins.">
+<meta name="author" content="Kenneth W. Bingham">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/geometry-bench.html">
+<link rel="icon" href="assets/butterfly.png">
+<link rel="stylesheet" href="site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/geometry-bench.html">
+<meta property="og:title" content="Run the geometry benchmark &middot; Kenneth W. Bingham">
+<meta property="og:description" content="Drop in a real file and measure it: rule plus correction against gzip, SHA-256 verified, on your own hardware, including the cases where this approach loses.">
+<meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  .bench-out { font-family: var(--mono); font-size: .82rem; }
+  .ok { color: var(--good); font-weight: 600; }
+  .bad { color: #e0a06a; font-weight: 600; }
+  .runbar { display: flex; gap: .7rem; align-items: center; flex-wrap: wrap; margin: 1.2rem 0; }
+  .drop {
+    border: 1px dashed var(--border-strong); border-radius: var(--radius);
+    padding: 1.4rem 1.2rem; text-align: center; color: var(--muted);
+    background: var(--surface); margin: 1.2rem 0; cursor: pointer;
+  }
+  .drop.over { border-color: var(--accent); color: var(--accent); }
+  .drop input { display: none; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="row">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham <span class="sub">AI Engineer</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/work/citeline.html">RAG demo</a>
+      <a href="/work/mcp-gateway.html">MCP gateway</a>
+      <a href="/work/valuesai.html">Reliability</a>
+      <a href="/geometry-as-data.html">Geometry as data</a>
+      <a href="/self-healing.html">Self-healing</a>
+      <a href="/shape-of-a-file.html">Shape of a file</a>
+      <a href="/paint-by-numbers.html">Paint by numbers</a>
+      <a href="/geometry-bench.html" class="here">Benchmark</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="role">Live benchmark &middot; real files &middot; runs on your machine</p>
+    <h1>Bring your own file.</h1>
+    <p class="lede">
+      Storing data as a shape only helps when the data has a shape. This page measures that on
+      <strong>real files</strong>: a photograph, its decoded pixels, a text document, and
+      anything you drop in. Each one is sealed as a generating rule plus the correction that
+      makes it exact, checked for losslessness with SHA-256, and put against gzip on the same
+      bytes.
+    </p>
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <strong>Expect to watch it lose.</strong> On text, on already-compressed files, and on
+        real photographs, gzip and PNG win, and my own testing says so. The point of running it
+        on real data is to find the boundary rather than to hide it. The synthetic fields at
+        the bottom are where the method is designed to win, and the contrast between the two
+        tables is the actual result.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Real files</h2>
+    <div class="runbar">
+      <button class="btn" id="run">Run on the sample files</button>
+      <span class="small muted" id="status">Ready.</span>
+    </div>
+
+    <label class="drop" id="drop">
+      <input type="file" id="file">
+      <strong>Drop a file here</strong>, or click to choose one.<br>
+      <span class="small">CSV, JSON, WAV, BMP, log, binary, anything. It never leaves your browser.</span>
+    </label>
+
+    <details style="margin: 1rem 0">
+      <summary class="small" style="cursor:pointer; color:var(--accent)">How to read the table</summary>
+      <div class="small muted" style="margin-top:.7rem; line-height:1.7">
+        <strong>Raw</strong> is the file as it sits on disk.
+        <strong>gzip</strong> is that file compressed the ordinary way, which is the number to beat.
+        <strong>Shapes fitted</strong> says how many 1 KB blocks the file was cut into and which
+        shapes won most often &mdash; a flat line, a slope, a curve or a wave.
+        <strong>Rules + corrections</strong> is the total cost of this approach: the coefficients
+        for every block, plus the packed differences between what the shapes predicted and what
+        the file actually contained.
+        <strong>vs gzip</strong> above 1.00 means the shapes did better.
+        <strong>Rebuild exact</strong> hashes the reconstruction against the original, so "yes"
+        means nothing was lost or approximated anywhere.
+        <strong>Verdict</strong> is the plain reading of the vs-gzip column.
+      </div>
+    </details>
+
+    <div style="overflow-x:auto">
+      <table class="tradeoffs bench-out">
+        <thead>
+          <tr>
+            <th>File</th><th>Type</th><th>Raw</th><th>gzip</th><th>Shapes fitted</th>
+            <th>Rules + corrections</th><th>vs gzip</th><th>Rebuild exact</th><th>Verdict</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="9" class="muted">Press run, or drop a file.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="small muted" id="note"></p>
+    <p class="small muted">
+      Numbers here will not match the written-up figures exactly. This page uses the browser's
+      own gzip and a JSON-encoded rule; the Node suite uses raw deflate at level 9 and a tighter
+      rule encoding, which is worth roughly 20% on the synthetic rows. Same mechanism, different
+      packing, and both are reported rather than the better one being quoted alone.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Live data from a public API</h2>
+    <p class="lede" style="margin-bottom:1rem">
+      Real measurements, fetched from Open-Meteo when you press the button: a year of hourly
+      temperature readings for St. George, Utah. Nothing synthetic, nothing chosen to flatter
+      the method. This is the case it is actually for &mdash; a physical quantity that rises and
+      falls on a daily cycle, so a shape genuinely describes it.
+    </p>
+
+    <div class="runbar">
+      <button class="btn" id="run-api">Fetch a year of weather and encode it</button>
+      <span class="small muted" id="api-status">Roughly 8,760 hourly readings.</span>
+    </div>
+
+    <canvas id="api-plot" width="1200" height="260" style="width:100%; height:auto; display:block; border-radius:8px; background:var(--surface-2)"></canvas>
+    <div class="legend small muted" style="margin-top:.5rem">
+      <span style="color:#7fb4d0">&#9632;</span> measured temperature &nbsp;
+      <span style="color:#e0a06a">&#9632;</span> the daily shape fitted to each block &nbsp;
+      <span style="color:#5fc491">&#9632;</span> what the shape missed
+    </div>
+
+    <div style="overflow-x:auto; margin-top:1.2rem">
+      <table class="tradeoffs bench-out">
+        <thead>
+          <tr><th>How it is held</th><th>Bytes</th><th>Against the shape</th><th>Notes</th></tr>
+        </thead>
+        <tbody id="api-rows">
+          <tr><td colspan="4" class="muted">Press the button.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small muted" id="api-note"></p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Synthetic fields, where geometry is the whole content</h2>
+    <p class="lede" style="margin-bottom:1rem">
+      The same machinery on data that <em>is</em> a shape. These are the cases the written-up
+      figures come from, and they are honest only because the table above exists next to them.
+    </p>
+    <div style="overflow-x:auto">
+      <table class="tradeoffs bench-out">
+        <thead>
+          <tr>
+            <th>Field</th><th>Raw</th><th>gzip</th><th>Rule</th><th>Correction</th>
+            <th>Capsule</th><th>vs raw</th><th>vs gzip</th><th>Lossless</th>
+          </tr>
+        </thead>
+        <tbody id="synth-rows">
+          <tr><td colspan="9" class="muted">Filled by the same run.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>How the fit is chosen</h2>
+    <p class="lede" style="margin-bottom:1rem">
+      For an arbitrary file the page has no idea what shape the data is, so it tries a small,
+      disclosed set of candidate rules over the byte stream and keeps whichever produces the
+      smallest capsule: a constant, a straight line, a quadratic, and a sinusoid whose
+      frequency is found by a coarse search. Each fit is stored as a handful of coefficients.
+    </p>
+    <p class="lede" style="margin-bottom:1rem">
+      That is deliberately a weak library of shapes. A serious implementation carries far more,
+      and choosing well for a given file is the hard part of the problem. What this page can
+      honestly show you is the mechanism and the boundary: rule plus correction is exact, and
+      the capsule shrinks only in proportion to the geometry actually present.
+    </p>
+    <div class="flow">
+      node dimensional-programming.test.js&nbsp; &rarr; 14 of 14 proofs, limits included<br>
+      node geometric-transport.js&nbsp; &rarr; the capsule table, SHA-256 verified per row
+    </div>
+    <div class="btn-row" style="margin-top:1.3rem">
+      <a class="btn ghost" href="/geometry-as-data.html">Back to the write-up</a>
+      <a class="btn ghost" href="/contact.html">Ask me for the scripts</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span>&copy; 2026 Kenneth W. Bingham</span>
+      <a href="/contact.html">Contact</a>
+      <a href="/resume.html">Resume</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var rowsEl = document.getElementById("rows");
+  var synthEl = document.getElementById("synth-rows");
+  var statusEl = document.getElementById("status");
+  var noteEl = document.getElementById("note");
+
+  var fmt = function (n) { return n.toLocaleString(); };
+
+  /* ---------- primitives ---------- */
+
+  async function gzipSize(bytes) {
+    if (typeof CompressionStream === "undefined") return null;
+    var cs = new CompressionStream("gzip");
+    var w = cs.writable.getWriter();
+    w.write(bytes);
+    w.close();
+    return (await new Response(cs.readable).arrayBuffer()).byteLength;
+  }
+
+  async function sha(bytes) {
+    var d = await crypto.subtle.digest("SHA-256", bytes);
+    return [].map.call(new Uint8Array(d), function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+  }
+
+  /* ---------- candidate rules over a byte stream ----------
+     Each returns { name, coeffs, predict(i) }. The stored rule is the name plus
+     its coefficients, which is why the rule column is a few dozen bytes. */
+
+  function fitConstant(bytes) {
+    var sum = 0;
+    for (var i = 0; i < bytes.length; i++) sum += bytes[i];
+    var mean = Math.round(sum / bytes.length);
+    return { name: "constant", coeffs: [mean], predict: function () { return mean; } };
+  }
+
+  function fitPolynomial(bytes, degree) {
+    // Least squares on a normalised index, solved with Gaussian elimination.
+    var n = bytes.length, m = degree + 1;
+    var A = [], b = [];
+    for (var r = 0; r < m; r++) { A.push(new Float64Array(m)); b.push(0); }
+    for (var i = 0; i < n; i++) {
+      var t = i / n, p = [1, t, t * t, t * t * t].slice(0, m);
+      for (var r2 = 0; r2 < m; r2++) {
+        for (var c = 0; c < m; c++) A[r2][c] += p[r2] * p[c];
+        b[r2] += p[r2] * bytes[i];
+      }
+    }
+    for (var k = 0; k < m; k++) {
+      var piv = A[k][k] || 1e-9;
+      for (var c2 = k; c2 < m; c2++) A[k][c2] /= piv;
+      b[k] /= piv;
+      for (var r3 = 0; r3 < m; r3++) {
+        if (r3 === k) continue;
+        var f = A[r3][k];
+        for (var c3 = k; c3 < m; c3++) A[r3][c3] -= f * A[k][c3];
+        b[r3] -= f * b[k];
+      }
+    }
+    var co = b.map(function (v) { return Math.round(v * 1000) / 1000; });
+    return {
+      name: degree === 1 ? "linear" : "quadratic",
+      coeffs: co,
+      predict: function (i) {
+        var t = i / n, v = 0, tp = 1;
+        for (var d = 0; d < co.length; d++) { v += co[d] * tp; tp *= t; }
+        return Math.round(v);
+      }
+    };
+  }
+
+  function fitSinusoid(bytes) {
+    // Coarse frequency search, then amplitude and phase by projection. This is
+    // the shape that matters for waveforms and anything periodic.
+    var n = bytes.length, mean = 0;
+    for (var i = 0; i < n; i++) mean += bytes[i];
+    mean /= n;
+
+    var bestPower = -1, bestK = 1, step = Math.max(1, Math.floor(n / 4096));
+    for (var k = 1; k <= 64; k++) {
+      var re = 0, im = 0;
+      for (var j = 0; j < n; j += step) {
+        var ang = 2 * Math.PI * k * j / n;
+        re += (bytes[j] - mean) * Math.cos(ang);
+        im += (bytes[j] - mean) * Math.sin(ang);
+      }
+      var power = re * re + im * im;
+      if (power > bestPower) { bestPower = power; bestK = k; }
+    }
+
+    var re2 = 0, im2 = 0;
+    for (var j2 = 0; j2 < n; j2++) {
+      var a = 2 * Math.PI * bestK * j2 / n;
+      re2 += (bytes[j2] - mean) * Math.cos(a);
+      im2 += (bytes[j2] - mean) * Math.sin(a);
+    }
+    var amp = Math.round(2 * Math.sqrt(re2 * re2 + im2 * im2) / n * 1000) / 1000;
+    var phase = Math.round(Math.atan2(-im2, re2) * 1000) / 1000;
+    var mn = Math.round(mean * 1000) / 1000;
+
+    return {
+      name: "sinusoid",
+      coeffs: [mn, amp, bestK, phase],
+      predict: function (i) {
+        return Math.round(mn + amp * Math.cos(2 * Math.PI * bestK * i / n + phase));
+      }
+    };
+  }
+
+  async function capsuleFor(bytes) {
+    // Try every candidate, keep the smallest capsule. Correction is the exact
+    // byte difference, so reconstruction is lossless whichever rule wins.
+    var candidates = [fitConstant(bytes), fitPolynomial(bytes, 1), fitPolynomial(bytes, 2), fitSinusoid(bytes)];
+    var best = null;
+
+    for (var c = 0; c < candidates.length; c++) {
+      var rule = candidates[c];
+      var correction = new Uint8Array(bytes.length);
+      for (var i = 0; i < bytes.length; i++) correction[i] = (bytes[i] - rule.predict(i)) & 255;
+
+      var packed = await gzipSize(correction);
+      if (packed === null) return null;
+      var ruleBytes = new TextEncoder().encode(JSON.stringify([rule.name, rule.coeffs])).length;
+      var total = ruleBytes + packed;
+
+      if (!best || total < best.total) {
+        best = { rule: rule, ruleBytes: ruleBytes, packed: packed, total: total, correction: correction };
+      }
+    }
+    return best;
+  }
+
+  /**
+   * The same idea applied LOCALLY, which is how it is actually meant to work.
+   *
+   * One shape stretched across a whole file describes nothing, so the fit falls
+   * back to the average and the result is indistinguishable from plain gzip.
+   * Fitting a shape per block is the honest version: each block keeps its own
+   * few coefficients, and the corrections stay small where the data is smooth.
+   */
+  async function blockCapsule(bytes, blockSize) {
+    var n = bytes.length;
+    var blocks = Math.ceil(n / blockSize);
+    var correction = new Uint8Array(n);
+    var rebuilt = new Uint8Array(n);
+    var rules = [];
+    var counts = { "constant": 0, "linear": 0, "quadratic": 0, "sinusoid": 0 };
+
+    for (var b = 0; b < blocks; b++) {
+      var start = b * blockSize;
+      var end = Math.min(start + blockSize, n);
+      var slice = bytes.subarray(start, end);
+
+      var cands = [fitConstant(slice), fitPolynomial(slice, 1), fitPolynomial(slice, 2)];
+      if (end - start >= 64) cands.push(fitSinusoid(slice));
+
+      // Choose by what the correction will COST, not by how well the curve hugs
+      // the data. A wandering sinusoid can cut the squared error while making the
+      // leftovers more expensive, because it destroys the repetition a compressor
+      // was already exploiting. Shannon entropy of the residual is the right yardstick.
+      var pick = null, pickCost = Infinity;
+      for (var c = 0; c < cands.length; c++) {
+        var hist = new Uint32Array(256);
+        for (var i = 0; i < slice.length; i++) {
+          hist[(slice[i] - Math.round(cands[c].predict(i))) & 255]++;
+        }
+        var bits = 0;
+        for (var s = 0; s < 256; s++) {
+          if (!hist[s]) continue;
+          var p = hist[s] / slice.length;
+          bits -= p * Math.log2(p);
+        }
+        var cost = bits * slice.length / 8 + cands[c].coeffs.length * 2 + 1;
+        if (cost < pickCost) { pickCost = cost; pick = cands[c]; }
+      }
+
+      // A shape only earns its place if it beats leaving the block alone.
+      var flat = cands[0];
+      if (pick !== flat) {
+        var flatHist = new Uint32Array(256);
+        for (var i2 = 0; i2 < slice.length; i2++) {
+          flatHist[(slice[i2] - Math.round(flat.predict(i2))) & 255]++;
+        }
+        var flatBits = 0;
+        for (var s2 = 0; s2 < 256; s2++) {
+          if (!flatHist[s2]) continue;
+          var p2 = flatHist[s2] / slice.length;
+          flatBits -= p2 * Math.log2(p2);
+        }
+        if (flatBits * slice.length / 8 + 3 <= pickCost) pick = flat;
+      }
+
+      counts[pick.name]++;
+      // The stored rule: a one-byte shape id plus its coefficients as bytes.
+      rules.push(["constant", "linear", "quadratic", "sinusoid"].indexOf(pick.name));
+      for (var k = 0; k < pick.coeffs.length; k++) {
+        var q = Math.round(pick.coeffs[k]);
+        rules.push(q & 255, (q >> 8) & 255);
+      }
+
+      for (var j = 0; j < slice.length; j++) {
+        var pred = Math.round(pick.predict(j));
+        correction[start + j] = (slice[j] - pred) & 255;
+        rebuilt[start + j] = (pred + correction[start + j]) & 255;   // must equal the original
+      }
+    }
+
+    var packed = await gzipSize(correction);
+    if (packed === null) return null;
+    var ruleBytes = (await gzipSize(new Uint8Array(rules))) || rules.length;
+
+    var mix = Object.keys(counts)
+      .filter(function (k) { return counts[k] > 0; })
+      .sort(function (a, b2) { return counts[b2] - counts[a]; })
+      .slice(0, 2)
+      .map(function (k) { return Math.round(counts[k] / blocks * 100) + "% " + k; })
+      .join(", ");
+
+    return {
+      total: ruleBytes + packed, ruleBytes: ruleBytes, packed: packed,
+      rebuilt: rebuilt, blocks: blocks, mix: mix
+    };
+  }
+
+  async function measure(label, type, bytes) {
+    var rawGz = await gzipSize(bytes);
+    var whole = await capsuleFor(bytes);                  // one shape for the entire file
+    var block = await blockCapsule(bytes, 1024);          // one shape per 1 KB block
+    if (!whole || !block || rawGz === null) return null;
+
+    // Verify the local version: rebuild from rules + corrections, hash, compare.
+    var lossless = (await sha(bytes)) === (await sha(block.rebuilt));
+
+    var ratio = rawGz / block.total;
+    var verdict = ratio >= 1.02 ? "shape wins" : (ratio <= 0.98 ? "gzip wins" : "a wash");
+
+    var tr = document.createElement("tr");
+    tr.innerHTML =
+      "<td>" + label + "</td>" +
+      "<td>" + type + "</td>" +
+      "<td>" + fmt(bytes.length) + "</td>" +
+      "<td>" + fmt(rawGz) + "</td>" +
+      "<td>" + block.blocks.toLocaleString() + " blocks &middot; " + block.mix + "</td>" +
+      "<td>" + fmt(block.total) + "</td>" +
+      "<td>" + ratio.toFixed(2) + "×</td>" +
+      "<td class='" + (lossless ? "ok" : "bad") + "'>" + (lossless ? "yes" : "NO") + "</td>" +
+      "<td class='" + (verdict === "shape wins" ? "ok" : "bad") + "'>" + verdict + "</td>";
+    rowsEl.appendChild(tr);
+    return verdict;
+  }
+
+  /* ---------- real sample files ---------- */
+
+  async function fetchBytes(url) {
+    var r = await fetch(url);
+    if (!r.ok) throw new Error(url + " returned " + r.status);
+    return new Uint8Array(await r.arrayBuffer());
+  }
+
+  async function decodedPixels(url) {
+    // A real photograph decoded to raw RGBA: uncompressed image data, which is
+    // the fair comparison against PNG rather than against an already-packed JPEG.
+    var img = new Image();
+    img.src = url;
+    await img.decode();
+    var w = Math.min(img.naturalWidth, 320), h = Math.round(img.naturalHeight * (w / img.naturalWidth));
+    var cv = document.createElement("canvas");
+    cv.width = w; cv.height = h;
+    cv.getContext("2d").drawImage(img, 0, 0, w, h);
+    var data = cv.getContext("2d").getImageData(0, 0, w, h).data;
+    return { bytes: new Uint8Array(data.buffer.slice(0)), w: w, h: h };
+  }
+
+  /* ---------- synthetic fields ---------- */
+
+  var W = 256, H = 256, N = W * H;
+
+  function buildField(rule) {
+    var out = new Uint8Array(N), i = 0;
+    for (var j = 0; j < H; j++) {
+      for (var k = 0; k < W; k++, i++) {
+        var x = (k / W * 2 - 1) * rule.ax, y = (j / H * 2 - 1) * rule.ay, v;
+        if (rule.lens === "saddle") v = x * y;
+        else if (rule.lens === "schwarzD") {
+          var z = rule.z;
+          v = Math.sin(x) * Math.sin(y) * Math.sin(z) + Math.sin(x) * Math.cos(y) * Math.cos(z) +
+              Math.cos(x) * Math.sin(y) * Math.cos(z) + Math.cos(x) * Math.cos(y) * Math.sin(z);
+        } else v = x * y + rule.amp * Math.sin(rule.k * Math.sqrt(x * x + y * y));
+        out[i] = (Math.round(v * rule.scale) + rule.offset) & 255;
+      }
+    }
+    return out;
+  }
+
+  var SYNTH = [
+    { name: "Saddle field", rule: { lens: "saddle", ax: 3, ay: 3, scale: 20, offset: 128 } },
+    { name: "Schwarz-D slice", rule: { lens: "schwarzD", ax: 3.14159, ay: 3.14159, z: 0.7, scale: 60, offset: 128 } },
+    { name: "Saddle + ripple", rule: { lens: "saddleRipple", ax: 3, ay: 3, amp: 0.6, k: 9, scale: 20, offset: 128 } },
+    { name: "Random bytes", rule: { lens: "saddle", ax: 3, ay: 3, scale: 20, offset: 128 }, random: true }
+  ];
+
+  async function runSynthetic() {
+    synthEl.innerHTML = "";
+    for (var c = 0; c < SYNTH.length; c++) {
+      var item = SYNTH[c];
+      var built = buildField(item.rule);
+      var target = built;
+      if (item.random) { target = new Uint8Array(N); crypto.getRandomValues(target); }
+
+      var correction = new Uint8Array(N);
+      for (var i = 0; i < N; i++) correction[i] = (target[i] - built[i]) & 255;
+
+      var packed = await gzipSize(correction);
+      var rawGz = await gzipSize(target);
+      var ruleBytes = new TextEncoder().encode(JSON.stringify(item.rule)).length;
+      var capsule = ruleBytes + packed;
+
+      var back = new Uint8Array(N);
+      for (var j = 0; j < N; j++) back[j] = (built[j] + correction[j]) & 255;
+      var lossless = (await sha(target)) === (await sha(back));
+
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td>" + item.name + "</td><td>" + fmt(N) + "</td><td>" + fmt(rawGz) + "</td>" +
+        "<td>" + ruleBytes + "</td><td>" + fmt(packed) + "</td><td>" + fmt(capsule) + "</td>" +
+        "<td>" + (N / capsule).toFixed(capsule > N ? 3 : 0) + "×</td>" +
+        "<td>" + (rawGz / capsule).toFixed(rawGz / capsule < 2 ? 2 : 0) + "×</td>" +
+        "<td class='" + (lossless ? "ok" : "bad") + "'>" + (lossless ? "yes" : "NO") + "</td>";
+      synthEl.appendChild(tr);
+    }
+  }
+
+  /* ---------- wiring ---------- */
+
+  async function runAll() {
+    rowsEl.innerHTML = "";
+    statusEl.textContent = "Running on this machine…";
+    var t0 = performance.now();
+    var verdicts = [];
+
+    try {
+      var jpg = await fetchBytes("/bench-data/photo.jpg");
+      verdicts.push(await measure("photo.jpg (a photograph I took)", "JPEG bytes", jpg));
+
+      var px = await decodedPixels("/bench-data/photo.jpg");
+      verdicts.push(await measure("the same photo, decoded", "raw RGBA " + px.w + "×" + px.h, px.bytes));
+
+      var txt = await fetchBytes("/bench-data/sample-text.txt");
+      verdicts.push(await measure("sample-text.txt", "UTF-8 text", txt));
+
+      await runSynthetic();
+
+      var wins = verdicts.filter(function (v) { return v === "shape wins"; }).length;
+      var losses = verdicts.filter(function (v) { return v === "gzip wins"; }).length;
+      noteEl.textContent =
+        "Losslessness is verified by hashing the original and the rebuilt bytes. Result on these real " +
+        "files: " + wins + " shape wins, " + losses + " gzip wins, " + (verdicts.length - wins - losses) +
+        " a wash. The winning fit is usually a constant, which captures no geometry at all, so the capsule " +
+        "lands within a percent of plain gzip. That is the expected outcome for a photograph and a text " +
+        "document, and it is the reason the synthetic table below is labelled as the case this is built for.";
+      statusEl.textContent = "Done in " + Math.round(performance.now() - t0) + " ms.";
+    } catch (err) {
+      statusEl.textContent = "Benchmark failed: " + err.message;
+    }
+  }
+
+  document.getElementById("run").addEventListener("click", runAll);
+
+  /* ---------- real measurements, fetched live ---------- */
+
+  function fitDaily(seg) {
+    // Mean plus one daily cosine. Coefficients are quantised to whole numbers,
+    // because that is what actually gets stored.
+    var m = seg.length, mean = 0, i;
+    for (i = 0; i < m; i++) mean += seg[i];
+    mean /= m;
+    var re = 0, im = 0;
+    for (i = 0; i < m; i++) {
+      var ang = 2 * Math.PI * i / 24;
+      re += (seg[i] - mean) * Math.cos(ang);
+      im += (seg[i] - mean) * Math.sin(ang);
+    }
+    var amp = 2 * Math.sqrt(re * re + im * im) / m;
+    var qMean = Math.round(mean), qAmp = Math.round(amp);
+    var qPh = Math.round(Math.atan2(-im, re) * 100) / 100;
+    return {
+      coeffs: [qMean, qAmp, Math.round(qPh * 100)],
+      at: function (k) { return Math.round(qMean + qAmp * Math.cos(2 * Math.PI * k / 24 + qPh)); }
+    };
+  }
+
+  function drawSeries(values, predict) {
+    var cv = document.getElementById("api-plot"), c = cv.getContext("2d");
+    var w = cv.width, h = cv.height;
+    c.clearRect(0, 0, w, h);
+    var lo = Infinity, hi = -Infinity, i;
+    for (i = 0; i < values.length; i++) { if (values[i] < lo) lo = values[i]; if (values[i] > hi) hi = values[i]; }
+    var span = (hi - lo) || 1;
+    var stride = Math.max(1, Math.floor(values.length / w));
+
+    function line(colour, width, fn) {
+      c.strokeStyle = colour; c.lineWidth = width; c.beginPath();
+      for (var x = 0, k = 0; k < values.length; k += stride, x++) {
+        var y = h - ((fn(k) - lo) / span) * (h * 0.92) - h * 0.04;
+        x === 0 ? c.moveTo(x, y) : c.lineTo(x, y);
+      }
+      c.stroke();
+    }
+
+    line("#7fb4d0", 1, function (k) { return values[k]; });
+    line("#e0a06a", 1.4, function (k) { return predict(k); });
+
+    c.strokeStyle = "rgba(95,196,145,.6)"; c.lineWidth = 1; c.beginPath();
+    for (var x2 = 0, k2 = 0; k2 < values.length; k2 += stride, x2++) {
+      var diff = values[k2] - predict(k2);
+      var y2 = h / 2 - (diff / span) * (h * 0.4);
+      x2 === 0 ? c.moveTo(x2, y2) : c.lineTo(x2, y2);
+    }
+    c.stroke();
+  }
+
+  document.getElementById("run-api").addEventListener("click", async function () {
+    var statusA = document.getElementById("api-status");
+    var rows = document.getElementById("api-rows");
+    var btn = document.getElementById("run-api");
+    btn.disabled = true;
+    statusA.textContent = "Asking Open-Meteo for a year of hourly readings…";
+
+    try {
+      var end = new Date(Date.now() - 3 * 86400000);
+      var start = new Date(end.getTime() - 364 * 86400000);
+      var iso = function (d) { return d.toISOString().slice(0, 10); };
+      var url = "https://archive-api.open-meteo.com/v1/archive?latitude=37.0965&longitude=-113.5684" +
+        "&start_date=" + iso(start) + "&end_date=" + iso(end) + "&hourly=temperature_2m";
+
+      var res = await fetch(url);
+      var text = await res.text();
+      var json = JSON.parse(text);
+      var series = json.hourly.temperature_2m.filter(function (v) { return v !== null; });
+      var n = series.length;
+
+      // Tenths of a degree as 16-bit integers: the honest binary form of this data.
+      var ints = new Int16Array(n);
+      for (var i = 0; i < n; i++) ints[i] = Math.round(series[i] * 10);
+      var rawBytes = new Uint8Array(ints.buffer);
+
+      // One daily shape per three-day block.
+      var block = 72, rules = [], resid = new Int16Array(n), maxErr = 0, exact = true;
+      var predictors = [];
+      for (var s = 0; s < n; s += block) {
+        var seg = ints.subarray(s, Math.min(s + block, n));
+        var f = fitDaily(seg);
+        predictors.push({ start: s, at: f.at });
+        rules.push(f.coeffs[0], f.coeffs[1], f.coeffs[2]);
+        for (var k = 0; k < seg.length; k++) {
+          var e = seg[k] - f.at(k);
+          if (Math.abs(e) > maxErr) maxErr = Math.abs(e);
+          resid[s + k] = e;
+          if (f.at(k) + e !== seg[k]) exact = false;
+        }
+      }
+      var predictAt = function (idx) {
+        var p = predictors[Math.floor(idx / block)];
+        return p ? p.at(idx - p.start) : 0;
+      };
+
+      var ruleArr = new Int16Array(rules);
+      var gzJson = await gzipSize(new TextEncoder().encode(text));
+      var gzRaw = await gzipSize(rawBytes);
+      var gzRules = await gzipSize(new Uint8Array(ruleArr.buffer));
+      var gzResid = await gzipSize(new Uint8Array(resid.buffer));
+      var shapeTotal = gzRules + gzResid;
+
+      drawSeries(ints, predictAt);
+
+      rows.innerHTML = "";
+      function addRow(label, bytes, note) {
+        var tr = document.createElement("tr");
+        var rel = bytes / shapeTotal;
+        tr.innerHTML = "<td>" + label + "</td><td>" + fmt(bytes) + "</td><td>" +
+          (label.indexOf("shape") === 0 ? "&mdash;" : rel.toFixed(2) + "× larger") +
+          "</td><td class='muted'>" + note + "</td>";
+        rows.appendChild(tr);
+      }
+      addRow("JSON exactly as the API sent it", new TextEncoder().encode(text).length, "what most systems would store");
+      addRow("that JSON, gzipped", gzJson, "the usual first improvement");
+      addRow("packed as 16-bit integers", rawBytes.length, "tenths of a degree, no text");
+      addRow("those integers, gzipped", gzRaw, "the number to beat");
+      addRow("shape: rules + corrections", shapeTotal, gzRules + " bytes of daily shapes, " + gzResid + " of corrections");
+
+      document.getElementById("api-note").textContent =
+        n.toLocaleString() + " real hourly readings. One daily shape per " + block + " hours, " +
+        (rules.length / 3) + " shapes in total. Against the fair comparison, gzipped integers, the " +
+        "shape version is " + (gzRaw / shapeTotal).toFixed(2) + "× " +
+        (gzRaw > shapeTotal ? "smaller" : "larger") + ". Largest single correction: " +
+        (maxErr / 10).toFixed(1) + " °C, and the rebuild is " +
+        (exact ? "exact" : "NOT exact, which would be a bug") + ". Note the modesty of the win: " +
+        "gzip is good at this data too, and the honest gain here is that the shape carries meaning " +
+        "a compressor cannot, not that it crushes the bytes.";
+      statusA.textContent = "Done.";
+    } catch (err) {
+      statusA.textContent = "Could not fetch the data: " + err.message;
+    }
+    btn.disabled = false;
+  });
+
+  var drop = document.getElementById("drop");
+  var fileInput = document.getElementById("file");
+
+  ["dragenter", "dragover"].forEach(function (e) {
+    drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.add("over"); });
+  });
+  ["dragleave", "drop"].forEach(function (e) {
+    drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.remove("over"); });
+  });
+
+  async function handleFile(file) {
+    if (!file) return;
+    if (rowsEl.querySelector(".muted")) rowsEl.innerHTML = "";
+    statusEl.textContent = "Measuring " + file.name + "…";
+    var bytes = new Uint8Array(await file.arrayBuffer());
+    if (bytes.length > 8 * 1024 * 1024) {
+      statusEl.textContent = "That file is over 8 MB; trimming to the first 8 MB.";
+      bytes = bytes.slice(0, 8 * 1024 * 1024);
+    }
+    var type = file.type || (file.name.split(".").pop() || "unknown");
+    await measure(file.name + " (yours)", type, bytes);
+    statusEl.textContent = "Measured " + file.name + ". It never left your browser.";
+  }
+
+  drop.addEventListener("drop", function (ev) { handleFile(ev.dataTransfer.files[0]); });
+  fileInput.addEventListener("change", function () { handleFile(fileInput.files[0]); });
+
+  if (typeof CompressionStream === "undefined") {
+    statusEl.textContent = "This browser has no CompressionStream, so the benchmark cannot run here.";
+    document.getElementById("run").disabled = true;
+  }
+})();
+</script>
+
+</body>
+</html>

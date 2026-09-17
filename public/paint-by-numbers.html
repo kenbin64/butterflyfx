@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paint by Numbers &middot; Kenneth W. Bingham</title>
+<meta name="description" content="Split any image into the part a rule can paint and the part it cannot. Most of a picture is smooth fill that can be derived at runtime; the information lives in the edges. Runs in your browser, lossless, measured against PNG.">
+<meta name="author" content="Kenneth W. Bingham">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/paint-by-numbers.html">
+<link rel="icon" href="assets/butterfly.png">
+<link rel="stylesheet" href="site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/paint-by-numbers.html">
+<meta property="og:title" content="Paint by Numbers &middot; Kenneth W. Bingham">
+<meta property="og:description" content="Most of an image is fill a rule can paint. The information lives in the lines. Split your own picture and see where the bytes actually go.">
+<meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  .panels { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1.2rem; }
+  @media (max-width: 760px) { .panels { grid-template-columns: 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: .8rem; }
+  .panel canvas { width: 100%; height: auto; display: block; border-radius: var(--radius-sm); background: var(--surface-2); }
+  .panel h3 { margin: 0 0 .5rem; font-size: .96rem; }
+  .panel p { font-size: .84rem; color: var(--muted); margin: .55rem 0 0; }
+  .drop {
+    border: 1px dashed var(--border-strong); border-radius: var(--radius);
+    padding: 1.4rem 1.2rem; text-align: center; color: var(--muted);
+    background: var(--surface); margin: 1.2rem 0; cursor: pointer; display: block;
+  }
+  .drop.over { border-color: var(--accent); color: var(--accent); }
+  .drop input { display: none; }
+  .ok { color: var(--good); font-weight: 600; }
+  .bad { color: #e0a06a; font-weight: 600; }
+  .controls { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin: 1rem 0; }
+  .controls label { font-size: .88rem; color: var(--muted); display: flex; gap: .5rem; align-items: center; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="row">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham <span class="sub">AI Engineer</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/geometry-as-data.html">Geometry as data</a>
+      <a href="/self-healing.html">Self-healing</a>
+      <a href="/shape-of-a-file.html">Shape of a file</a>
+      <a href="/paint-by-numbers.html" class="here">Paint by numbers</a>
+      <a href="/geometry-bench.html">Benchmark</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="role">The part I used to keep to myself</p>
+    <h1>An image is mostly fill. The information is in the lines.</h1>
+    <p class="lede">
+      Take any photograph and divide it in two. One part is smooth: skies, walls, skin, water,
+      shadow, the slow gradients that make up most of the frame. That part follows a rule and
+      can be painted at runtime from a handful of numbers. The other part is the lines and
+      textures, where the picture actually changes, and that part has to be kept exactly.
+      Add them back together and you have the original, byte for byte.
+    </p>
+    <p class="lede" style="margin-top:1rem">
+      Below, your own image is split that way in front of you, and the sizes are put against PNG
+      so you can see where it stands. Sometimes it edges PNG out, often it does not, and that is
+      not the interesting part anyway. The claim is that the <em>information</em> in an image is
+      not spread evenly, and once you can see where it actually lives, the problem changes shape.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <label class="drop" id="drop">
+      <input type="file" id="file" accept="image/*">
+      <strong>Drop an image here</strong>, or click to choose one.<br>
+      <span class="small">It never leaves your browser. Photographs, screenshots, drawings, anything.</span>
+    </label>
+
+    <div class="controls">
+      <button class="btn" id="try-photo">Use my sample photograph</button>
+      <label>
+        Tile size
+        <select id="tile">
+          <option value="8">8 px</option>
+          <option value="16" selected>16 px</option>
+          <option value="32">32 px</option>
+        </select>
+      </label>
+      <span class="small muted" id="status">Waiting for an image.</span>
+    </div>
+
+    <div class="panels" id="panels" hidden>
+      <div class="panel">
+        <h3>1. The original</h3>
+        <canvas id="c-orig"></canvas>
+        <p>What you gave me, scaled to fit.</p>
+      </div>
+      <div class="panel">
+        <h3>2. What the rules paint</h3>
+        <canvas id="c-fill"></canvas>
+        <p id="fill-cap">Each tile gets one flat plane: a starting brightness and two slopes. That is all.</p>
+      </div>
+      <div class="panel">
+        <h3>3. What the rules could not paint</h3>
+        <canvas id="c-res"></canvas>
+        <p>The difference, amplified six times so it is visible at all. Black means the rule was already right. Skies and smooth rock go dark; edges, foliage and rough texture light up, and that is where the bytes go.</p>
+      </div>
+      <div class="panel">
+        <h3>4. Rules plus difference</h3>
+        <canvas id="c-back"></canvas>
+        <p id="back-cap">The reconstruction. Identical to the original, verified by hash.</p>
+      </div>
+    </div>
+
+    <div class="score" id="score" hidden style="display:flex; gap:1.4rem; flex-wrap:wrap; margin-top:1.4rem">
+      <div class="metric"><span class="n" id="m-close">&mdash;</span><span class="l">of the picture the rules already got right</span></div>
+      <div class="metric"><span class="n" id="m-rules">&mdash;</span><span class="l">bytes of painting rules</span></div>
+      <div class="metric"><span class="n" id="m-res">&mdash;</span><span class="l">bytes for the lines</span></div>
+      <div class="metric"><span class="n" id="m-png">&mdash;</span><span class="l">the same image as PNG</span></div>
+      <div class="metric"><span class="n" id="m-exact">&mdash;</span><span class="l">rebuild matches original</span></div>
+    </div>
+
+    <p class="verdict" id="verdict" style="margin-top:1rem"></p>
+    <p class="small muted">
+      Read the PNG number as indicative rather than as a codec benchmark. PNG here encodes four
+      channels including alpha and carries its own container; the split encodes the three colour
+      channels and packs the differences with the browser's gzip. A serious comparison would
+      match those conditions and use a tuned entropy coder on both sides. Losslessness, on the
+      other hand, is exact: panel 4 is hashed against panel 1 every run.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The gain is not the compression. It is that the data never exists.</h2>
+    <p class="lede" style="margin-bottom:1.2rem">
+      Comparing against PNG is the wrong scoreboard, and I put it there only because it is the
+      first thing a sceptic asks for. Compression makes a stored thing smaller. This makes a
+      stored thing <strong>unnecessary</strong>: the fill in panel 2 is not a small file, it is
+      no file at all until something asks for it, and afterwards it is gone again.
+    </p>
+    <p class="lede" style="margin-bottom:1.2rem">
+      That matters because of how much of a data centre is holding things nobody is looking at.
+      Thumbnails and previews at six sizes. Map tiles for every zoom level. Rolled-up
+      aggregates. Rendered reports. Cached variants. Synthetic and augmented training sets.
+      Procedural textures and terrain. All of it derivable, all of it sitting on a disk being
+      paid for by the month, and almost none of it read on any given day.
+    </p>
+
+    <div class="grid g2">
+      <div class="card">
+        <h3>Measured, and the boundary with it</h3>
+        <p>
+          Against materialising a whole field up front, deriving only the part actually
+          requested was <strong>611&times; cheaper at 0.02%</strong> of the field and
+          <strong>17&times; at 0.4%</strong>. The two approaches break even near
+          <strong>25%</strong>. Below that line you should not be storing it; above it you
+          should. Real viewports, real queries and real page views live far below the line,
+          which is the entire argument.
+        </p>
+      </div>
+      <div class="card">
+        <h3>What it costs instead</h3>
+        <p>
+          Compute, and honesty about it. Reproducing a value you already have on local disk is
+          about <strong>4.5&times; slower</strong> than reading it. You are trading storage for
+          CPU, and that trade is only worth making when the stored copy is rarely read, or when
+          the alternative is fetching it across a network, where deriving beat the link by
+          114&times;.
+        </p>
+      </div>
+      <div class="card">
+        <h3>A database that holds less</h3>
+        <p>
+          Same principle one level up: keep the source values and the rule that produces the
+          derived ones, rather than keeping every derived table, index projection and rolled-up
+          copy. The derived rows are computed when queried. This is not exotic &mdash; it is
+          what a view is, versus a materialised view &mdash; and the discipline is deciding
+          which things have earned the right to be stored.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Where it does not apply</h3>
+        <p>
+          A photograph of a real place, a log of what actually happened, a document someone
+          wrote: there is no rule that generates those, so they must be kept, and storing them
+          well is a compression problem rather than a derivation one. The honest claim is about
+          the derivable fraction of the pile, which is large, not about the whole pile.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What the four panels are telling you</h2>
+    <div class="grid g2" style="margin-top:1.2rem">
+      <div class="card">
+        <h3>Panel 2 costs almost nothing</h3>
+        <p>
+          Every tile in the image is described by three numbers per colour channel: a starting
+          value and how fast it changes across and down. That is a plane, the simplest possible
+          rule. For a 16 pixel tile it replaces 768 bytes of pixels with 9 bytes of rule, and it
+          is generated at runtime rather than stored.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Panel 3 is where the bytes went</h3>
+        <p>
+          Look at how black it is. Across most of the frame the rule was right to within a
+          shade or two. The bright parts are edges, hair, foliage, lettering, texture. Those
+          pixels are the actual information in the picture, and they are a small fraction of
+          its area while being most of its cost.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Nothing is approximated</h3>
+        <p>
+          Panel 4 is not close to the original, it <em>is</em> the original, and the page proves
+          it by hashing both and comparing. Every difference, however small, is kept. This is a
+          change of representation rather than a quality trade, which is what separates it from
+          lossy compression.
+        </p>
+      </div>
+      <div class="card">
+        <h3>And the honest part</h3>
+        <p>
+          PNG is very good at exactly this, and on a photograph it normally wins, because it has
+          decades of tuned prediction and entropy coding behind it. What this page shows is not
+          a better compressor. It is where the information sits, and that a plane per tile
+          already accounts for most of a picture.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Why publish it</h2>
+    <p class="lede">
+      I kept this part quiet for a while, on the theory that obscurity is a head start. A head
+      start you never spend is worth nothing, and an idea from one person working alone does not
+      get accepted on assertion in any case &mdash; not from someone without an institution
+      behind them. It gets accepted when people can run it themselves and watch what happens.
+      So here it is, with the measurement that shows where it fails printed next to the part
+      that works.
+    </p>
+    <div class="btn-row" style="margin-top:1.3rem">
+      <a class="btn" href="/geometry-as-data.html">The technical write-up</a>
+      <a class="btn ghost" href="/geometry-bench.html">The benchmark</a>
+      <a class="btn ghost" href="/contact.html">Tell me I am wrong</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span>&copy; 2026 Kenneth W. Bingham</span>
+      <a href="/contact.html">Contact</a>
+      <a href="/resume.html">Resume</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var statusEl = document.getElementById("status");
+  var panels = document.getElementById("panels");
+  var scoreEl = document.getElementById("score");
+  var MAXDIM = 560;
+
+  function ctxOf(id) { return document.getElementById(id).getContext("2d", { willReadFrequently: true }); }
+
+  async function gzipSize(bytes) {
+    if (typeof CompressionStream === "undefined") return null;
+    var cs = new CompressionStream("gzip");
+    var w = cs.writable.getWriter();
+    w.write(bytes);
+    w.close();
+    return (await new Response(cs.readable).arrayBuffer()).byteLength;
+  }
+
+  async function sha(bytes) {
+    var d = await crypto.subtle.digest("SHA-256", bytes);
+    return [].map.call(new Uint8Array(d), function (b) { return b.toString(16).padStart(2, "0"); }).join("");
+  }
+
+  /**
+   * Fit one plane per tile per colour channel.
+   *
+   * A plane is v = a + b*dx + c*dy, solved by least squares. Because dx and dy
+   * are centred on the tile, the normal equations are diagonal and the solution
+   * is three sums, which is why this runs instantly on a large image.
+   */
+  function splitImage(px, w, h, tile) {
+    var painted = new Uint8ClampedArray(px.length);
+    var residual = new Uint8Array(w * h * 3);
+    var tilesAcross = Math.ceil(w / tile), tilesDown = Math.ceil(h / tile);
+    var rules = [];
+    var flatTiles = 0, totalTiles = tilesAcross * tilesDown;
+
+    for (var ty = 0; ty < tilesDown; ty++) {
+      for (var tx = 0; tx < tilesAcross; tx++) {
+        var x0 = tx * tile, y0 = ty * tile;
+        var x1 = Math.min(x0 + tile, w), y1 = Math.min(y0 + tile, h);
+        var n = (x1 - x0) * (y1 - y0);
+        var cx = (x1 - x0 - 1) / 2, cy = (y1 - y0 - 1) / 2;
+        var tileMax = 0;
+
+        for (var ch = 0; ch < 3; ch++) {
+          var sum = 0, sxv = 0, syv = 0, sxx = 0, syy = 0;
+          for (var y = y0; y < y1; y++) {
+            for (var x = x0; x < x1; x++) {
+              var v = px[(y * w + x) * 4 + ch];
+              var dx = x - x0 - cx, dy = y - y0 - cy;
+              sum += v; sxv += v * dx; syv += v * dy;
+              sxx += dx * dx; syy += dy * dy;
+            }
+          }
+          var a = sum / n;
+          var b = sxx > 0 ? sxv / sxx : 0;
+          var c = syy > 0 ? syv / syy : 0;
+
+          // Quantise the rule: one byte for the level, one each for the slopes.
+          var qa = Math.max(0, Math.min(255, Math.round(a)));
+          var qb = Math.max(-128, Math.min(127, Math.round(b * 8)));
+          var qc = Math.max(-128, Math.min(127, Math.round(c * 8)));
+          rules.push(qa, qb & 255, qc & 255);
+
+          for (var y2 = y0; y2 < y1; y2++) {
+            for (var x2 = x0; x2 < x1; x2++) {
+              var dx2 = x2 - x0 - cx, dy2 = y2 - y0 - cy;
+              var pred = Math.round(qa + (qb / 8) * dx2 + (qc / 8) * dy2);
+              var clamped = Math.max(0, Math.min(255, pred));
+              var idx = (y2 * w + x2) * 4 + ch;
+              painted[idx] = clamped;
+              var diff = (px[idx] - clamped) & 255;
+              residual[(y2 * w + x2) * 3 + ch] = diff;
+              var signed = diff > 127 ? diff - 256 : diff;
+              if (Math.abs(signed) > tileMax) tileMax = Math.abs(signed);
+            }
+          }
+        }
+        for (var q = 3; q < px.length; q += 4) { /* alpha handled below */ }
+        if (tileMax <= 6) flatTiles++;
+      }
+    }
+
+    for (var p = 3; p < painted.length; p += 4) painted[p] = 255;
+
+    // How much of the picture did the planes already get right? Counted per
+    // channel value, which is the honest version of "most of an image is fill".
+    var close = 0;
+    for (var r2 = 0; r2 < residual.length; r2++) {
+      var d2 = residual[r2];
+      var s2 = d2 > 127 ? d2 - 256 : d2;
+      if (Math.abs(s2) <= 4) close++;
+    }
+    return {
+      painted: painted, residual: residual,
+      rules: new Uint8Array(rules),
+      flat: flatTiles, tiles: totalTiles, closeShare: close / residual.length
+    };
+  }
+
+  function drawResidual(ctx, residual, w, h) {
+    var img = ctx.createImageData(w, h);
+    for (var i = 0, o = 0; i < w * h; i++, o += 4) {
+      var acc = 0;
+      for (var ch = 0; ch < 3; ch++) {
+        var d = residual[i * 3 + ch];
+        var signed = d > 127 ? d - 256 : d;
+        acc += Math.abs(signed);
+      }
+      // Amplified so the sparse structure is visible at all.
+      var v = Math.min(255, Math.round(acc * 6));
+      img.data[o] = img.data[o + 1] = img.data[o + 2] = v;
+      img.data[o + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
+  async function run(img) {
+    var scale = Math.min(1, MAXDIM / Math.max(img.naturalWidth, img.naturalHeight));
+    var w = Math.max(8, Math.round(img.naturalWidth * scale));
+    var h = Math.max(8, Math.round(img.naturalHeight * scale));
+    var tile = parseInt(document.getElementById("tile").value, 10);
+
+    ["c-orig", "c-fill", "c-res", "c-back"].forEach(function (id) {
+      var cv = document.getElementById(id);
+      cv.width = w; cv.height = h;
+    });
+
+    var oc = ctxOf("c-orig");
+    oc.drawImage(img, 0, 0, w, h);
+    var data = oc.getImageData(0, 0, w, h);
+    var px = data.data;
+
+    statusEl.textContent = "Splitting " + w + "×" + h + " into " + tile + " pixel tiles…";
+    var t0 = performance.now();
+    var split = splitImage(px, w, h, tile);
+
+    // Panel 2: the fill.
+    var fc = ctxOf("c-fill");
+    var fillImg = fc.createImageData(w, h);
+    fillImg.data.set(split.painted);
+    fc.putImageData(fillImg, 0, 0);
+
+    // Panel 3: the leftovers.
+    drawResidual(ctxOf("c-res"), split.residual, w, h);
+
+    // Panel 4: put them back together.
+    var bc = ctxOf("c-back");
+    var backImg = bc.createImageData(w, h);
+    for (var i = 0, o = 0; i < w * h; i++, o += 4) {
+      for (var ch = 0; ch < 3; ch++) {
+        backImg.data[o + ch] = (split.painted[o + ch] + split.residual[i * 3 + ch]) & 255;
+      }
+      backImg.data[o + 3] = 255;
+    }
+    bc.putImageData(backImg, 0, 0);
+
+    // Exactness: compare the RGB bytes of original and rebuild.
+    var origRGB = new Uint8Array(w * h * 3), backRGB = new Uint8Array(w * h * 3);
+    for (var j = 0, k = 0; j < w * h; j++, k += 4) {
+      for (var c2 = 0; c2 < 3; c2++) {
+        origRGB[j * 3 + c2] = px[k + c2];
+        backRGB[j * 3 + c2] = backImg.data[k + c2];
+      }
+    }
+    var exact = (await sha(origRGB)) === (await sha(backRGB));
+
+    // The accounting, against PNG of the same pixels.
+    var rulesGz = await gzipSize(split.rules);
+    var resGz = await gzipSize(split.residual);
+    var pngBytes = await new Promise(function (resolve) {
+      document.getElementById("c-orig").toBlob(function (b) { resolve(b ? b.size : null); }, "image/png");
+    });
+
+    document.getElementById("m-close").textContent = Math.round(split.closeShare * 100) + "%";
+    document.getElementById("m-rules").textContent = rulesGz === null ? "n/a" : rulesGz.toLocaleString();
+    document.getElementById("m-res").textContent = resGz === null ? "n/a" : resGz.toLocaleString();
+    document.getElementById("m-png").textContent = pngBytes === null ? "n/a" : pngBytes.toLocaleString();
+    var exactEl = document.getElementById("m-exact");
+    exactEl.textContent = exact ? "yes" : "NO";
+    exactEl.className = "n " + (exact ? "ok" : "bad");
+
+    document.getElementById("fill-cap").textContent =
+      "One plane per " + tile + " pixel tile per colour: " + split.tiles.toLocaleString() +
+      " tiles, " + split.rules.length.toLocaleString() + " bytes of rules before packing.";
+
+    var total = (rulesGz || 0) + (resGz || 0);
+    var verdict;
+    if (pngBytes && total < pngBytes) {
+      verdict = "On this image the split wins: " + total.toLocaleString() + " bytes against " +
+        pngBytes.toLocaleString() + " for PNG. " + Math.round(split.closeShare * 100) + "% of the picture was already correct from the planes alone, within a shade or two.";
+    } else if (pngBytes) {
+      verdict = "PNG wins on this image: " + pngBytes.toLocaleString() + " bytes against " +
+        total.toLocaleString() + " for rules plus differences. That is the expected result for a " +
+        "photograph, and it is the honest state of this today. What the panels show is still true: " +
+        Math.round(split.closeShare * 100) + "% of the picture came out correct from the planes alone, and " +
+        "the cost is concentrated in the bright parts of panel 3.";
+    } else {
+      verdict = "Sizes are unavailable in this browser, but the split itself ran.";
+    }
+    document.getElementById("verdict").textContent = verdict;
+
+    panels.hidden = false;
+    scoreEl.hidden = false;
+    statusEl.textContent = "Done in " + Math.round(performance.now() - t0) + " ms.";
+  }
+
+  function loadFile(file) {
+    if (!file) return;
+    var img = new Image();
+    img.onload = function () { run(img); URL.revokeObjectURL(img.src); };
+    img.onerror = function () { statusEl.textContent = "That file did not decode as an image."; };
+    img.src = URL.createObjectURL(file);
+  }
+
+  var drop = document.getElementById("drop");
+  var input = document.getElementById("file");
+  ["dragenter", "dragover"].forEach(function (e) {
+    drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.add("over"); });
+  });
+  ["dragleave", "drop"].forEach(function (e) {
+    drop.addEventListener(e, function (ev) { ev.preventDefault(); drop.classList.remove("over"); });
+  });
+  drop.addEventListener("drop", function (ev) { loadFile(ev.dataTransfer.files[0]); });
+  input.addEventListener("change", function () { loadFile(input.files[0]); });
+
+  document.getElementById("try-photo").addEventListener("click", function () {
+    var img = new Image();
+    img.onload = function () { run(img); };
+    img.src = "/bench-data/photo.jpg";
+  });
+
+  document.getElementById("tile").addEventListener("change", function () {
+    var orig = document.getElementById("c-orig");
+    if (orig.width > 8) {
+      var img = new Image();
+      img.onload = function () { run(img); };
+      img.src = orig.toDataURL();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
