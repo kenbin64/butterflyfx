@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Paint by Numbers &middot; Kenneth W. Bingham</title>
-<meta name="description" content="Split any image into the part a rule can paint and the part it cannot. Most of a picture is smooth fill that can be derived at runtime; the information lives in the edges. Runs in your browser, lossless, measured against PNG.">
+<meta name="description" content="Split any image into the part a simple rule can paint and the exact remainder it cannot. Runs in your browser, lossless, measured against PNG.">
 <meta name="author" content="Kenneth W. Bingham">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://butterflyfx.us/paint-by-numbers.html">
@@ -13,7 +13,7 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://butterflyfx.us/paint-by-numbers.html">
 <meta property="og:title" content="Paint by Numbers &middot; Kenneth W. Bingham">
-<meta property="og:description" content="Most of an image is fill a rule can paint. The information lives in the lines. Split your own picture and see where the bytes actually go.">
+<meta property="og:description" content="Split your own picture into what a simple rule paints and the exact remainder, and see how the sizes compare.">
 <meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <style>
@@ -58,20 +58,20 @@
 
 <section class="hero">
   <div class="wrap">
-    <p class="role">The part I used to keep to myself</p>
-    <h1>An image is mostly fill. The information is in the lines.</h1>
+    <p class="role">Rule plus remainder, on your own picture</p>
+    <h1>Part of every image can be painted by a rule.</h1>
     <p class="lede">
       Take any photograph and divide it in two. One part is smooth: skies, walls, skin, water,
-      shadow, the slow gradients that make up most of the frame. That part follows a rule and
-      can be painted at runtime from a handful of numbers. The other part is the lines and
-      textures, where the picture actually changes, and that part has to be kept exactly.
+      shadow, the slow gradients that make up much of the frame. That part follows a rule and
+      can be painted at runtime from a handful of numbers. Whatever the rule does not get is
+      kept exactly, as a remainder.
       Add them back together and you have the original, byte for byte.
     </p>
     <p class="lede" style="margin-top:1rem">
       Below, your own image is split that way in front of you, and the sizes are put against PNG
-      so you can see where it stands. Sometimes it edges PNG out, often it does not, and that is
-      not the interesting part anyway. The claim is that the <em>information</em> in an image is
-      not spread evenly, and once you can see where it actually lives, the problem changes shape.
+      so you can see where it stands. Sometimes it beats PNG, often it does not, and that is not
+      the interesting part anyway. The interesting part is how much of a real picture the
+      simplest possible rule already accounts for.
     </p>
   </div>
 </section>
@@ -111,7 +111,7 @@
       <div class="panel">
         <h3>3. What the rules could not paint</h3>
         <canvas id="c-res"></canvas>
-        <p>The difference, amplified six times so it is visible at all. Black means the rule was already right. Skies and smooth rock go dark; edges, foliage and rough texture light up, and that is where the bytes go.</p>
+        <p>The remainder, amplified six times so it is visible at all. Black means the rule was already right.</p>
       </div>
       <div class="panel">
         <h3>4. Rules plus difference</h3>
@@ -121,11 +121,11 @@
     </div>
 
     <div class="score" id="score" hidden style="display:flex; gap:1.4rem; flex-wrap:wrap; margin-top:1.4rem">
-      <div class="metric"><span class="n" id="m-close">&mdash;</span><span class="l">of the picture the rules already got right</span></div>
-      <div class="metric"><span class="n" id="m-rules">&mdash;</span><span class="l">bytes of painting rules</span></div>
-      <div class="metric"><span class="n" id="m-res">&mdash;</span><span class="l">bytes for the lines</span></div>
-      <div class="metric"><span class="n" id="m-png">&mdash;</span><span class="l">the same image as PNG</span></div>
-      <div class="metric"><span class="n" id="m-exact">&mdash;</span><span class="l">rebuild matches original</span></div>
+      <div class="metric"><span class="n" id="m-close">...</span><span class="l">of the picture the rules already got right</span></div>
+      <div class="metric"><span class="n" id="m-rules">...</span><span class="l">bytes of painting rules</span></div>
+      <div class="metric"><span class="n" id="m-res">...</span><span class="l">bytes for the remainder</span></div>
+      <div class="metric"><span class="n" id="m-png">...</span><span class="l">the same image as PNG</span></div>
+      <div class="metric"><span class="n" id="m-exact">...</span><span class="l">rebuild matches original</span></div>
     </div>
 
     <p class="verdict" id="verdict" style="margin-top:1rem"></p>
@@ -183,8 +183,8 @@
         <p>
           Same principle one level up: keep the source values and the rule that produces the
           derived ones, rather than keeping every derived table, index projection and rolled-up
-          copy. The derived rows are computed when queried. This is not exotic &mdash; it is
-          what a view is, versus a materialised view &mdash; and the discipline is deciding
+          copy. The derived rows are computed when queried. This is not exotic: it is what a
+          view is, versus a materialised view, and the discipline is deciding
           which things have earned the right to be stored.
         </p>
       </div>
@@ -215,12 +215,11 @@
         </p>
       </div>
       <div class="card">
-        <h3>Panel 3 is where the bytes went</h3>
+        <h3>Panel 3 is the remainder</h3>
         <p>
-          Look at how black it is. Across most of the frame the rule was right to within a
-          shade or two. The bright parts are edges, hair, foliage, lettering, texture. Those
-          pixels are the actual information in the picture, and they are a small fraction of
-          its area while being most of its cost.
+          Look at how black it is. Across much of the frame the rule was right to within a
+          shade or two. Every pixel it missed is kept exactly, so nothing is lost, and on a
+          photograph that remainder is most of the cost.
         </p>
       </div>
       <div class="card">
@@ -237,8 +236,8 @@
         <p>
           PNG is very good at exactly this, and on a photograph it normally wins, because it has
           decades of tuned prediction and entropy coding behind it. What this page shows is not
-          a better compressor. It is where the information sits, and that a plane per tile
-          already accounts for most of a picture.
+          a better compressor. It is how much of a picture one plane per tile already accounts
+          for.
         </p>
       </div>
     </div>
@@ -247,14 +246,12 @@
 
 <section>
   <div class="wrap">
-    <h2>Why publish it</h2>
+    <h2>Why it runs in your browser</h2>
     <p class="lede">
-      I kept this part quiet for a while, on the theory that obscurity is a head start. A head
-      start you never spend is worth nothing, and an idea from one person working alone does not
-      get accepted on assertion in any case &mdash; not from someone without an institution
-      behind them. It gets accepted when people can run it themselves and watch what happens.
-      So here it is, with the measurement that shows where it fails printed next to the part
-      that works.
+      An idea from one person working alone does not get accepted on assertion, not from someone
+      without an institution behind them. It gets accepted when people can run it themselves and
+      watch what happens. So it runs here, with the measurement that shows where it fails printed
+      next to the part that works.
     </p>
     <div class="btn-row" style="margin-top:1.3rem">
       <a class="btn" href="/geometry-as-data.html">The technical write-up</a>

@@ -76,8 +76,9 @@
       is printed beside it rather than left for you to discover.
     </p>
     <p class="lede" style="margin-top:1rem">
-      This is not a compression trick. It is a way of computing: hold the shape, ask it
-      questions, calculate with it, let a change travel through it, and let it repair itself.
+      This is not a compression trick. It is a way of answering: hold the shape, ask it
+      questions and read the answers off it by observation instead of computing through the
+      data, let a change travel through it, and let it repair itself.
       None of it is new mathematics, and none of it overturns any. It is known mathematics
       presented dimensionally, so the form of the answer is visible at the start instead of at
       the end of a long derivation.
@@ -109,7 +110,7 @@
       <a href="#shape"><b>01</b>A curved surface made of straight lines</a>
       <a href="#ask"><b>02</b>Ask the shape instead of working it out</a>
       <a href="#data"><b>03</b>Holding data as that shape</a>
-      <a href="#logic"><b>04</b>The same shape computes</a>
+      <a href="#logic"><b>04</b>The same shape holds logic</a>
       <a href="#heal"><b>05</b>And repairs itself</a>
       <a href="#ledger"><b>06</b>The honest ledger</a>
       <a href="#repro"><b>07</b>Reproduce all of it</a>
@@ -232,7 +233,7 @@
           <source type="image/webp" srcset="/img/saddle-star-640.webp">
           <img src="/img/saddle-star-640.jpg" width="396" height="408" loading="lazy" alt="Six saddle wings arranged with six-fold symmetry, with a hyperbola highlighted in orange.">
         </picture>
-        <figcaption>The star. A saddle's corners are one tetrahedron of a cube and its mirror twin's are the other; down the cube's long diagonal that pair reads as a six-pointed star. The orange curve is a cut through the saddle.</figcaption>
+        <figcaption>Six saddles set in three perpendicular orientations. Their 24 corners land on just the 8 corners of a cube, and form exactly two tetrahedra: the stella octangula, the three-dimensional Star of David.</figcaption>
       </figure>
     </div>
 
@@ -274,9 +275,12 @@
         <p>
           The saddle's four corners are four alternate corners of the cube, and every pair of them
           is the same distance apart (2&radic;2), so they make a perfect tetrahedron. The twin
-          saddle takes the other four corners. Together the two are the <em>stella octangula</em>,
-          and down the cube's long diagonal they read as the six-pointed star above: six points,
-          one radius, exactly 60&deg; apart. z = x&middot;y&sup2; has its corners on the same cube.
+          saddle takes the other four corners. Together the two are the <em>stella octangula</em>.
+          Build the saddle in all three perpendicular orientations and you get the same two
+          tetrahedra every time: the star is forced by the signs of multiplication, not by how the
+          pieces are arranged. z = x&middot;y&sup2; also has its corners on the cube, but all four
+          lie on one flat plane, so it makes no tetrahedron. That result belongs to x&middot;y
+          alone.
         </p>
       </div>
     </div>
@@ -312,8 +316,11 @@
         <p>
           Every cut is a straight line through the centre. So the bloom's value is a
           <strong>direction</strong>, a slope, readable from anywhere along it. Bloom undoes seed
-          and seed undoes bloom, checked on 100,000 random pairs each way. The centre itself is a
-          hole the bloom cannot pass through. z = x / y&sup2; is the inverse square: double the
+          and seed undoes bloom, checked on 100,000 random pairs each way. And the famous hole is
+          in the drawing, not the shape: turn the saddle a quarter turn and every point lands
+          exactly on the bloom. Seed and bloom are one sheet, a quarter turn apart. The line where
+          division "blows up" simply stands vertical, and a vertical line cannot be drawn as a
+          height above a flat page. z = x / y&sup2; is the inverse square: double the
           distance and the result falls to a quarter, the same shape as the inverse-square law
           that light and gravity follow.
         </p>
@@ -378,7 +385,7 @@
     <div class="grid g3" style="margin:1.2rem 0">
       <div class="card"><h3>Hold</h3><p>The field is a rule plus its corners, not millions of stored values. <a href="#data">Section 03</a>.</p></div>
       <div class="card"><h3>Ask</h3><p>Questions are answered from the shape: corners, edges, directions, curves. This section.</p></div>
-      <div class="card"><h3>Compute</h3><p>The same shape on ones and zeros is a complete set of logic gates. <a href="#logic">Section 04</a>.</p></div>
+      <div class="card"><h3>Logic</h3><p>The same shape on ones and zeros holds a complete set of logic gates, in the algebra. <a href="#logic">Section 04</a>.</p></div>
       <div class="card"><h3>Propagate</h3><p>Every value knows its neighbours, so a change updates only what depends on it. Measured: one change touched 0.18% of a 216,000-cell lattice, 111&times; less work than recomputing.</p></div>
       <div class="card"><h3>Repair</h3><p>The neighbours notice damage and put it back, with no master copy. <a href="#heal">Section 05</a>.</p></div>
       <div class="card"><h3>Turn</h3><p>A quarter turn flips the sign: the switch that opens or closes a gate, and the rule that tiles the lattice. <a href="#flat">Section 00</a>.</p></div>
@@ -485,10 +492,10 @@
 
     <div class="grid g2">
       <figure class="shot">
-        <img src="/img/paint-example.jpg" width="640" height="296" loading="lazy" alt="A photograph beside the smooth fill a rule paints for it, and the sparse edges left over.">
+        <img src="/img/paint-example.jpg" width="640" height="148" loading="lazy" alt="A photograph beside the version one simple rule paints for it.">
         <figcaption>
-          A photograph split into what a rule can paint and what it cannot. 30% of this picture
-          was already correct from planes alone; the bytes went into the edges.
+          A photograph beside what one flat plane per tile paints for it. 30% of this picture was
+          already correct from that alone; everything else is kept exactly as a remainder.
           <a href="/paint-by-numbers.html">Do it to your own image</a>.
         </figcaption>
       </figure>
@@ -497,9 +504,9 @@
         <h3 style="margin-top:.6rem">What that split costs</h3>
         <p>
           One plane per 16-pixel tile, three numbers per colour: 4,960 bytes of painting rules
-          against 332,232 bytes for the edges and texture. Rebuild hashed against the original
-          every run, byte for byte. The information in a picture is not spread evenly, and this
-          is the measurement that shows where it sits.
+          against 332,232 bytes for the exact remainder. Rebuild hashed against the original
+          every run, byte for byte. On a photograph this is roughly level with PNG, which is the
+          honest result for captured data.
         </p>
       </div>
     </div>
@@ -509,7 +516,7 @@
 <!-- ================================================================= -->
 <section id="logic">
   <div class="wrap">
-    <h2>04 &middot; The same shape computes</h2>
+    <h2>04 &middot; The same shape holds logic</h2>
     <p class="lede" style="margin-bottom:1rem">
       On ordinary numbers <code>x&middot;y</code> is a saddle. On ones and zeros the very same
       expression is the AND gate. Add <code>1&minus;x</code> for NOT and you have a pair that can
@@ -588,7 +595,8 @@
   <div class="wrap">
     <h2>05 &middot; And repairs itself</h2>
     <p class="lede" style="margin-bottom:1.2rem">
-      I call this the Mrs. Kravitz lattice, after the neighbour who notices everything. It is the
+      I call this the Mrs. Kravitz lattice. Every cell knows its neighbours' addresses, not their
+      business, and that is enough to notice when something next door stops adding up. It is the
       part that convinced me the shape is doing something a compressed blob cannot.
       Because four corners define a patch, every 2&times;2 block of the field obeys one identity.
       A damaged value stops agreeing with what its neighbours imply, so the damage is visible
@@ -672,7 +680,7 @@
         <tr><td>The saddle turned 90&deg; and lifted by one is NAND; a flat single layer cannot make XOR, the saddle term can</td><td><span class="tag t-est">established</span> (Minsky and Papert, 1969)</td></tr>
         <tr><td>The saddle's corners are a regular tetrahedron in a cube; with its twin, a six-pointed star down the diagonal</td><td><span class="tag t-est">established</span></td></tr>
         <tr><td>x&middot;y&sup2; is straight one way and a parabola the other, up on one edge and down on the opposite</td><td><span class="tag t-est">established</span></td></tr>
-        <tr><td>Division is the bloom: it undoes the seed, and its level cuts are straight lines, i.e. directions</td><td><span class="tag t-est">established</span></td></tr>
+        <tr><td>Division is the bloom: it undoes the seed, its level cuts are straight lines (directions), and it is the same sheet as the seed turned a quarter turn</td><td><span class="tag t-est">established</span></td></tr>
         <tr><td>Asking the shape answers extremes, totals, boundaries, slopes and inverses from hundreds to hundreds of thousands of times faster than scanning, with identical answers</td><td><span class="tag t-mea">measured</span> (live on this page)</td></tr>
         <tr><td>Generated fields held as a rule: 81 to 524&times; smaller, lossless</td><td><span class="tag t-mea">measured</span></td></tr>
         <tr><td>Measured real-world data: 1.05 to 1.20&times;, sometimes a loss</td><td><span class="tag t-mea">measured</span></td></tr>
@@ -705,7 +713,7 @@
         <h3>In this browser, right now</h3>
         <ul class="tags" style="display:block; margin-top:.6rem">
           <li style="display:block; margin:.35rem 0"><a href="/geometry-bench.html">Benchmark</a>: drop in your own file; fetch a year of real weather from a public API and watch it encoded</li>
-          <li style="display:block; margin:.35rem 0"><a href="/paint-by-numbers.html">Paint by numbers</a>: split your own photograph into fill and edges, hash-verified</li>
+          <li style="display:block; margin:.35rem 0"><a href="/paint-by-numbers.html">Paint by numbers</a>: split your own photograph into rule and remainder, hash-verified</li>
           <li style="display:block; margin:.35rem 0"><a href="/self-healing.html">Self-healing</a>: damage the lattice and watch it repair, or fail honestly</li>
           <li style="display:block; margin:.35rem 0"><a href="/shape-of-a-file.html">Shape of a file</a>: see any file as a landscape, and hear music generated from the surface</li>
         </ul>
