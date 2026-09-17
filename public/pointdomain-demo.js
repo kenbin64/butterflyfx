@@ -6,7 +6,7 @@
     return Math.abs(angleDeg - 90.0) <= hingeEps;
   }
 
-  // PointDomain internal math — mirrors dimensionalprogramming/PointDomain.py defaults.
+  // PointDomain internal math: mirrors dimensionalprogramming/PointDomain.py defaults.
   function makePointDomain() {
     const real_axis = 1.0;
     const imag_axis = { re: 0, im: 1 };

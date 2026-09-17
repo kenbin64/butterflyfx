@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Directing AI - Kenneth W. Bingham</title>
+  <meta name="description"
+    content="How I customize an AI instance without touching the model: the directives, instructions, and constraints I have it read and ingest, and the observable change in behavior. Reproducible by anyone.">
+  <meta name="keywords" content="AI directives, prompt engineering, instance behavior, governance, deterministic AI, reliability, Claude">
+  <meta name="author" content="Kenneth W. Bingham">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://butterflyfx.us/directing-ai.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://butterflyfx.us/directing-ai.html">
+  <meta property="og:title" content="Directing AI - Kenneth W. Bingham">
+  <meta property="og:description" content="Customizing an AI instance with directives, not by touching the model. The exact instructions and the behavior they change.">
+  <meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
+
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="carousel.css">
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    .dir-item{padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.12)}
+    .dir-item:last-child{border-bottom:none}
+    .dir-name{font-weight:700;color:#9ec5ff;font-size:1.04em}
+    .dir-body{opacity:0.88;margin-top:5px;line-height:1.55}
+    .dir-body strong{opacity:1}
+    .boundary{display:grid;grid-template-columns:1fr 1fr;gap:1.2em;margin-top:1em}
+    @media(max-width:680px){.boundary{grid-template-columns:1fr}}
+    .boundary .box{border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:14px 16px}
+    .boundary .box h4{margin:0 0 6px;font-size:0.95em}
+    .boundary .no h4{color:#ff9b8a}.boundary .yes h4{color:#7fffcf}
+    .boundary .box p{margin:0;opacity:0.86;line-height:1.5;font-size:0.95em}
+  </style>
+</head>
+
+<body>
+  <canvas id="spiral-bg"></canvas>
+
+  <nav class="navbar glass">
+    <a href="index.html">Home</a>
+    <a href="index.html#work">Work</a>
+    <a href="bfx-ingest.html">bfx-ingest</a>
+    <a href="create-directive.html">Create Directive</a>
+    <a href="directing-ai.html" class="active">Directing AI</a>
+    <a href="resume.html">Resume</a>
+    <a href="contact.html">Contact</a>
+    <a href="https://github.com/kenbin64" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+
+  <div class="content">
+
+    <section class="section glass">
+      <h2 class="section-title">Directing AI</h2>
+      <p style="margin:0 0 1.2em;opacity:0.88;">
+        I cannot change the model. The provider owns the weights, the training, and the underlying engineering, and
+        nothing I do reaches any of that. What I can change is the behavior of the instance I am working in, by what I
+        have it read and ingest: directives, instructions, constraints, and context. The same out-of-the-box model then
+        behaves to my standard instead of a generic one. This is not fine-tuning and not a custom model. It is directive
+        engineering, and the point of this page is that anyone can do it with the right directives in their own instance.
+      </p>
+      <div class="boundary">
+        <div class="box no">
+          <h4>What I cannot touch</h4>
+          <p>The model weights, the training data, the architecture, the inference engine. That is the provider's domain.
+            No prompt reaches it.</p>
+        </div>
+        <div class="box yes">
+          <h4>What I can direct</h4>
+          <p>The behavior of my instance: how it reasons, what it refuses, what it verifies, how it writes, and the
+            standards it holds, all set by directives it reads and ingests.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">The directives, and what each one changes</h2>
+      <p style="margin:0 0 0.6em;opacity:0.88;">
+        These are the actual directives behind The Conduit, with the observable change each one produced in the instance.
+        Every effect is something you can open and check.
+      </p>
+
+      <div class="dir-item">
+        <div class="dir-name">The organizing law: <span class="math">z = x &middot; y</span></div>
+        <div class="dir-body"><strong>Instruction:</strong> Treat identity times behavior as state. Model parts as
+          identities with ancestry. AND is <span class="math">z = x &middot; y</span>; weighted AND is
+          <span class="math">z = x &middot; y&sup2;</span>.</div>
+        <div class="dir-body"><strong>Effect:</strong> Structure stays consistent across modules instead of drifting. The
+          water health score collapses the moment any one factor fails, rather than averaging a failure away.</div>
+      </div>
+
+      <div class="dir-item">
+        <div class="dir-name">The symbolic cycle: INGEST, EXPAND, COLLAPSE, OSCILLATE, INVOKE</div>
+        <div class="dir-body"><strong>Instruction:</strong> Run every task through this loop before producing output.</div>
+        <div class="dir-body"><strong>Effect:</strong> The instance scopes and checks before it builds, instead of
+          jumping to an answer. The agent loop in the project follows it step for step.</div>
+      </div>
+
+      <div class="dir-item">
+        <div class="dir-name">No claim without proof</div>
+        <div class="dir-body"><strong>Instruction:</strong> A claim is added only when it is tested and proven. Until
+          then it stays a hypothesis and is labeled as one.</div>
+        <div class="dir-body"><strong>Effect:</strong> Tests are run and output is shown before anything is called done.
+          Unverified work is marked unverified, not presented as working.</div>
+      </div>
+
+      <div class="dir-item">
+        <div class="dir-name">Synthesis is not recovery</div>
+        <div class="dir-body"><strong>Instruction:</strong> Detail that is added is synthesized, not recovered. Say so
+          plainly.</div>
+        <div class="dir-body"><strong>Effect:</strong> The tools state that they add plausible detail and do not recover
+          lost data. A scoring function is labeled a heuristic, not a judge.</div>
+      </div>
+
+      <div class="dir-item">
+        <div class="dir-name">Simulation only, never fabricate operational data</div>
+        <div class="dir-body"><strong>Instruction:</strong> The water system is a simulation. No real data. Keep the
+          disclaimer visible.</div>
+        <div class="dir-body"><strong>Effect:</strong> The 3D level-of-detail reveals only data that actually exists and
+          stops where the data ends, rather than inventing infrastructure to fill the view.</div>
+      </div>
+
+      <div class="dir-item">
+        <div class="dir-name">Authority decides, software recommends</div>
+        <div class="dir-body"><strong>Instruction:</strong> The software recommends GO or NO-GO. A named human authority
+          always makes the final call.</div>
+        <div class="dir-body"><strong>Effect:</strong> The go-live gate was built as advisory, with a documented human
+          override, not an automated lock.</div>
+      </div>
+
+      <div class="dir-item">
+        <div class="dir-name">A style directive: no em-dashes</div>
+        <div class="dir-body"><strong>Instruction:</strong> Do not use em-dashes.</div>
+        <div class="dir-body"><strong>Effect:</strong> Output style changes immediately and stays changed. A small,
+          easily checked proof that an instance instruction shifts behavior at once.</div>
+      </div>
+
+      <div class="dir-item">
+        <div class="dir-name">Anti-hallucination reasoning</div>
+        <div class="dir-body"><strong>Instruction:</strong> Reason with truth tables, logic gates, determination graphs,
+          and decision trees. Bound the recursion.</div>
+        <div class="dir-body"><strong>Effect:</strong> Steps stay explicit and checkable, and expansion stays bounded
+          instead of wandering into unrelated territory.</div>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">Anyone can do this</h2>
+      <div class="section-content">
+        <p>
+          None of this is secret and none of it is mine to gatekeep. That is the point. You write the directives, you
+          have your instance read and ingest them, and the same model holds your standard. The skill is knowing which
+          directives matter and stating them so the model can actually follow them, then verifying that it did. It works
+          on any capable model, in anyone's instance, with no training and no special access.
+        </p>
+        <p>
+          The Conduit is the proof. It was built in one directed instance under exactly these directives, and you can
+          open it, inspect it, and re-run it.
+        </p>
+        <div class="hero-cta">
+          <a href="https://theconduit.me" class="cta-btn" target="_blank" rel="noopener">Open The Conduit</a>
+          <a href="index.html#work" class="cta-btn alt">How it was built</a>
+          <a href="create-directive.html" class="cta-btn alt">Build a directive</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>
+        &copy; 2026 Kenneth W. Bingham &middot; ButterflyFx
+        &middot; <a href="index.html" style="opacity:0.7;">Home</a>
+      </p>
+    </footer>
+  </div>
+
+  <script src="manifold-bg.js" defer></script>
+</body>
+
+</html>

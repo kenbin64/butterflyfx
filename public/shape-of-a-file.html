@@ -95,10 +95,10 @@
       <p class="cap" id="caption"></p>
 
       <div class="score">
-        <div class="metric"><span class="n" id="s-shape">&mdash;</span><span class="l">of the file follows the shape</span></div>
-        <div class="metric"><span class="n" id="s-rule">&mdash;</span><span class="l">bytes to describe the shape</span></div>
-        <div class="metric"><span class="n" id="s-left">&mdash;</span><span class="l">left over to store exactly</span></div>
-        <div class="metric"><span class="n" id="s-size">&mdash;</span><span class="l">file size</span></div>
+        <div class="metric"><span class="n" id="s-shape">...</span><span class="l">of the file follows the shape</span></div>
+        <div class="metric"><span class="n" id="s-rule">...</span><span class="l">bytes to describe the shape</span></div>
+        <div class="metric"><span class="n" id="s-left">...</span><span class="l">left over to store exactly</span></div>
+        <div class="metric"><span class="n" id="s-size">...</span><span class="l">file size</span></div>
       </div>
 
       <p class="verdict" id="verdict"></p>
@@ -140,10 +140,10 @@
       <canvas id="wave" width="1200" height="180" aria-label="The generated waveform"></canvas>
 
       <div class="score">
-        <div class="metric"><span class="n" id="a-rule">&mdash;</span><span class="l">bytes of rule</span></div>
-        <div class="metric"><span class="n" id="a-samples">&mdash;</span><span class="l">samples produced</span></div>
-        <div class="metric"><span class="n" id="a-wav">&mdash;</span><span class="l">as a WAV file</span></div>
-        <div class="metric"><span class="n" id="a-ratio">&mdash;</span><span class="l">rule against recording</span></div>
+        <div class="metric"><span class="n" id="a-rule">...</span><span class="l">bytes of rule</span></div>
+        <div class="metric"><span class="n" id="a-samples">...</span><span class="l">samples produced</span></div>
+        <div class="metric"><span class="n" id="a-wav">...</span><span class="l">as a WAV file</span></div>
+        <div class="metric"><span class="n" id="a-ratio">...</span><span class="l">rule against recording</span></div>
       </div>
 
       <p class="cap" id="a-rule-text"></p>
@@ -156,7 +156,7 @@
         It shows that when music is <em>defined</em> by a rule, the rule is the only thing that
         has to exist: a few dozen bytes standing in for a few megabytes of samples, rendered on
         demand. It does not show that a recording of a real performance can be shrunk to that
-        size, because a recording is not a rule &mdash; it is the sound of a room, and the
+        size, because a recording is not a rule; it is the sound of a room, and the
         <a href="/geometry-bench.html">benchmark</a> measures what happens when you try. The
         synthesizer that turns the rule into sound is shared code, the same way a codec sits on
         both ends of an MP3 and is not counted in the file's size.
@@ -180,8 +180,8 @@
       <div class="card">
         <h3>The orange line is a guess</h3>
         <p>
-          A handful of simple shapes are tried against your file &mdash; a flat line, a slope, a
-          curve, a wave &mdash; and the closest one is drawn. That shape can be written down in
+          A handful of simple shapes are tried against your file (a flat line, a slope, a
+          curve, a wave) and the closest one is drawn. That shape can be written down in
           a few dozen characters, which is the entire point.
         </p>
       </div>
@@ -209,7 +209,7 @@
     <p class="lede" style="margin-bottom:1.2rem">
       That is the whole idea. Where data follows a pattern, keep the pattern instead of the
       data, and rebuild it when someone actually asks. A smooth sensor reading, a tone, a
-      gradient, a fractal &mdash; those are recipes wearing a disguise, and the recipe is tiny.
+      gradient, a fractal: those are recipes wearing a disguise, and the recipe is tiny.
     </p>
     <div class="callout">
       <span class="ico" aria-hidden="true">&#9633;</span>
@@ -700,7 +700,7 @@
     document.getElementById("a-wav").textContent = (wavBytes / 1048576).toFixed(2) + " MB";
     document.getElementById("a-ratio").textContent = Math.round(wavBytes / ruleBytes).toLocaleString() + "×";
     document.getElementById("a-rule-text").textContent =
-      "The entire composition: " + ruleText + " — rendered in " + ms + " ms at " +
+      "The entire composition: " + ruleText + ", rendered in " + ms + " ms at " +
       audioCtx.sampleRate.toLocaleString() + " Hz.";
 
     statusA.textContent = "Playing. Nothing was downloaded and nothing is being stored.";

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Manifold Explorer: One Surface, Eleven Windows</title>
+  <meta name="robots" content="noindex">
+  <style>
+    :root {
+      --bg: #0a0d14;
+      --panel: #141925;
+      --line: #232a3c;
+      --ink: #e6ebf5;
+      --dim: #8d97ad;
+      --accent: #6ee7ff;
+      --accent2: #ffd166;
+      --mono: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 18px 22px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.04em;
+    }
+
+    header h1 .accent {
+      color: var(--accent);
+    }
+
+    header p {
+      margin: 4px 0 0;
+      color: var(--dim);
+      font-size: 13px;
+      max-width: 760px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 480px) 1fr;
+      gap: 18px;
+      padding: 18px 22px;
+    }
+
+    @media (max-width: 880px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* The pad */
+    .pad-wrap {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .pad-wrap h2 {
+      font-size: 13px;
+      margin: 0 0 10px;
+      color: var(--dim);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    canvas#pad {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #000;
+      border-radius: 8px;
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    .coord {
+      margin-top: 10px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    .coord b {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    /* Channels */
+    .channels {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      align-content: start;
+    }
+
+    .ch {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 14px;
+      min-height: 96px;
+    }
+
+    .ch .label {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .ch .label .hint {
+      color: #555f78;
+      font-size: 10px;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .ch .value {
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .ch .big {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+    }
+
+    .ch.color .swatch {
+      width: 100%;
+      height: 36px;
+      border-radius: 6px;
+      margin-top: 4px;
+      border: 1px solid var(--line);
+    }
+
+    .ch.ascii .glyph {
+      font-family: var(--mono);
+      font-size: 44px;
+      line-height: 1;
+      color: var(--accent2);
+      text-align: center;
+      padding: 4px 0;
+    }
+
+    .ch.gate .gname {
+      color: var(--accent);
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .ch.rule .rname {
+      color: var(--accent2);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .ch.card .face {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .ch.card .face.red {
+      color: #ff6b6b;
+    }
+
+    .ch.card .face.black {
+      color: var(--ink);
+    }
+
+    .ch.vector svg {
+      display: block;
+      width: 100%;
+      height: 60px;
+    }
+
+    footer {
+      padding: 16px 22px 24px;
+      border-top: 1px solid var(--line);
+      color: var(--dim);
+      font-size: 12px;
+    }
+
+    footer code {
+      font-family: var(--mono);
+      background: var(--panel);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1><span class="accent">🜂 Manifold Explorer</span> &nbsp;·&nbsp; one surface, eleven windows</h1>
+    <p>
+      Move your pointer over the pad. The same coordinate <code>(x, y)</code> is queried through every aperture
+      the manifold has: sound, light, color, ASCII, pixel, gate, decision, vector, card, rule, input.
+      Nothing is generated; every value is read off the surface <code>z = x · y</code>.
+    </p>
+  </header>
+
+  <div class="layout">
+    <div class="pad-wrap">
+      <h2>The Pad: strike the manifold here</h2>
+      <canvas id="pad" width="480" height="480"></canvas>
+      <div class="coord">
+        x = <b id="cx">0.500</b> &nbsp; y = <b id="cy">0.500</b> &nbsp;
+        z = <b id="cz">0.250</b> &nbsp; |∇z| = <b id="cs">0.707</b>
+      </div>
+    </div>
+
+    <div class="channels">
+      <div class="ch sound">
+        <div class="label"><span>sound</span><span class="hint">slope → pentatonic</span></div>
+        <div class="value"><span id="snd-freq" class="big">...</span> Hz</div>
+        <div class="value">λ = <span id="snd-wl">...</span> m &nbsp;·&nbsp; scale step <span id="snd-idx">...</span></div>
+      </div>
+
+      <div class="ch light">
+        <div class="label"><span>light</span><span class="hint">slope → 380 to 740 nm</span></div>
+        <div class="value"><span id="lt-nm" class="big">...</span> nm</div>
+        <div class="value"><span id="lt-hz">...</span> Hz</div>
+      </div>
+
+      <div class="ch color">
+        <div class="label"><span>color</span><span class="hint">light → sRGB</span></div>
+        <div class="value"><span id="col-hex">#000000</span> &nbsp; <span id="col-rgb"
+            style="color:var(--dim)">rgb(0,0,0)</span></div>
+        <div class="swatch" id="col-sw"></div>
+      </div>
+
+      <div class="ch ascii">
+        <div class="label"><span>ascii</span><span class="hint">z → printable codepoint</span></div>
+        <div class="glyph" id="asc-glyph">·</div>
+        <div class="value" style="text-align:center;color:var(--dim)">code <span id="asc-code">0</span></div>
+      </div>
+
+      <div class="ch gate">
+        <div class="label"><span>gate</span><span class="hint">∂z partials → bin</span></div>
+        <div class="value"><span id="gate-name" class="gname">...</span></div>
+        <div class="value">∂x = <span id="gate-dx">...</span> &nbsp; ∂y = <span id="gate-dy">...</span></div>
+      </div>
+
+      <div class="ch decision">
+        <div class="label"><span>decision</span><span class="hint">z ≷ 0.5</span></div>
+        <div class="value"><span id="dec-branch" class="big">...</span></div>
+        <div class="value">confidence <span id="dec-conf">...</span></div>
+      </div>
+
+      <div class="ch vector">
+        <div class="label"><span>vector</span><span class="hint">∇z direction & magnitude</span></div>
+        <svg viewBox="-1.1 -1.1 2.2 2.2" preserveAspectRatio="xMidYMid meet">
+          <circle cx="0" cy="0" r="1" fill="none" stroke="#232a3c" stroke-width="0.02" />
+          <line id="vec-line" x1="0" y1="0" x2="0" y2="0" stroke="#6ee7ff" stroke-width="0.05" stroke-linecap="round" />
+          <circle id="vec-tip" cx="0" cy="0" r="0.07" fill="#ffd166" />
+        </svg>
+        <div class="value">θ = <span id="vec-ang">...</span>° &nbsp;|v| = <span id="vec-mag">...</span></div>
+      </div>
+
+      <div class="ch card">
+        <div class="label"><span>card</span><span class="hint">(x,y) → suit × rank</span></div>
+        <div class="face" id="card-face">...</div>
+        <div class="value">value <span id="card-val">...</span></div>
+      </div>
+
+      <div class="ch rule">
+        <div class="label"><span>rule</span><span class="hint">z → rule slot</span></div>
+        <div class="value"><span id="rule-name" class="rname">...</span></div>
+      </div>
+
+      <div class="ch input">
+        <div class="label"><span>input</span><span class="hint">unified device map</span></div>
+        <div class="value"><b id="in-ch">...</b> · <span id="in-btn">...</span></div>
+      </div>
+
+      <div class="ch pixel">
+        <div class="label"><span>pixel</span><span class="hint">position-as-color</span></div>
+        <div class="value">(<span id="px-x">...</span>, <span id="px-y">...</span>) → <span id="px-hex">...</span></div>
+        <div class="swatch" id="px-sw" style="height:24px"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Surface: <code>z = x · y</code> on <code>[0,1]²</code>.&nbsp;
+    Source: <code>brickbreaker_manifold_substrate.js</code> &rarr; <code>Manifold.interpret.*</code>.&nbsp;
+    No lookup tables. No assets. Just geometry being read.
+  </footer>
+
+  <script src="brickbreaker_manifold_substrate.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      const BB = window.BBManifoldSubstrate;
+      if (!BB || !BB.interpret) {
+        document.body.innerHTML = '<pre style="color:#f88;padding:24px">Manifold substrate failed to load.</pre>';
+        return;
+      }
+
+      // ── Background heatmap of the surface itself ────────────────────
+      const canvas = document.getElementById('pad');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+
+      function paintSurface() {
+        const img = ctx.createImageData(W, H);
+        for (let py = 0; py < H; py++) {
+          const y = 1 - py / (H - 1);                  // y up
+          for (let px = 0; px < W; px++) {
+            const x = px / (W - 1);
+            const c = BB.interpret.color(x, y);
+            const i = (py * W + px) * 4;
+            img.data[i] = c.r;
+            img.data[i + 1] = c.g;
+            img.data[i + 2] = c.b;
+            img.data[i + 3] = 255;
+          }
+        }
+        ctx.putImageData(img, 0, 0);
+      }
+
+      // ── Crosshair overlay at the current observation point ──────────
+      let lastX = 0.5, lastY = 0.5;
+      function paintCrosshair(x, y) {
+        const px = x * (W - 1);
+        const py = (1 - y) * (H - 1);
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, py); ctx.lineTo(W, py);
+        ctx.moveTo(px, 0); ctx.lineTo(px, H);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(px, py, 8, 0, Math.PI * 2);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(255,209,102,0.95)';
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // ── Read every channel at (x,y) and paint the panel ─────────────
+      const $ = id => document.getElementById(id);
+      const fmt = (n, d = 3) => Number(n).toFixed(d);
+      const fmtInt = n => Math.round(n).toString();
+      const fmtSI = n => {
+        if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
+        if (n >= 1e9) return (n / 1e9).toFixed(2) + 'G';
+        if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+        if (n >= 1e3) return (n / 1e3).toFixed(2) + 'k';
+        return n.toFixed(2);
+      };
+
+      function observe(x, y) {
+        lastX = x; lastY = y;
+        const I = BB.interpret;
+
+        const z = x * y;
+        const slope = Math.sqrt(x * x + y * y);
+        $('cx').textContent = fmt(x);
+        $('cy').textContent = fmt(y);
+        $('cz').textContent = fmt(z);
+        $('cs').textContent = fmt(slope);
+
+        // sound
+        const snd = I.sound(x, y);
+        $('snd-freq').textContent = fmt(snd.frequency, 1);
+        $('snd-wl').textContent = fmt(snd.wavelength, 3);
+        $('snd-idx').textContent = snd.scaleIndex;
+
+        // light
+        const lt = I.light(x, y);
+        $('lt-nm').textContent = fmt(lt.wavelengthNm, 1);
+        $('lt-hz').textContent = fmtSI(lt.frequency);
+
+        // color
+        const c = I.color(x, y);
+        $('col-hex').textContent = c.hex;
+        $('col-rgb').textContent = `rgb(${c.r},${c.g},${c.b})`;
+        $('col-sw').style.background = c.hex;
+
+        // ascii
+        const a = I.ascii(x, y);
+        $('asc-glyph').textContent = a.char === ' ' ? '␣' : a.char;
+        $('asc-code').textContent = a.code;
+
+        // gate
+        const g = I.gate(x, y);
+        $('gate-name').textContent = g.name;
+        $('gate-dx').textContent = fmt(g.dx);
+        $('gate-dy').textContent = fmt(g.dy);
+
+        // decision
+        const d = I.decision(x, y);
+        $('dec-branch').textContent = d.branch;
+        $('dec-conf').textContent = fmt(d.confidence);
+
+        // vector
+        const v = I.vector(x, y);
+        $('vec-line').setAttribute('x2', v.x.toFixed(3));
+        $('vec-line').setAttribute('y2', (-v.y).toFixed(3));    // svg y down
+        $('vec-tip').setAttribute('cx', v.x.toFixed(3));
+        $('vec-tip').setAttribute('cy', (-v.y).toFixed(3));
+        $('vec-ang').textContent = fmt(v.angle * 180 / Math.PI, 1);
+        $('vec-mag').textContent = fmt(v.magnitude);
+
+        // card
+        const cd = I.card(x, y);
+        const face = $('card-face');
+        face.textContent = cd.label;
+        face.className = 'face ' + (cd.suit === '♥' || cd.suit === '♦' ? 'red' : 'black');
+        $('card-val').textContent = cd.value;
+
+        // rule
+        $('rule-name').textContent = I.rule(x, y).name;
+
+        // input
+        const inp = I.input(x, y);
+        $('in-ch').textContent = inp.channel;
+        $('in-btn').textContent = inp.button;
+
+        // pixel
+        const pxn = I.pixel(x, y);
+        $('px-x').textContent = fmt(pxn.x);
+        $('px-y').textContent = fmt(pxn.y);
+        $('px-hex').textContent = pxn.hex;
+        $('px-sw').style.background = pxn.hex;
+
+        // overlay
+        paintSurface();
+        paintCrosshair(x, y);
+      }
+
+      // ── Pointer wiring ──────────────────────────────────────────────
+      function fromPointer(ev) {
+        const r = canvas.getBoundingClientRect();
+        const px = (ev.clientX - r.left) / r.width;
+        const py = (ev.clientY - r.top) / r.height;
+        const x = Math.max(0, Math.min(1, px));
+        const y = Math.max(0, Math.min(1, 1 - py));
+        observe(x, y);
+      }
+      canvas.addEventListener('pointermove', fromPointer);
+      canvas.addEventListener('pointerdown', fromPointer);
+
+      // First paint
+      paintSurface();
+      observe(0.5, 0.5);
+    })();
+  </script>
+</body>
+
+</html>

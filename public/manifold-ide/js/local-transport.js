@@ -150,7 +150,7 @@ export function createTransport() {
 
 // ── Browser fallbacks (remote / no local server) ──────────────────────────────
 // These use the browser File System Access API and sandboxed workers.
-// Credentials are NOT available here — the proxy falls through to the engine.
+// Credentials are NOT available here: the proxy falls through to the engine.
 const BrowserFS = {
   _root: null,
 

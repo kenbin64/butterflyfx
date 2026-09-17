@@ -5,7 +5,7 @@
 // Each user runs their own instance on their own machine.
 // Credentials never leave the machine.
 //
-// Zero dependencies — pure Node.js built-ins only.
+// Zero dependencies: pure Node.js built-ins only.
 //
 // Usage:
 //   node local-server.js            # start on default port 3131
@@ -67,7 +67,7 @@ const MIME = {
 
 // Provider proxy map: name -> default base URL.
 const PROVIDERS = {
-  // Local GPU — Qwen via Ollama. Install: https://ollama.com
+  // Local GPU: Qwen via Ollama. Install: https://ollama.com
   // Pull a model: ollama pull qwen2.5:7b
   // Fibonacci tier sizes: 1.5b  3b  7b  14b  32b  72b
   ollama:    'http://localhost:11434/v1',
@@ -268,7 +268,7 @@ function handleHealth(req, res) {
     if (k.startsWith('_')) continue;
     sources[k] = !!(v.apiKey || v.token || v.apiBase || v.wsUrl);
   }
-  // GPU detection is async — fire and return cached result.
+  // GPU detection is async: fire and return cached result.
   detectGPU().then(gpu => {
     json(res, { ok: true, version: '1.0.0', port: PORT, sources, gpu });
   }).catch(() => {

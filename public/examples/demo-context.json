@@ -1,0 +1,35 @@
+{
+  "source": "demo-project",
+  "root": "058c0dd9",
+  "tokens": 107,
+  "savedTokens": 39,
+  "files": [
+    {
+      "path": "README.md",
+      "hash": "03d0b75d",
+      "bytes": 175,
+      "dupOf": null,
+      "text": "# Demo Project\n\nA tiny sample so you can see exactly what `bfx-ingest` produces.\n\nNote: `lib/util.js` and `helpers/util.js` are identical on purpose, to show dedup in action.\n"
+    },
+    {
+      "path": "helpers/util.js",
+      "hash": "c3ce6374",
+      "bytes": 156,
+      "dupOf": null,
+      "text": "// Shared helper.\nfunction slugify(s) {\n  return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');\n}\nmodule.exports = { slugify };\n"
+    },
+    {
+      "path": "index.js",
+      "hash": "55fdca65",
+      "bytes": 95,
+      "dupOf": null,
+      "text": "const { slugify } = require('./lib/util');\n\nconsole.log(slugify('Hello, ButterflyFx World!'));\n"
+    },
+    {
+      "path": "lib/util.js",
+      "hash": "c3ce6374",
+      "bytes": 156,
+      "dupOf": "helpers/util.js"
+    }
+  ]
+}

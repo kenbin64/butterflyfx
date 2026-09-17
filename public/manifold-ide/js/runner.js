@@ -36,7 +36,7 @@ class JSWorkerRunner {
       };
       this.worker.postMessage({ code });
 
-      // Hard timeout — protects against infinite loops.
+      // Hard timeout: protects against infinite loops.
       setTimeout(() => {
         if (this.worker) {
           onLog?.('warn', '⏱ killed after 10s timeout');
@@ -128,7 +128,7 @@ export class Runner {
     if (lang === 'python') return this.py.run(code, onLog);
     if (lang === 'javascript') return this.js.run(code, onLog);
     if (lang === 'typescript') {
-      // Naive TS strip — enough for ad-hoc scripts. For real TS use a worker compiler.
+      // Naive TS strip: enough for ad-hoc scripts. For real TS use a worker compiler.
       const stripped = code
         .replace(/:\s*[A-Za-z_$][\w$<>,[\]\s|&?]*(?=[=,)\];])/g, '')
         .replace(/\binterface\s+\w+\s*\{[^}]*\}/g, '')

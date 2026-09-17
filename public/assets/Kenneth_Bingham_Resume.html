@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<style>
+@page { size: letter; margin: 0.5in 0.7in; }
+* { box-sizing: border-box; }
+body { font-family: Calibri, "Segoe UI", Arial, sans-serif; font-size: 10.5pt;
+       line-height: 1.3; color: #111; margin: 0; }
+h1 { text-align: center; font-size: 22pt; margin: 0 0 2pt; }
+.role { text-align: center; font-weight: bold; font-size: 11pt; margin: 0 0 2pt; }
+.contact { text-align: center; font-size: 9.5pt; margin: 0 0 8pt; color: #333; }
+h2 { font-size: 12pt; text-transform: uppercase; letter-spacing: .04em;
+      border-bottom: 1px solid #888; padding-bottom: 2pt; margin: 12pt 0 5pt; }
+h3 { font-size: 11pt; margin: 8pt 0 1pt; }
+p { margin: 0 0 5pt; }
+ul { margin: 2pt 0 6pt; padding-left: 18pt; }
+li { margin: 0 0 3pt; }
+</style></head><body>
+<h1>Kenneth W. Bingham</h1>
+<div class="role">AI Engineer | Backend &amp; Platform Engineer</div>
+<div class="contact">Kaysville, UT | ken.bingham64@gmail.com | linkedin.com/in/kenneth-bingham-11378b10 | github.com/kenbin64</div>
+<h2>SUMMARY</h2>
+<p>Software engineer with 10+ years building reliable systems end to end. Focused on the reliability layer around large language models: deterministic pipelines, evaluation harnesses, structured-output validation, and cost-aware model routing. Comfortable owning a problem from architecture through production deployment, with a track record of shipping tested, reproducible systems. Seeking an AI engineering or backend/platform role where reliability and cost-efficiency matter.</p>
+<h2>CORE SKILLS</h2>
+<p><strong>Languages:</strong> JavaScript / TypeScript, Python, SQL, C# / .NET, Java, GLSL</p>
+<p><strong>AI / LLM:</strong> LLM integration, RAG, prompt engineering, evaluation harnesses, structured outputs, tool / function calling, model routing, prompt caching, token budgeting</p>
+<p><strong>Backend &amp; Infra:</strong> Node.js, Express, REST, WebSockets, PostgreSQL, SQLite, Linux, nginx, CI/CD (GitHub Actions), Docker, PM2, zero-downtime deploys</p>
+<p><strong>Practices:</strong> Event sourcing, content-addressed storage, deterministic replay, automated testing, observability</p>
+<h2>SELECTED ENGINEERING PROJECTS</h2>
+<h3>bfx-ingest - Deterministic LLM Context Tool (Open Source)</h3>
+<ul><li>Built a zero-dependency CLI that assembles deterministic, content-addressed context from a codebase, deduplicating by content hash to cut token usage and produce a reproducible root hash for pinned evals and prompt-cache hits.</li><li>Emits model-specific formats (Markdown / XML / JSON) with token estimates; covered by automated tests with CI across four Node.js versions; MIT licensed.</li></ul>
+<h3>Zero-Downtime Deployment System</h3>
+<ul><li>Designed an atomic, content-addressed release pipeline: each deploy is hashed into a verifiable manifest, promoted by an atomic symlink swap, health-checked, and automatically rolled back on failure.</li><li>Replaced in-place rsync deploys (which left the site broken on partial failure) with immutable releases and one-command rollback; integrated with GitHub Actions CI/CD across multiple domains.</li></ul>
+<h3>Deterministic Multiplayer Game Platform - KensGames</h3>
+<ul><li>Built real-time multiplayer netcode using event sourcing: game state is derived from a seed and an append-only command log, so every client replays identical events and converges on byte-identical state, eliminating an entire class of state-divergence bugs.</li><li>Full-stack ownership: WebGL2 / Three.js rendering, Node.js / WebSocket backend, deployed and operated on a self-managed Linux VPS.</li></ul>
+<h3>ButterflyFx - Reproducible State Runtime (Open Source)</h3>
+<ul><li>Built a small event-sourcing runtime that wraps any reducer to provide content-addressed, hash-chained, tamper-evident state with deterministic replay, making reproducibility and auditability architectural properties; each property covered by tests.</li></ul>
+<h2>EXPERIENCE</h2>
+<h3>Independent Software Engineer | 2020 - Present</h3>
+<ul><li>Designed and shipped end-to-end systems solo: a deterministic multiplayer platform, a reproducible CI/CD deployment pipeline, and open-source developer tools (see projects above).</li><li>Concentrated on the reliability, reproducibility, and cost-efficiency of LLM-backed systems.</li></ul>
+<h3>[FILL: Title] | [FILL: Company] | [FILL: start - end]</h3>
+<ul><li>[FILL: a concrete accomplishment in standard terms, with a number if possible]</li><li>[FILL: a second accomplishment showing scope or ownership]</li></ul>
+<h2>EDUCATION</h2>
+<h3>[FILL: Degree or relevant coursework] | [FILL: School] | [FILL: year]</h3>
+</body></html>

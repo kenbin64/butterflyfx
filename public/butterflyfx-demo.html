@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ButterflyFx - reproducible, tamper-evident state (live demo) | ButterflyFx</title>
+  <meta name="description"
+    content="A live, interactive demo of the ButterflyFx event-sourcing runtime: state derived from a seed and an append-only, hash-chained log. Reproducible, auditable, and tamper-evident by construction.">
+  <link rel="canonical" href="https://butterflyfx.us/butterflyfx-demo.html">
+
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    .demo-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 0.6rem; }
+    @media (max-width: 820px) { .demo-wrap { grid-template-columns: 1fr; } }
+    .panel {
+      background: rgba(10, 15, 30, 0.6);
+      border: 1px solid rgba(120, 180, 255, 0.18);
+      border-radius: 12px;
+      padding: 1.1rem 1.2rem;
+    }
+    .panel h3 { margin: 0 0 0.6rem; font-size: 1.05rem; color: #58e0ff; }
+    .btnrow { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.6rem; }
+    .demo-btn {
+      background: rgba(40, 70, 130, 0.55);
+      border: 1px solid rgba(120, 180, 255, 0.35);
+      color: #dceaff; border-radius: 8px; padding: 0.45rem 0.8rem;
+      font: inherit; font-size: 0.9rem; cursor: pointer; transition: all 0.13s ease;
+    }
+    .demo-btn:hover { border-color: #58e0ff; background: rgba(60, 100, 170, 0.6); }
+    .demo-btn.warn { border-color: rgba(255, 120, 120, 0.5); }
+    .demo-btn.warn:hover { background: rgba(150, 50, 50, 0.5); }
+    .balance { font-size: 2.1rem; font-weight: 700; color: #35ff7a; line-height: 1.1; }
+    .balance.viewing { color: #ffd700; }
+    .muted { opacity: 0.78; font-size: 0.86rem; }
+    table.log { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin-top: 0.3rem; }
+    table.log th, table.log td { text-align: left; padding: 0.3rem 0.4rem; border-bottom: 1px solid rgba(120,180,255,0.12); }
+    table.log th { color: #9fb6dd; font-weight: 600; }
+    .mono { font-family: Consolas, "SFMono-Regular", Menlo, monospace; }
+    .hashpill { color: #58e0ff; }
+    .ok { color: #35ff7a; font-weight: 700; }
+    .bad { color: #ff7a7a; font-weight: 700; }
+    .rejected td { opacity: 0.55; }
+    input[type=range] { width: 100%; }
+    .status { margin-top: 0.6rem; font-size: 0.9rem; min-height: 1.3em; }
+    .headbox { margin-top: 0.6rem; font-size: 0.85rem; }
+  </style>
+</head>
+
+<body>
+  <canvas id="spiral-bg"></canvas>
+
+  <nav class="navbar glass">
+    <a href="index.html">Home</a>
+    <a href="index.html#work">Work</a>
+    <a href="bfx-ingest.html">bfx-ingest</a>
+    <a href="butterflyfx-demo.html" class="active">ButterflyFx</a>
+    <a href="resume.html">Resume</a>
+    <a href="contact.html">Contact</a>
+    <a href="https://github.com/kenbin64" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+
+  <div class="content">
+
+    <section class="hero glass">
+      <div class="hero-title">ButterflyFx runtime</div>
+      <div class="hero-subtitle">Reproducible, auditable, tamper-evident state &middot; live and interactive</div>
+      <div class="hero-tagline">
+        Most bugs in distributed and AI systems come from one thing: state that is <b>mutated in place</b>, so you can't
+        reproduce it, replay it, or trust it. ButterflyFx wraps any reducer and derives state from a seed and an
+        append-only, hash-chained log instead. Click below and watch the guarantees hold.
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">The problem, and the fix</h2>
+      <div class="section-content">
+        <p>
+          <strong>Problem:</strong> when you store and mutate state, you lose the ability to answer "how did we get
+          here?" A bug you can't reproduce is a bug you can't fix, and in a distributed or probabilistic system that
+          question is everything.
+        </p>
+        <p>
+          <strong>Solution:</strong> derive, never store. Keep one source of truth (a seed plus an ordered log of what
+          happened) and compute every state as a pure fold over it. That single discipline makes state reproducible
+          (same inputs, same bytes), auditable (time-travel to any point), and tamper-evident (the log is hash-chained,
+          so altering the past is detectable). This is event sourcing, and the demo below is the real runtime, not a mockup.
+        </p>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">Live demo: an account ledger</h2>
+      <div class="section-content">
+        <p class="muted">Every button dispatches an action. State is never stored; it is re-derived from the log on
+          every render. Try to overdraw and watch the reducer reject it, so it never enters the record.</p>
+
+        <div class="demo-wrap">
+          <div class="panel">
+            <h3>Do things</h3>
+            <div class="btnrow">
+              <button class="demo-btn" data-act="deposit" data-amt="10">Deposit $10</button>
+              <button class="demo-btn" data-act="deposit" data-amt="50">Deposit $50</button>
+              <button class="demo-btn" data-act="withdraw" data-amt="30">Withdraw $30</button>
+              <button class="demo-btn" data-act="withdraw" data-amt="1000">Withdraw $1000</button>
+            </div>
+            <div id="balance" class="balance">$0</div>
+            <div id="balanceLabel" class="muted">current balance (derived from the log)</div>
+
+            <div style="margin-top:1rem;">
+              <div class="muted">Time-travel: view the state at any point in history.</div>
+              <input type="range" id="travel" min="0" max="0" value="0">
+              <div id="travelLabel" class="muted">viewing the latest state</div>
+            </div>
+
+            <div class="headbox">
+              <div class="muted">Head hash (a Merkle-style root of the entire history):</div>
+              <div class="mono hashpill" id="head">-</div>
+            </div>
+
+            <div class="btnrow" style="margin-top:0.9rem;">
+              <button class="demo-btn" id="verifyBtn">Verify integrity</button>
+              <button class="demo-btn warn" id="tamperBtn">Tamper with the record</button>
+              <button class="demo-btn" id="resetBtn">Reset</button>
+            </div>
+            <div class="status" id="status"></div>
+          </div>
+
+          <div class="panel">
+            <h3>The append-only, hash-chained log</h3>
+            <div class="muted">This <em>is</em> the source of truth. Nothing happens off this log.</div>
+            <table class="log">
+              <thead><tr><th>#</th><th>action</th><th>resulting hash</th></tr></thead>
+              <tbody id="logBody"></tbody>
+            </table>
+            <div id="logEmpty" class="muted" style="margin-top:0.5rem;">No actions yet. Press a button.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">Why you can trust it</h2>
+      <div class="pillars-grid">
+        <article class="pillar-card span-2x2">
+          <h3>Tamper-evident</h3>
+          <p>Each log entry binds the previous hash, the action, and the resulting state. Change any past action and the
+            head hash changes, so a trusted head proves the whole history. The "Tamper" button shows it: edit one past
+            action and verification fails.</p>
+        </article>
+        <article class="pillar-card">
+          <h3>Reproducible</h3>
+          <p>State is a fold over (seed, log). Same inputs give byte-identical state on any machine. Nothing is stored that cannot be recomputed.</p>
+        </article>
+        <article class="pillar-card">
+          <h3>Auditable</h3>
+          <p>The log is the full ordered history. Time-travel to any prefix. Rejected actions never enter the record at all.</p>
+        </article>
+        <article class="pillar-card">
+          <h3>Open and tested</h3>
+          <p>One small runtime, MIT licensed, covered by tests. The exact file powering this page is <span class="mono">butterflyfx.js</span> in the repo.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">About this project</h2>
+      <div class="section-content">
+        <p>
+          ButterflyFx is free and open source, a personal portfolio piece demonstrating reproducibility and
+          auditability as architectural properties rather than afterthoughts. It is not a commercial product or a
+          service for sale. I am seeking a full-time AI engineering role.
+        </p>
+        <div class="hero-cta">
+          <a href="https://github.com/kenbin64" class="cta-btn" target="_blank" rel="noopener">Source on GitHub</a>
+          <a href="contact.html" class="cta-btn alt">Contact for hiring</a>
+          <a href="bfx-ingest.html" class="cta-btn alt">See bfx-ingest</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 Kenneth W. Bingham &middot; ButterflyFx &middot; MIT-licensed open source.</p>
+    </footer>
+  </div>
+
+  <script src="manifold-codec.js"></script>
+  <script src="butterflyfx.js"></script>
+  <script>
+    // The whole demo runs on the real ButterflyFx runtime loaded above.
+    // Your existing logic goes inside reduce(); the runtime gives the guarantees.
+    var spec = {
+      seed: 'ledger-demo',
+      reduce: function (state, action, ctx) {
+        if (state === null) return { balance: 0, count: 0 };
+        if (action.type === 'deposit') {
+          return { balance: state.balance + action.amount, count: state.count + 1 };
+        }
+        if (action.type === 'withdraw') {
+          // Overdraw is rejected: return state UNCHANGED, and the runtime never logs it.
+          if (action.amount > state.balance) return state;
+          return { balance: state.balance - action.amount, count: state.count + 1 };
+        }
+        return state;
+      }
+    };
+
+    var acct = ButterflyFx.forge(spec);
+    var lastRejected = false;
+
+    var $ = function (id) { return document.getElementById(id); };
+    function short(h) { return h ? String(h).slice(0, 16) : '-'; }
+
+    function render(viewingN) {
+      var logArr = acct.log();
+      var total = logArr.length;
+      var travel = $('travel');
+      travel.max = total;
+      if (viewingN === undefined) { travel.value = total; viewingN = total; }
+      var viewing = parseInt(travel.value, 10);
+
+      var st = acct.at(viewing);
+      $('balance').textContent = '$' + st.balance;
+      var atLatest = (viewing === total);
+      $('balance').classList.toggle('viewing', !atLatest);
+      $('balanceLabel').textContent = atLatest
+        ? 'current balance (derived from the log)'
+        : 'balance after ' + viewing + ' of ' + total + ' actions (time-travel)';
+      $('travelLabel').textContent = atLatest ? 'viewing the latest state' : 'viewing step ' + viewing + ' of ' + total;
+
+      $('head').textContent = short(acct.head());
+
+      var body = $('logBody');
+      body.innerHTML = '';
+      for (var i = 0; i < logArr.length; i++) {
+        var e = logArr[i];
+        var tr = document.createElement('tr');
+        var a = e.action;
+        var label = a.type + (a.amount != null ? ' $' + a.amount : '');
+        tr.innerHTML = '<td>' + e.n + '</td><td>' + label + '</td><td class="mono hashpill">' + short(e.hash) + '</td>';
+        body.appendChild(tr);
+      }
+      $('logEmpty').style.display = logArr.length ? 'none' : 'block';
+    }
+
+    document.querySelectorAll('.demo-btn[data-act]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var amt = parseInt(b.getAttribute('data-amt'), 10);
+        var res = acct.dispatch({ type: b.getAttribute('data-act'), amount: amt });
+        $('status').innerHTML = res.ok
+          ? '<span class="ok">accepted</span> and appended to the log.'
+          : '<span class="bad">rejected</span> by the reducer (insufficient funds) - never entered the record.';
+        render();
+      });
+    });
+
+    $('travel').addEventListener('input', function () { render(); });
+
+    $('verifyBtn').addEventListener('click', function () {
+      var v = acct.verify();
+      $('status').innerHTML = v.ok
+        ? '<span class="ok">verify OK</span> - the log re-derives and re-chains cleanly from the seed.'
+        : '<span class="bad">verify FAILED</span> - ' + v.reason + '.';
+    });
+
+    $('tamperBtn').addEventListener('click', function () {
+      var snap = acct.serialize();
+      if (!snap.actions.length) {
+        $('status').innerHTML = 'Add a few actions first, then try to tamper.';
+        return;
+      }
+      // Forge a copy, secretly alter one past action, and check it against the
+      // ORIGINAL trusted head. This is the real load() tamper-check.
+      var tampered = JSON.parse(JSON.stringify(snap));
+      tampered.actions[0] = { type: 'deposit', amount: (tampered.actions[0].amount || 0) + 1000 };
+      var reloaded = ButterflyFx.load(tampered, spec);
+      $('status').innerHTML =
+        'Someone changed action #0 to a $1000 deposit. Trusted head was <span class="mono hashpill">' + short(snap.head) +
+        '</span>; the tampered record re-hashes to <span class="mono hashpill">' + short(reloaded.head()) + '</span>. ' +
+        'Match: <span class="' + (reloaded.snapshotValid ? 'ok">yes' : 'bad">no, tamper detected') + '</span>.';
+    });
+
+    $('resetBtn').addEventListener('click', function () {
+      acct = ButterflyFx.forge(spec);
+      $('status').textContent = '';
+      render();
+    });
+
+    render();
+  </script>
+  <script src="manifold-bg.js" defer></script>
+</body>
+
+</html>

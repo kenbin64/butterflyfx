@@ -1,4 +1,4 @@
-/* theme.css — layered AFTER style.css.
+/* theme.css: layered AFTER style.css.
    Palette: cyan / green / purple / gold on deep-space substrate.
    Golden-ratio spacing.  Contrast tuned for readability over the
    live manifold-bg.js raymarched surface. */
@@ -6,7 +6,7 @@
 :root {
   --phi:        1.6180339887;
 
-  /* Base substrate — deep space, slightly violet */
+  /* Base substrate: deep space, slightly violet */
   --bg-0:       #06060f;
   --bg-1:       #0c0a1c;
 
@@ -43,7 +43,7 @@ html, body {
   z-index: 0 !important;
 }
 
-/* Glass panels — darker + crisp edge → text always wins ------------- */
+/* Glass panels: darker + crisp edge → text always wins ------------- */
 .glass, .hero, .section, .route-section, .demo, .result-card, .layer-card,
 .project-card, .contact-form, .navbar {
   background: var(--panel) !important;
@@ -55,7 +55,7 @@ html, body {
 }
 
 /* Project / service / details cards lived on a white background in
-   the legacy stylesheet — restore them to the dark substrate so text
+   the legacy stylesheet: restore them to the dark substrate so text
    doesn't disappear over the manifold. */
 .project-card, .service-card, .details-card, .layer-card, .result-card {
   color: var(--t-primary) !important;
@@ -76,7 +76,7 @@ html, body {
   box-shadow: 0 calc(8px * var(--phi)) calc(40px * var(--phi)) rgba(124, 92, 255, 0.35) !important;
 }
 
-/* Typography accents — assign one color per role -------------------- */
+/* Typography accents: assign one color per role -------------------- */
 .hero-title, .section-title, h1, h2 { color: var(--c-gold)   !important; text-shadow: 0 1px 16px rgba(0,0,0,0.6); }
 .hero-subtitle, h3                  { color: var(--c-cyan)   !important; }
 .hero-role, h4                      { color: var(--c-green)  !important; }
@@ -91,7 +91,7 @@ strong, b                          { color: var(--t-primary)   !important; }
 a               { color: var(--c-cyan); }
 a:hover, a:focus{ color: var(--c-gold); }
 
-/* Navbar — clearer state, golden-ratio padding ---------------------- */
+/* Navbar: clearer state, golden-ratio padding ---------------------- */
 .navbar a {
   color: var(--c-cyan) !important;
   padding: 6px 10px !important;
@@ -102,7 +102,7 @@ a:hover, a:focus{ color: var(--c-gold); }
   color: var(--bg-0) !important;
 }
 
-/* CTAs — gradient across the four-color palette --------------------- */
+/* CTAs: gradient across the four-color palette --------------------- */
 .cta-btn {
   background: linear-gradient(95deg, var(--c-cyan) 0%, var(--c-green) 40%,
                                      var(--c-gold) 70%, var(--c-purple) 100%) !important;
@@ -116,7 +116,7 @@ a:hover, a:focus{ color: var(--c-gold); }
   box-shadow: 0 6px 28px rgba(255, 209, 102, 0.45) !important;
 }
 
-/* Routing-page demo overrides — keep the inline styles legible ------ */
+/* Routing-page demo overrides: keep the inline styles legible ------ */
 .route-section h2 { color: var(--c-gold)  !important; }
 .route-section h3 { color: var(--c-green) !important; }
 .demo-row label   { color: var(--c-cyan)  !important; }
@@ -137,7 +137,7 @@ footer, footer * { color: var(--t-muted) !important; }
 /* Selection */
 ::selection { background: var(--c-purple); color: var(--bg-0); }
 
-/* Reduced motion — keep canvas but kill the time-driven palette swirl */
+/* Reduced motion: keep canvas but kill the time-driven palette swirl */
 @media (prefers-reduced-motion: reduce) {
   #spiral-bg { opacity: 0.55 !important; }
 }

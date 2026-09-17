@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kenneth W. Bingham - AI Engineer, Backend &amp; Platform Engineer</title>
+  <meta name="description" content="Kenneth W. Bingham, AI and backend engineer. The reliability layer around LLMs: deterministic pipelines, evaluation harnesses, reproducibility. Working apps with real numbers, not promises.">
+  <meta name="robots" content="index, follow">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="carousel.css">
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    .ataglance{display:grid;grid-template-columns:1fr 1fr;gap:1.4em;margin-top:0.5em}
+    @media(max-width:680px){.ataglance{grid-template-columns:1fr}}
+    .ataglance h3{font-size:0.8em;text-transform:uppercase;letter-spacing:0.06em;opacity:0.6;margin:0 0 6px}
+    .ataglance p{margin:0;opacity:0.9;line-height:1.55;font-size:0.98em}
+    .skills-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .chip{font-size:0.82em;border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:3px 10px;opacity:0.92;font-family:ui-monospace,monospace}
+    .badge{display:inline-block;font-size:0.78em;font-family:ui-monospace,monospace;color:#7fffcf;border:1px solid rgba(127,255,207,0.35);border-radius:6px;padding:2px 8px;margin:2px 0 8px}
+    .proof-note{opacity:0.6;font-size:0.85em;margin:0 0 1em}
+  </style>
+</head>
+
+<body>
+  <canvas id="spiral-bg"></canvas>
+
+  <nav class="navbar glass">
+    <a href="index.html" class="active">Home</a>
+    <a href="#proof">Work</a>
+    <a href="directing-ai.html">Directing AI</a>
+    <a href="resume.html">Resume</a>
+    <a href="contact.html">Contact</a>
+    <a href="https://github.com/kenbin64" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+
+  <div class="content">
+
+    <section class="hero glass">
+      <img src="kennethbingham.webp" alt="Kenneth W. Bingham" class="hero-photo" />
+      <div class="hero-title">Kenneth W. Bingham</div>
+      <div class="hero-subtitle">AI Engineer &middot; Full-Stack &middot; Backend &amp; Platform Engineer</div>
+      <div class="hero-role">Kaysville, UT &middot; Open to full-time and remote</div>
+      <div class="hero-tagline">
+        I build the <b>reliability layer around AI</b>: deterministic pipelines, evaluation harnesses, and reproducible,
+        cost-efficient systems. Every project below runs, is tested, and has a working example you can open and re-run.
+      </div>
+      <div class="hero-cta">
+        <a href="assets/Kenneth_Bingham_Resume.pdf" class="cta-btn" download>Download resume (PDF)</a>
+        <a href="contact.html" class="cta-btn alt">Contact</a>
+        <a href="https://www.linkedin.com/in/kenneth-bingham-11378b10" class="cta-btn alt" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">At a glance</h2>
+      <div class="ataglance">
+        <div>
+          <h3>What I do</h3>
+          <p>AI and backend engineer focused on making LLM systems reliable: reproducible pipelines, evaluation and
+            verification harnesses, cost control, and deterministic state. Full-stack from database to cloud deploy.</p>
+        </div>
+        <div>
+          <h3>Experience</h3>
+          <p>4 years building and running Azure DevOps CI/CD pipelines, plus GitHub Actions. Ship end to end: schema and
+            API, modern front end (Angular, React), and the deploy that puts it in production.</p>
+        </div>
+      </div>
+      <div class="skills-row" style="margin-top:1.1em">
+        <span class="chip">Python</span><span class="chip">Node.js</span><span class="chip">JavaScript</span>
+        <span class="chip">Rust</span><span class="chip">Angular</span><span class="chip">React</span>
+        <span class="chip">PostgreSQL</span><span class="chip">SQL Server</span><span class="chip">SQLite</span>
+        <span class="chip">Azure DevOps</span><span class="chip">GitHub Actions</span><span class="chip">Docker</span>
+        <span class="chip">Linux</span><span class="chip">nginx</span><span class="chip">LLM / RAG</span>
+        <span class="chip">evals</span><span class="chip">prompt caching</span><span class="chip">WebGL</span>
+      </div>
+    </section>
+
+    <section class="section glass" id="proof">
+      <h2 class="section-title">Proof: working software</h2>
+      <p class="proof-note">Each one runs, is tested, and carries a real number or a live link. Open them.</p>
+      <div class="projects-grid">
+
+        <div class="project-card">
+          <h3>The Conduit</h3>
+          <span class="badge">123 automated tests &middot; deterministic</span>
+          <p class="project-summary">A water-system telemetry, health-monitoring, and compliance platform. One health
+            number per station on <span class="math">z = x &middot; y</span>, a signed go-live gate, a tamper-evident
+            audit, and a dependency-free 3D network view with selectable system types. Plain JavaScript, no frameworks.</p>
+          <a href="https://theconduit.me" class="cta-btn" target="_blank" rel="noopener">Open the live demo</a>
+        </div>
+
+        <div class="project-card">
+          <h3>kensgames &middot; Fast Track</h3>
+          <span class="badge">503 paths, 0 teleports &middot; deterministic multiplayer</span>
+          <p class="project-summary">A 3D browser game portal. Fast Track is a board-race game on a formal rules engine,
+            consolidated into one source of truth and covered by an automated suite that proves path integrity and that
+            both clients deal byte-identical decks from one seed.</p>
+          <a href="https://kensgames.com" class="cta-btn" target="_blank" rel="noopener">Play the demo</a>
+        </div>
+
+        <div class="project-card">
+          <h3>bfx-ingest</h3>
+          <span class="badge">1,593 files &middot; ~4.55M tokens &middot; same input, same hash</span>
+          <p class="project-summary">One command turns a whole repo into a clean, deterministic, token-counted context
+            artifact for an LLM, so you never overflow the window blind and the same input always reproduces.</p>
+          <a href="bfx-ingest.html" class="cta-btn">See it &amp; download examples</a>
+        </div>
+
+        <div class="project-card">
+          <h3>Hallucination verifier</h3>
+          <span class="badge">hallucinated outputs 39% &rarr; 0%</span>
+          <p class="project-summary">A deterministic verifier wrapped around generation: candidates are checked and the
+            bad ones rejected, so the rate of unverifiable output reaching the user drops to zero while best-of-N keeps the
+            answer rate high. Measured, reproducible, stdlib only.</p>
+          <a href="directing-ai.html" class="cta-btn alt">How it works</a>
+        </div>
+
+        <div class="project-card">
+          <h3>ButterflyFx runtime</h3>
+          <span class="badge">tamper-evident &middot; hash-chained</span>
+          <p class="project-summary">Wrap any reducer and state becomes a fold over a seed and an append-only,
+            hash-chained log: reproducible, auditable, and tamper-evident by construction. Edit the past and the hash breaks.</p>
+          <a href="butterflyfx-demo.html" class="cta-btn">Try the live demo</a>
+        </div>
+
+        <div class="project-card">
+          <h3>Zero-downtime deploys</h3>
+          <span class="badge">atomic releases &middot; auto-rollback</span>
+          <p class="project-summary">Content-addressed releases promoted by symlink swap, health-checked after the swap,
+            automatically rolled back on failure, with one-command manual rollback. The same system serves the sites linked here.</p>
+          <a href="https://github.com/kenbin64" class="cta-btn" target="_blank" rel="noopener">Read the source</a>
+        </div>
+
+        <div class="project-card">
+          <h3>Create-Directive &amp; Create-Agent</h3>
+          <span class="badge">client-side &middot; nothing uploaded</span>
+          <p class="project-summary">Two browser tools: turn a few answers into a versioned directive an AI must obey, or
+            scaffold an agent around one disciplined sample, evaluate, publish, verify loop. Download a spec you paste
+            straight into ChatGPT or Claude.</p>
+          <a href="create-directive.html" class="cta-btn">Build a directive</a>
+          <a href="create-agent.html" class="cta-btn alt">Build an agent</a>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">How I work: directing AI</h2>
+      <p style="margin:0 0 1em;opacity:0.9;line-height:1.6">
+        I get this quality out of a stock model by directing the instance, not by hoping. An explicit operating directive,
+        hard constraints (simulation only, no fabricated data, no claim without proof), and verification at each step keep
+        the model on track and out of drift. The verifier above is that idea reduced to a number: structure takes
+        hallucinated output to zero. It is repeatable on any capable model, no fine-tuning required.
+      </p>
+      <a href="directing-ai.html" class="cta-btn">See exactly how, with the directives</a>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">Skills</h2>
+      <div class="pillars-grid">
+        <article class="pillar-card">
+          <h3>AI / LLM reliability</h3>
+          <p>Deterministic context pipelines, evaluation and verification harnesses, prompt caching for cost, retrieval, and directive-driven agents that stay on track.</p>
+        </article>
+        <article class="pillar-card">
+          <h3>Backend &amp; infrastructure</h3>
+          <p>Node.js, Python, Rust, REST, WebSockets, PostgreSQL, SQL Server, SQLite, Linux, nginx, Docker, zero-downtime deploys.</p>
+        </article>
+        <article class="pillar-card">
+          <h3>Full-stack, database to cloud</h3>
+          <p>Schema and queries, API, modern front end (Angular, React), then CI/CD to the cloud. 4 years on Azure DevOps pipelines plus GitHub Actions.</p>
+        </article>
+        <article class="pillar-card">
+          <h3>Reproducibility &amp; provenance</h3>
+          <p>Content-addressed, hash-verified, deterministic replay, so you can prove exactly what a system did and recreate it on any machine.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">Looking for my next role</h2>
+      <p style="margin:0 0 1.2em;opacity:0.9;line-height:1.6">
+        I am seeking a full-time AI engineering or backend and platform role, open to remote. The projects here are
+        personal portfolio pieces, built end to end to demonstrate the work. They are not products for sale.
+        Independent research and the geometric theory behind some of this lives separately at
+        <a href="https://dimensionalprogramming.com" target="_blank" rel="noopener">dimensionalprogramming.com</a>.
+      </p>
+      <div class="hero-cta">
+        <a href="contact.html" class="cta-btn">Contact for hiring</a>
+        <a href="mailto:ken.bingham64@gmail.com" class="cta-btn alt">ken.bingham64@gmail.com</a>
+        <a href="resume.html" class="cta-btn alt">Resume</a>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 Kenneth W. Bingham &middot; ButterflyFx</p>
+    </footer>
+  </div>
+
+  <script src="manifold-bg.js" defer></script>
+</body>
+
+</html>

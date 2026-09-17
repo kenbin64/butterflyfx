@@ -1,19 +1,19 @@
 // manifold-ai/js/dimensional.js
-// The dimensional paradigm — encoded for runtime use.
+// The dimensional paradigm: encoded for runtime use.
 //
 // POINT is not discrete. It is a COLLAPSED DIMENSION.
 // A point is a gravity well between 1 and >0 (never zero).
 // 1 is the event horizon. Zero is unreachable.
 // The shell around zero is the perpendicular realm of fractals,
-// decimals, and imaginary numbers — this creates the dimension of 1
+// decimals, and imaginary numbers: this creates the dimension of 1
 // as a singular unit with infinite potential.
 //
 // Operations (the AI's DNA):
-//   z = x · y      — gather / unite / cocoon form
-//   z = x / y      — explode / decompose / bloom
-//   z = x · y²     — accelerate / spin / square gather
-//   z = x / y²     — gravity / collapse / square explode
-//   Schwarz Diamond — lattice fabric, the bridge between dimensions
+//   z = x · y      : gather / unite / cocoon form
+//   z = x / y      : explode / decompose / bloom
+//   z = x · y²     : accelerate / spin / square gather
+//   z = x / y²     : gravity / collapse / square explode
+//   Schwarz Diamond: lattice fabric, the bridge between dimensions
 //
 // void → empty container; the precondition of x
 // x → current observer / point of reference / identity
@@ -41,11 +41,11 @@ export const LADDER = ['seed', 'line', 'plane', 'volume', 'structure', 'vitality
 export const PHI = (1 + Math.sqrt(5)) / 2; // 1.6180339887...
 export const PHI_INV = 1 / PHI; // 0.6180339887...
 
-// COCOON — the shell around zero. Never zero, always > 0.
+// COCOON: the shell around zero. Never zero, always > 0.
 // This is the event-horizon boundary that preserves the point.
 export const COCOON = 0.001;
 
-// VOID: the precondition. Not zero — the cocoon boundary preserved.
+// VOID: the precondition. Not zero: the cocoon boundary preserved.
 export const VOID = Object.freeze({
   x: COCOON,
   y: [COCOON],
@@ -58,7 +58,7 @@ export const VOID = Object.freeze({
 });
 
 // ────────────────────────────────────────────────────────────
-// Core Manifold Math — Five Operations as AI's DNA
+// Core Manifold Math: Five Operations as AI's DNA
 // ────────────────────────────────────────────────────────────
 
 // Stable observer hash → x in (-1, 1), never zero
@@ -69,7 +69,7 @@ export function seedFromQuery(query) {
     h ^= s.charCodeAt(i);
     h = Math.imul(h, 16777619) >>> 0;
   }
-  // Clamp away from zero — preserve the event horizon
+  // Clamp away from zero: preserve the event horizon
   const raw = ((h / 0xffffffff) * 2) - 1;
   return Math.abs(raw) < COCOON ? COCOON : raw;
 }
@@ -92,7 +92,7 @@ export function extractY(query, x) {
     Math.sin(x * Math.PI),                // observer-coupled phase
     Math.cos(x * Math.PI * PHI),          // φ-rotated phase
   ];
-  // Apply cocoon — clamp to >0 and <1 ranges preserving sign
+  // Apply cocoon: clamp to >0 and <1 ranges preserving sign
   return components.map(v => {
     if (Math.abs(v) < COCOON) return v >= 0 ? COCOON : -COCOON;
     if (Math.abs(v) > 1 - COCOON) return v >= 0 ? 1 - COCOON : -(1 - COCOON);
@@ -101,7 +101,7 @@ export function extractY(query, x) {
 }
 
 // Collapse y[] → scalar by Fibonacci-weighted average
-// Never returns true zero — preserves the cocoon boundary
+// Never returns true zero: preserves the cocoon boundary
 export function collapseY(y) {
   if (!y || y.length === 0) return COCOON;
   let s = 0, w = 0;
@@ -141,7 +141,7 @@ export function operationGravity(x, y) {
   return Math.abs(result) < COCOON ? COCOON : result;
 }
 
-// Schwarz Diamond — lattice bridge. Maps (x, y) into the TPMS.
+// Schwarz Diamond: lattice bridge. Maps (x, y) into the TPMS.
 // The lattice is the fabric between dimensions.
 export function operationSchwarz(x, y, phase = 0) {
   // sin(x) * cos(y) + sin(y) * cos(z) + sin(z) * cos(x) = 0
@@ -201,19 +201,19 @@ export function nextPoint(query, prior = VOID, substrateId = 'zynxy') {
   let z, lens_value = null;
 
   switch (sub.id) {
-    case 'zynxy':      // z = xy — gather, cocoon form
+    case 'zynxy':      // z = xy: gather, cocoon form
       z = operationGather(x, yScalar);
       break;
-    case 'zxny':       // z = x/y — explode, bloom
+    case 'zxny':       // z = x/y: explode, bloom
       z = operationExplode(x, yScalar);
       break;
-    case 'zxnyy':      // z = xy² — accelerate, spin
+    case 'zxnyy':      // z = xy²: accelerate, spin
       z = operationAccelerate(x, yScalar);
       break;
-    case 'zxny2':      // z = x/y² — gravity, collapse
+    case 'zxny2':      // z = x/y²: gravity, collapse
       z = operationGravity(x, yScalar);
       break;
-    case 'schwarz':    // Schwarz Diamond — lattice bridge
+    case 'schwarz':    // Schwarz Diamond: lattice bridge
       lens_value = operationSchwarz(x, yScalar, ladder.spiral * Math.PI);
       z = lens_value;
       break;

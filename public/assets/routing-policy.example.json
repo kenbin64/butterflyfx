@@ -93,8 +93,8 @@
     }
   ],
   "global_rules": [
-    "Don't pay Opus for Sonnet work — if Sonnet would be indistinguishable, Sonnet wins. Cost ratio ~20x.",
-    "Don't pay Sonnet for Haiku work — boilerplate, formatting, simple edits are Haiku-grade. Cost ratio ~10x.",
+    "Don't pay Opus for Sonnet work: if Sonnet would be indistinguishable, Sonnet wins. Cost ratio ~20x.",
+    "Don't pay Sonnet for Haiku work: boilerplate, formatting, simple edits are Haiku-grade. Cost ratio ~10x.",
     "Frontier is for irreversibility, ambiguity, and high context. Everywhere else, frontier is waste.",
     "Always route embeddings to a local model. There is no reason to pay for cloud embeddings.",
     "When stakes >= 0.7, append a verify step using the same or one-tier-up model."

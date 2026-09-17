@@ -1,0 +1,24 @@
+<context source="demo-project" root="058c0dd9" files="4" tokens="107">
+  <file path="README.md" hash="03d0b75d"><![CDATA[
+# Demo Project
+
+A tiny sample so you can see exactly what `bfx-ingest` produces.
+
+Note: `lib/util.js` and `helpers/util.js` are identical on purpose, to show dedup in action.
+
+]]></file>
+  <file path="helpers/util.js" hash="c3ce6374"><![CDATA[
+// Shared helper.
+function slugify(s) {
+  return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+module.exports = { slugify };
+
+]]></file>
+  <file path="index.js" hash="55fdca65"><![CDATA[
+const { slugify } = require('./lib/util');
+
+console.log(slugify('Hello, ButterflyFx World!'));
+
+]]></file>
+</context>

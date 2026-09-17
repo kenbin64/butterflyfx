@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Capstone Engine - preview</title>
+<style>
+:root{--bg:#0a0e15;--panel:#141b25;--edge:#27323f;--txt:#e7eef6;--mut:#8593a3;--cy:#39e6ff;--gr:#5fe39a;--pu:#c9a6ff;--go:#ffcf6b}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% -10%,#13202f,#05070c 60%);color:var(--txt);font-family:"Segoe UI",system-ui,sans-serif;min-height:100vh;line-height:1.55;display:flex;align-items:flex-start;justify-content:center}
+.wrap{max-width:620px;width:100%;padding:48px 22px 70px}
+h1{font-size:30px;margin:0 0 4px;background:linear-gradient(90deg,var(--cy),var(--gr),var(--pu),var(--go));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900}
+.lead{color:var(--cy);font-family:ui-monospace,monospace;font-size:13px;margin-bottom:18px}
+.tag{color:var(--mut);font-size:14.5px}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:20px;margin-top:16px}
+label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);margin:0 0 6px}
+input{width:100%;background:#0c1118;color:#dbe6f2;border:1px solid var(--edge);border-radius:9px;padding:11px 13px;font-size:15px}
+.btn{cursor:pointer;background:var(--cy);color:#06121f;font-weight:800;font-size:15px;border:0;border-radius:11px;padding:12px 22px;margin-top:12px}
+.btn:hover{background:#7fe6ff}
+#msg{margin-top:12px;font-size:13.5px;color:var(--mut);min-height:18px}
+#setup{display:none}
+h2{font-size:16px;margin:22px 0 8px}
+.step{display:flex;gap:10px;margin:8px 0;font-size:14px}.step .n{color:var(--cy);font-weight:800;min-width:18px}
+code{background:#0c1118;border:1px solid var(--edge);border-radius:6px;padding:2px 7px;color:var(--cy);font-size:12.5px;font-family:ui-monospace,monospace}
+a{color:var(--cy)}
+.foot{margin-top:26px;border-top:1px solid var(--edge);padding-top:14px;color:#6c7c8c;font-size:11.5px}
+</style>
+</head>
+<body><div class="wrap">
+  <h1>The Capstone Engine</h1>
+  <div class="lead">Private preview</div>
+  <p class="tag">A reliability instrument for any AI. It runs on your own machine, on your own model or your own cloud key. Enter the password you were given to download it.</p>
+
+  <div class="card">
+    <label>Password</label>
+    <input id="pw" type="password" placeholder="from your invite" onkeydown="if(event.key==='Enter')unlock()">
+    <button class="btn" onclick="unlock()">Unlock and download</button>
+    <div id="msg"></div>
+  </div>
+
+  <div class="card" id="setup">
+    <h2>Set up an AI, then open the app</h2>
+    <p class="tag" style="margin:0 0 10px"><b style="color:var(--gr)">Local (free, private):</b> install <a href="https://ollama.com/download" target="_blank" rel="noopener">Ollama</a>, then run:</p>
+    <div class="step"><span class="n">1</span><code>ollama pull llama3.2:3b</code></div>
+    <div class="step"><span class="n">2</span><code>ollama pull nomic-embed-text</code></div>
+    <div class="step"><span class="n">3</span><span>Run CapstoneEngine.exe and pick "Local (Ollama)".</span></div>
+    <p class="tag" style="margin:12px 0 0"><b style="color:var(--pu)">Cloud:</b> in the app, choose OpenAI or Anthropic and paste your own key. It stays on your machine.</p>
+  </div>
+
+  <div class="foot">Portable, no install. Windows. Reliability is measured, never guaranteed. &copy; Kenneth W. Bingham.</div>
+</div>
+<script>
+async function unlock(){
+  var msg=document.getElementById('msg');
+  var pw=(document.getElementById('pw').value||'').trim();
+  if(!pw){ msg.textContent='Enter the password.'; return; }
+  msg.textContent='Checking...';
+  var buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+  var hex=Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+  var url='/d/'+hex.slice(0,16)+'/CapstoneEngine.exe';
+  try{
+    var r=await fetch(url,{method:'HEAD'});
+    if(r.ok){
+      msg.innerHTML='Password accepted. Your download is starting.';
+      var a=document.createElement('a'); a.href=url; a.download='CapstoneEngine.exe'; document.body.appendChild(a); a.click(); a.remove();
+      document.getElementById('setup').style.display='block';
+    } else { msg.textContent='That password is not right.'; }
+  }catch(e){ msg.textContent='Could not reach the file. Check your connection and try again.'; }
+}
+</script>
+</body>
+</html>

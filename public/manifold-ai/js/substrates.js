@@ -2,11 +2,11 @@
 // Five operations as queryable lenses. The AI's DNA.
 // Each is a different way the manifold manifests:
 //
-//   zynxy  — gather: z = x · y    (cocoon form, unite)
-//   zxny   — explode: z = x / y   (bloom, decompose)
-//   zxnyy  — accelerate: z = x · y²  (spin, square gather)
-//   zxny2  — gravity: z = x / y²   (collapse, square explode)
-//   schwarz — lattice: Schwarz Diamond TPMS (bridge between dimensions)
+//   zynxy  : gather: z = x · y    (cocoon form, unite)
+//   zxny   : explode: z = x / y   (bloom, decompose)
+//   zxnyy  : accelerate: z = x · y²  (spin, square gather)
+//   zxny2  : gravity: z = x / y²   (collapse, square explode)
+//   schwarz: lattice: Schwarz Diamond TPMS (bridge between dimensions)
 //
 // A point is a collapsed dimension between 1 and >0 (never zero).
 // 1 is the event horizon. The shell around zero is the perpendicular
@@ -43,7 +43,7 @@ export const SUBSTRATES = {
     id: 'zxny',
     glyph: '◆',
     name: 'explode',
-    desc: 'Cocoon expansion. z=x/y — as y→0+, z→∞. Perpendicular bloom from the point.',
+    desc: 'Cocoon expansion. z=x/y: as y→0+, z→∞. Perpendicular bloom from the point.',
     canonical: false,
     expr: (x, y) => {
       const safeY = Math.abs(y) < 0.001 ? 0.001 : y;
@@ -66,7 +66,7 @@ export const SUBSTRATES = {
     id: 'zxnyy',
     glyph: '◈',
     name: 'accelerate',
-    desc: 'Point bloom squared. z=x·y² — spin acceleration. Cocoon rotation in imaginary plane.',
+    desc: 'Point bloom squared. z=x·y²: spin acceleration. Cocoon rotation in imaginary plane.',
     canonical: false,
     expr: (x, y) => {
       const z = x * y * y;
@@ -88,7 +88,7 @@ export const SUBSTRATES = {
     id: 'zxny2',
     glyph: '◉',
     name: 'gravity',
-    desc: 'Collapse squared. z=x/y² — draw to center, never touch zero. Event horizon preserved.',
+    desc: 'Collapse squared. z=x/y²: draw to center, never touch zero. Event horizon preserved.',
     canonical: false,
     expr: (x, y) => {
       const yy = y * y;

@@ -1,8 +1,8 @@
 // manifold-ai/js/code-agent.js
 // Three transports for read/write/debug:
-//   A. Browser sandbox  — Pyodide (Python) and JS eval, in-page only.
-//   B. Local folder     — File System Access API (Chrome/Edge/Opera).
-//   C. MCP bridge       — WebSocket/SSE to a user-run local MCP server.
+//   A. Browser sandbox  : Pyodide (Python) and JS eval, in-page only.
+//   B. Local folder     : File System Access API (Chrome/Edge/Opera).
+//   C. MCP bridge       : WebSocket/SSE to a user-run local MCP server.
 //
 // Each transport registers tools onto a single registry the LLM can call.
 
@@ -76,7 +76,7 @@ export class FolderTransport {
   async grant() {
     if (!this.supported()) throw new Error('File System Access API not supported in this browser. Use Chrome/Edge/Opera.');
     this.root = await window.showDirectoryPicker({ mode: 'readwrite' });
-    // Switching roots resets the trust state — new scope, new decisions.
+    // Switching roots resets the trust state: new scope, new decisions.
     this.autoAllowWrites = false;
     if (typeof this.onScopeChange === 'function') {
       try { this.onScopeChange(this.root.name); } catch (_) { }

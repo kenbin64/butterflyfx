@@ -97,7 +97,7 @@
         <strong>Raw</strong> is the file as it sits on disk.
         <strong>gzip</strong> is that file compressed the ordinary way, which is the number to beat.
         <strong>Shapes fitted</strong> says how many 1 KB blocks the file was cut into and which
-        shapes won most often &mdash; a flat line, a slope, a curve or a wave.
+        shapes won most often: a flat line, a slope, a curve or a wave.
         <strong>Rules + corrections</strong> is the total cost of this approach: the coefficients
         for every block, plus the packed differences between what the shapes predicted and what
         the file actually contained.
@@ -138,7 +138,7 @@
     <p class="lede" style="margin-bottom:1rem">
       Real measurements, fetched from Open-Meteo when you press the button: a year of hourly
       temperature readings for St. George, Utah. Nothing synthetic, nothing chosen to flatter
-      the method. This is the case it is actually for &mdash; a physical quantity that rises and
+      the method. This is the case it is actually for: a physical quantity that rises and
       falls on a daily cycle, so a shape genuinely describes it.
     </p>
 
@@ -712,7 +712,7 @@
         var tr = document.createElement("tr");
         var rel = bytes / shapeTotal;
         tr.innerHTML = "<td>" + label + "</td><td>" + fmt(bytes) + "</td><td>" +
-          (label.indexOf("shape") === 0 ? "&mdash;" : rel.toFixed(2) + "× larger") +
+          (label.indexOf("shape") === 0 ? "n/a" : rel.toFixed(2) + "× larger") +
           "</td><td class='muted'>" + note + "</td>";
         rows.appendChild(tr);
       }

@@ -1,4 +1,4 @@
-// manifold-bg.js — pure vanilla WebGL2.  Schwarz-D / gyroid wireframe,
+// manifold-bg.js: pure vanilla WebGL2.  Schwarz-D / gyroid wireframe,
 // raymarched, reactive to mouse + scroll + router sliders.  No deps.
 // Palette: cyan, green, purple, gold.  PHI-tuned proportions.
 (function () {
@@ -23,7 +23,7 @@
   const gl = canvas.getContext('webgl2', { antialias: true, alpha: true, premultipliedAlpha: false });
   if (!gl) return;
 
-  // Shared state — routing.html (and anything else) can mutate this live.
+  // Shared state: routing.html (and anything else) can mutate this live.
   const state = window.__manifold = window.__manifold || {
     complexity: 0.42, stakes: 0.30, context: 0.50,
     mouseX: 0.5, mouseY: 0.5, scroll: 0
@@ -114,7 +114,7 @@
       if (t > 7.6) break;
     }
 
-    // Subtle nebula tint behind the lattice — keeps text panels readable.
+    // Subtle nebula tint behind the lattice: keeps text panels readable.
     vec3 bg = mix(vec3(0.025, 0.025, 0.06), vec3(0.06, 0.03, 0.10),
                   smoothstep(-1.0, 1.0, uv.y));
     col = bg + col;

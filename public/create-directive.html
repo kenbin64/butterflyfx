@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create a Directive: build an AI contract in your browser | ButterflyFx</title>
+  <meta name="description"
+    content="A free, in-browser wizard that turns a few answers into a versioned AI directive: purpose, ontology, allowed operations, prohibitions, and a governing invariant. Download as Markdown or JSON. No install, nothing uploaded.">
+  <link rel="canonical" href="https://butterflyfx.us/create-directive.html">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    /* Page-scoped wizard styling (self-contained, theme-friendly). */
+    .wz { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 1rem; }
+    @media (max-width: 860px) { .wz { grid-template-columns: 1fr; } }
+    .wz-form, .wz-out { background: rgba(8,12,24,0.55); border: 1px solid rgba(120,180,255,0.18); border-radius: 12px; padding: 1.1rem 1.2rem; }
+    .wz label { display: block; font-weight: 600; margin: 0.9rem 0 0.3rem; font-size: 0.92rem; }
+    .wz label:first-child { margin-top: 0; }
+    .wz input[type=text], .wz textarea { width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.35); color: #e8f0ff; border: 1px solid rgba(120,180,255,0.25); border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 0.92rem; }
+    .wz textarea { resize: vertical; min-height: 60px; font-family: ui-monospace, Consolas, monospace; }
+    .wz .hint { font-weight: 400; opacity: 0.7; font-size: 0.82rem; }
+    .wz-ops { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-top: 0.3rem; }
+    .wz-ops label { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 500; margin: 0; }
+    .wz-list .wz-li { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
+    .wz-list .wz-li input { flex: 1; }
+    .wz-x { border: 1px solid rgba(255,255,255,0.2); background: transparent; color: #ffb4b4; border-radius: 7px; width: 34px; cursor: pointer; }
+    .wz-add { margin-top: 0.5rem; border: 1px dashed rgba(120,180,255,0.4); background: transparent; color: #9cc6ff; border-radius: 8px; padding: 6px 12px; cursor: pointer; font: inherit; font-size: 0.85rem; }
+    .wz-tabs { display: inline-flex; gap: 4px; margin-bottom: 0.7rem; }
+    .wz-tab { padding: 6px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: transparent; color: inherit; font: inherit; font-size: 0.85rem; cursor: pointer; }
+    .wz-tab.active { background: rgba(120,180,255,0.22); border-color: rgba(120,180,255,0.7); }
+    .wz-pre { background: #07090f; border: 1px solid rgba(120,180,255,0.18); border-radius: 10px; padding: 1rem; overflow: auto; max-height: 520px; font-family: ui-monospace, Consolas, monospace; font-size: 0.82rem; line-height: 1.5; color: #d6e4ff; white-space: pre-wrap; }
+    .wz-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem; }
+  </style>
+</head>
+
+<body>
+  <canvas id="spiral-bg"></canvas>
+
+  <nav class="navbar glass">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="method.html">Method</a>
+    <a href="agents.html">Agents</a>
+    <a href="create-directive.html" class="active">Create Directive</a>
+    <a href="create-agent.html">Create Agent</a>
+    <a href="bfx-ingest.html">bfx-ingest</a>
+    <a href="resume.html">Resume</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+
+  <div class="content">
+
+    <section class="hero glass">
+      <div class="hero-title">Create a Directive</div>
+      <div class="hero-subtitle">A versioned contract for an AI &middot; built in your browser</div>
+      <div class="hero-tagline">
+        A prompt is text you hope the model follows. A <strong>directive</strong> is a small, versioned contract:
+        a single purpose, the entities it may touch, the operations it may run, the things it must refuse, and one
+        governing invariant every output has to satisfy. Answer a few fields below and download a directive you can
+        paste straight into ChatGPT, Claude, or your own agent. Nothing is uploaded; it all runs in this tab.
+      </div>
+    </section>
+
+    <section class="section glass">
+      <div class="section-content">
+        <div class="wz">
+          <!-- ── FORM ── -->
+          <div class="wz-form">
+            <label>Name <span class="hint">(what this directive governs)</span></label>
+            <input type="text" id="d-name" placeholder="Support Triage Assistant">
+
+            <label>Version</label>
+            <input type="text" id="d-version" value="1.0.0">
+
+            <label>Purpose <span class="hint">(the single job, in one sentence)</span></label>
+            <textarea id="d-purpose" placeholder="Classify each inbound support email and route it, never inventing facts about the customer's account."></textarea>
+
+            <label>Ontology <span class="hint">(the entities it works with and their properties)</span></label>
+            <div class="wz-list" id="d-onto"></div>
+            <button type="button" class="wz-add" data-add="d-onto">+ add entity</button>
+
+            <label>Allowed operations</label>
+            <div class="wz-ops" id="d-ops">
+              <label><input type="checkbox" value="Ingest" checked> Ingest</label>
+              <label><input type="checkbox" value="Expand"> Expand</label>
+              <label><input type="checkbox" value="Collapse"> Collapse</label>
+              <label><input type="checkbox" value="Oscillate"> Oscillate</label>
+              <label><input type="checkbox" value="Invoke" checked> Invoke</label>
+            </div>
+            <textarea id="d-ops-extra" placeholder="Any other allowed operations, one per line (optional)."></textarea>
+
+            <label>Prohibitions <span class="hint">(falsifiable rules it must refuse to break)</span></label>
+            <div class="wz-list" id="d-prohib"></div>
+            <button type="button" class="wz-add" data-add="d-prohib">+ add prohibition</button>
+
+            <label>Governing invariant <span class="hint">(the rule every decision must satisfy)</span></label>
+            <input type="text" id="d-law" value="z = x · y  (state = identity × behavior)">
+
+            <label>Output contract <span class="hint">(what a valid response always contains; optional)</span></label>
+            <textarea id="d-output" placeholder="A JSON object: { category, confidence, route, evidence[] }. Refuse if evidence is empty."></textarea>
+          </div>
+
+          <!-- ── OUTPUT ── -->
+          <div class="wz-out">
+            <div class="wz-tabs">
+              <button type="button" class="wz-tab active" data-fmt="md">Markdown (paste into an AI)</button>
+              <button type="button" class="wz-tab" data-fmt="json">JSON</button>
+            </div>
+            <div class="wz-pre" id="d-preview"></div>
+            <div class="wz-actions">
+              <a href="#" id="d-dl" class="cta-btn">Download directive</a>
+              <button type="button" id="d-copy" class="cta-btn alt">Copy</button>
+            </div>
+            <p class="hint" style="margin-top:0.7rem;">Tip: the Markdown version works as a system prompt as-is.
+              Made a directive here? Feed it into the <a href="create-agent.html">Create-Agent wizard</a> next.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">About this project</h2>
+      <div class="section-content">
+        <p>This wizard is a free <strong>portfolio piece</strong> demonstrating directive engineering: turning fuzzy
+          intent into a versioned, checkable contract an AI must obey. It runs entirely client-side. I'm seeking a
+          full-time AI engineering role.</p>
+        <div class="hero-cta">
+          <a href="contact.html" class="cta-btn">Contact for hiring</a>
+          <a href="create-agent.html" class="cta-btn alt">Create an Agent &rarr;</a>
+          <a href="directive.html" class="cta-btn alt">Read the full directive spec</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 Kenneth W. Bingham &middot; ButterflyFx</p>
+    </footer>
+  </div>
+
+  <script src="manifold-bg.js" defer></script>
+  <script>
+  // ── Create-Directive wizard ───────────────────────────────────────────────
+  // Reads the form into a plain object, renders it two ways (a paste-ready
+  // Markdown directive and structured JSON), and offers a download. Pure
+  // client-side; nothing leaves the page.
+  (function () {
+    'use strict';
+    var $ = function (id) { return document.getElementById(id); };
+    var fmt = 'md', lastText = '', lastName = 'directive.md';
+
+    // Repeatable text-row lists (ontology entities, prohibitions).
+    function addRow(listId, placeholder) {
+      var wrap = document.createElement('div');
+      wrap.className = 'wz-li';
+      var inp = document.createElement('input');
+      inp.type = 'text'; inp.placeholder = placeholder;
+      inp.addEventListener('input', render);
+      var x = document.createElement('button');
+      x.type = 'button'; x.className = 'wz-x'; x.textContent = '×';
+      x.addEventListener('click', function () { wrap.remove(); render(); });
+      wrap.appendChild(inp); wrap.appendChild(x);
+      $(listId).appendChild(wrap);
+      return inp;
+    }
+    function rows(listId) {
+      return Array.prototype.map.call($(listId).querySelectorAll('input'), function (i) { return i.value.trim(); })
+        .filter(function (v) { return v; });
+    }
+    document.querySelectorAll('.wz-add').forEach(function (b) {
+      b.addEventListener('click', function () {
+        addRow(b.getAttribute('data-add'), b.getAttribute('data-add') === 'd-onto' ? 'order: id, status, total, customerId' : 'Never state an account balance without a matching record.');
+        render();
+      });
+    });
+
+    function model() {
+      var ops = Array.prototype.map.call(document.querySelectorAll('#d-ops input:checked'), function (c) { return c.value; });
+      $('d-ops-extra').value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean).forEach(function (o) { ops.push(o); });
+      return {
+        name: $('d-name').value.trim() || 'Untitled Directive',
+        version: $('d-version').value.trim() || '1.0.0',
+        purpose: $('d-purpose').value.trim(),
+        ontology: rows('d-onto'),
+        operations: ops,
+        prohibitions: rows('d-prohib'),
+        invariant: $('d-law').value.trim(),
+        output: $('d-output').value.trim()
+      };
+    }
+
+    function toMarkdown(m) {
+      var L = [];
+      L.push('# Directive: ' + m.name + '  (v' + m.version + ')');
+      L.push('');
+      L.push('You operate under the following directive. Follow it exactly. If a request would require breaking it, refuse and say which rule applies.');
+      L.push('');
+      L.push('## Purpose');
+      L.push(m.purpose || '(state the single job in one sentence)');
+      L.push('');
+      L.push('## Ontology: the entities you may reason about');
+      if (m.ontology.length) m.ontology.forEach(function (e) { L.push('- ' + e); });
+      else L.push('- (list each entity and its properties)');
+      L.push('');
+      L.push('## Allowed operations');
+      if (m.operations.length) m.operations.forEach(function (o) { L.push('- ' + o); });
+      else L.push('- (the only actions you may take)');
+      L.push('');
+      L.push('## Prohibitions: refuse if any would be true');
+      if (m.prohibitions.length) m.prohibitions.forEach(function (p) { L.push('- ' + p); });
+      else L.push('- (falsifiable rules you must never break)');
+      L.push('');
+      L.push('## Governing invariant');
+      L.push('Every decision must satisfy: **' + (m.invariant || 'z = x · y') + '**. Reject any output that cannot be expressed this way.');
+      if (m.output) { L.push(''); L.push('## Output contract'); L.push(m.output); }
+      L.push('');
+      L.push('---');
+      L.push('_Directive v' + m.version + ' · generated with the ButterflyFx Create-Directive wizard._');
+      return L.join('\n') + '\n';
+    }
+
+    function render() {
+      var m = model();
+      lastText = (fmt === 'json') ? JSON.stringify(m, null, 2) : toMarkdown(m);
+      lastName = (m.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'directive') + '.' + (fmt === 'json' ? 'json' : 'md');
+      $('d-preview').textContent = lastText;
+      var blob = new Blob([lastText], { type: 'text/plain;charset=utf-8' });
+      $('d-dl').href = URL.createObjectURL(blob);
+      $('d-dl').setAttribute('download', lastName);
+    }
+
+    document.querySelectorAll('.wz-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        document.querySelectorAll('.wz-tab').forEach(function (x) { x.classList.toggle('active', x === t); });
+        fmt = t.getAttribute('data-fmt'); render();
+      });
+    });
+    ['d-name', 'd-version', 'd-purpose', 'd-ops-extra', 'd-law', 'd-output'].forEach(function (id) { $(id).addEventListener('input', render); });
+    document.querySelectorAll('#d-ops input').forEach(function (c) { c.addEventListener('change', render); });
+    $('d-copy').addEventListener('click', async function () {
+      try { await navigator.clipboard.writeText(lastText); var b = $('d-copy'); var t = b.textContent; b.textContent = 'Copied ✓'; setTimeout(function () { b.textContent = t; }, 1400); } catch (_) {}
+    });
+
+    // Seed one empty row in each list so the UI isn't bare.
+    addRow('d-onto', 'order: id, status, total, customerId');
+    addRow('d-prohib', 'Never state an account balance without a matching record.');
+    render();
+  })();
+  </script>
+</body>
+
+</html>

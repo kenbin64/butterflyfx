@@ -457,7 +457,7 @@ function updateScopeUI() {
     ui.scopeRoot.textContent = root.name;
     ui.scopeRoot.classList.remove('none');
   } else {
-    ui.scopeRoot.textContent = '(no root — writes disabled)';
+    ui.scopeRoot.textContent = '(no root, writes disabled)';
     ui.scopeRoot.classList.add('none');
   }
   const on =!!state.folder.autoAllowWrites;
@@ -491,7 +491,7 @@ function getSelectedEngineKind() {
 }
 
 async function ensureEngine(onProgress) {
-  // Always read the current dropdown value — this is what makes engine selection work
+  // Always read the current dropdown value: this is what makes engine selection work
   const kind = getSelectedEngineKind();
   state.preferred = kind;
 
@@ -579,7 +579,7 @@ function renderPage() {
   ui.aiPage.innerHTML = '';
   if (total === 0) {
     ui.aiPage.classList.add('ai-page-empty');
-    ui.aiPage.innerHTML = '<div class="ai-empty-hint">No messages yet — ask the manifold below.</div>';
+    ui.aiPage.innerHTML = '<div class="ai-empty-hint">No messages yet. Ask the manifold below.</div>';
   } else {
     ui.aiPage.classList.remove('ai-page-empty');
     const idx = Math.max(0, Math.min(state.pageIndex, total - 1));
@@ -772,7 +772,7 @@ function loadPreview(url) {
 }
 
 // ────────────────────────────────────────────────────────────
-// Init — wire everything up
+// Init: wire everything up
 // ────────────────────────────────────────────────────────────
 initSecretUI();
 maybeShowSecretButton();
@@ -787,11 +787,11 @@ const WELCOME = \`// Manifold IDE · z = xy
 console.log('Hello from the Manifold IDE!');
 const x = 4, y = 6;
 // Point is a collapsed dimension. 1 is event horizon. Zero unreachable.
-// z = x · y — gather (cocoon form)
-// z = x / y — explode (bloom)
-// z = x · y² — accelerate (spin)
-// z = x / y² — gravity (collapse)
-// ⬥ schwarz — lattice (bridge between dimensions)
+// z = x · y: gather (cocoon form)
+// z = x / y: explode (bloom)
+// z = x · y²: accelerate (spin)
+// z = x / y²: gravity (collapse)
+// ⬥ schwarz: lattice (bridge between dimensions)
 console.log('z =', x * y, '← gathered state');
 \`;
 
@@ -859,7 +859,7 @@ ui.aiNextBtn.onclick = () => gotoPage(state.pageIndex + 1);
 ui.aiLatestBtn.onclick = () => gotoPage(state.pages.length - 1);
 
 setStatus('Manifold IDE ready');
-console.log('◇ Manifold IDE activated — five operations, one point.');
+console.log('◇ Manifold IDE activated: five operations, one point.');
 
   console.log('point product =', x * y);\n}\nmain();\`;
       await openFile('examples/point.js', js, 'javascript');
@@ -879,7 +879,7 @@ function loadPreview(url) {
 }
 
 // ────────────────────────────────────────────────────────────
-// Init — wire everything up
+// Init: wire everything up
 // ────────────────────────────────────────────────────────────
 initSecretUI();
 maybeShowSecretButton();
@@ -894,11 +894,11 @@ const WELCOME = \`// Manifold IDE · z = xy
 console.log('Hello from the Manifold IDE!');
 const x = 4, y = 6;
 // Point is a collapsed dimension. 1 is event horizon. Zero unreachable.
-// z = x · y — gather (cocoon form)
-// z = x / y — explode (bloom)
-// z = x · y² — accelerate (spin)
-// z = x / y² — gravity (collapse)
-// ⬥ schwarz — lattice (bridge between dimensions)
+// z = x · y: gather (cocoon form)
+// z = x / y: explode (bloom)
+// z = x · y²: accelerate (spin)
+// z = x / y²: gravity (collapse)
+// ⬥ schwarz: lattice (bridge between dimensions)
 console.log('z =', x * y, '← gathered state');
 \`;
 
@@ -966,4 +966,4 @@ ui.aiNextBtn.onclick = () => gotoPage(state.pageIndex + 1);
 ui.aiLatestBtn.onclick = () => gotoPage(state.pages.length - 1);
 
 setStatus('Manifold IDE ready');
-console.log('◇ Manifold IDE activated — five operations, one point.');
+console.log('◇ Manifold IDE activated: five operations, one point.');

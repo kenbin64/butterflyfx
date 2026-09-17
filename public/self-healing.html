@@ -59,7 +59,7 @@
       Hold values as a shape rather than as a list and something else comes free.
       Every 2&times;2 patch of the surface <code>z = a&middot;x&middot;y + b&middot;x + c&middot;y + d</code>
       obeys one small identity. A cell that has been damaged no longer agrees with what its
-      neighbours imply, so the damage is <strong>visible from the outside</strong> &mdash; with
+      neighbours imply, so the damage is <strong>visible from the outside</strong>, with
       no master copy, no checksum file and nobody in charge. The neighbours notice, they vote,
       and the lattice puts itself back.
     </p>
@@ -95,8 +95,8 @@
     <div class="score" style="display:flex; gap:1.4rem; flex-wrap:wrap; margin-top:1.2rem">
       <div class="metric"><span class="n" id="m-damaged">0</span><span class="l">cells damaged</span></div>
       <div class="metric"><span class="n" id="m-rounds">0</span><span class="l">repair rounds</span></div>
-      <div class="metric"><span class="n" id="m-fixed">&mdash;</span><span class="l">repaired</span></div>
-      <div class="metric"><span class="n" id="m-left">&mdash;</span><span class="l">still wrong</span></div>
+      <div class="metric"><span class="n" id="m-fixed">...</span><span class="l">repaired</span></div>
+      <div class="metric"><span class="n" id="m-left">...</span><span class="l">still wrong</span></div>
     </div>
 
     <div class="log" id="log">Ready. The lattice is intact.</div>
@@ -143,8 +143,8 @@
         <strong>Where this sits in the established world.</strong>
         This is the same shape of idea as erasure coding and RAID: you recover while enough
         independent witnesses survive, and you lose when a single failure takes out a cell and
-        all of its witnesses together. The engineering question it raises is the familiar one
-        &mdash; how far apart to place things so that one accident cannot reach both. What is
+        all of its witnesses together. The engineering question it raises is the familiar one:
+        how far apart to place things so that one accident cannot reach both. What is
         unusual here is that no parity was added to the data. The geometry was already carrying
         it, because the rule that generates the values also constrains them.
       </p>
@@ -157,7 +157,7 @@
     <h2>What this is evidence for</h2>
     <p class="lede">
       Storing data as a shape is usually argued about on size, and on measured data the size
-      argument is modest &mdash; my own
+      argument is modest: my own
       <a href="/geometry-bench.html">benchmarks</a> put it at a few percent over gzip, and I
       publish the cases where it loses. This page is the other half of the story. A shape brings
       properties a compressed blob does not have: it can be queried without being unpacked, it
@@ -316,7 +316,7 @@
     }
     drawField();
     var flagged = drawErrors();
-    setMetrics("—", damagedCount.toLocaleString());
+    setMetrics("...", damagedCount.toLocaleString());
     document.getElementById("repair").disabled = false;
     log("Damaged " + damagedCount.toLocaleString() + " of " + (N * N).toLocaleString() + " cells at random.\n" +
       "The neighbours can already see " + flagged.toLocaleString() + " cells that do not fit the surface.\n" +
@@ -331,7 +331,7 @@
     }
     drawField();
     drawErrors();
-    setMetrics("—", damagedCount.toLocaleString());
+    setMetrics("...", damagedCount.toLocaleString());
     document.getElementById("repair").disabled = false;
     log("Destroyed a solid " + side + "×" + side + " block: " + damagedCount + " cells.\n" +
       "Notice the error map only lights up at the edges of the hole. Inside it, every witness\n" +
@@ -382,7 +382,7 @@
   });
   document.getElementById("reset").addEventListener("click", function () {
     build(); drawField(); drawErrors();
-    setMetrics("—", "—");
+    setMetrics("...", "...");
     document.getElementById("repair").disabled = true;
     log("Reset. The lattice is intact.");
   });

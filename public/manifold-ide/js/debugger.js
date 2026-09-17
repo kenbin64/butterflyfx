@@ -1,5 +1,5 @@
 // manifold-ide/js/debugger.js
-// Dimensional debugger — every emitted log becomes a manifold step.
+// Dimensional debugger: every emitted log becomes a manifold step.
 // Walks the Fibonacci-7 ladder: point → line → plane → volume → identity → spiral → bloom.
 // At step 7 (bloom), the run "collapses" into a single z that becomes the next x.
 

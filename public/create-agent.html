@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create an Agent: wizard for a trustworthy AI agent | ButterflyFx</title>
+  <meta name="description"
+    content="A free, in-browser wizard that scaffolds a trustworthy AI agent: role, directive, the SAMPLE-EVALUATE-PUBLISH-VERIFY loop, model policy, and tools. Download as Markdown or JSON. No install, nothing uploaded.">
+  <link rel="canonical" href="https://butterflyfx.us/create-agent.html">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="theme.css">
+  <style>
+    .wz { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-top: 1rem; }
+    @media (max-width: 860px) { .wz { grid-template-columns: 1fr; } }
+    .wz-form, .wz-out { background: rgba(8,12,24,0.55); border: 1px solid rgba(120,180,255,0.18); border-radius: 12px; padding: 1.1rem 1.2rem; }
+    .wz label { display: block; font-weight: 600; margin: 0.9rem 0 0.3rem; font-size: 0.92rem; }
+    .wz label:first-child { margin-top: 0; }
+    .wz input[type=text], .wz textarea { width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.35); color: #e8f0ff; border: 1px solid rgba(120,180,255,0.25); border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 0.92rem; }
+    .wz textarea { resize: vertical; min-height: 60px; font-family: ui-monospace, Consolas, monospace; }
+    .wz .hint { font-weight: 400; opacity: 0.7; font-size: 0.82rem; }
+    .wz-roles { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-top: 0.3rem; }
+    @media (max-width: 560px) { .wz-roles { grid-template-columns: 1fr; } }
+    .wz-role { border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 0.6rem 0.7rem; cursor: pointer; font-size: 0.85rem; }
+    .wz-role.active { background: rgba(120,180,255,0.2); border-color: rgba(120,180,255,0.7); }
+    .wz-role b { display: block; color: #9cc6ff; }
+    .wz-tabs { display: inline-flex; gap: 4px; margin-bottom: 0.7rem; }
+    .wz-tab { padding: 6px 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: transparent; color: inherit; font: inherit; font-size: 0.85rem; cursor: pointer; }
+    .wz-tab.active { background: rgba(120,180,255,0.22); border-color: rgba(120,180,255,0.7); }
+    .wz-pre { background: #07090f; border: 1px solid rgba(120,180,255,0.18); border-radius: 10px; padding: 1rem; overflow: auto; max-height: 560px; font-family: ui-monospace, Consolas, monospace; font-size: 0.82rem; line-height: 1.5; color: #d6e4ff; white-space: pre-wrap; }
+    .wz-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.8rem; }
+  </style>
+</head>
+
+<body>
+  <canvas id="spiral-bg"></canvas>
+
+  <nav class="navbar glass">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="method.html">Method</a>
+    <a href="agents.html">Agents</a>
+    <a href="create-directive.html">Create Directive</a>
+    <a href="create-agent.html" class="active">Create Agent</a>
+    <a href="bfx-ingest.html">bfx-ingest</a>
+    <a href="resume.html">Resume</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+
+  <div class="content">
+
+    <section class="hero glass">
+      <div class="hero-title">Create an Agent</div>
+      <div class="hero-subtitle">Scaffold a trustworthy AI agent &middot; in your browser</div>
+      <div class="hero-tagline">
+        A single model call answers a question. An <strong>agent</strong> is the small program that makes the answer
+        trustworthy: it carries a directive and runs one disciplined loop: <strong>sample &rarr; evaluate &rarr;
+        publish &rarr; verify</strong>, with a separate verifier whose only job is to say <em>no</em>. Fill in
+        the fields and download a ready-to-use agent spec. Nothing is uploaded; it all runs in this tab.
+      </div>
+    </section>
+
+    <section class="section glass">
+      <div class="section-content">
+        <div class="wz">
+          <!-- ── FORM ── -->
+          <div class="wz-form">
+            <label>Agent name</label>
+            <input type="text" id="a-name" placeholder="Triage Router">
+
+            <label>Role</label>
+            <div class="wz-roles" id="a-roles">
+              <div class="wz-role active" data-role="director"><b>Director</b>carries the directive; decides the next step</div>
+              <div class="wz-role" data-role="worker"><b>Worker</b>does one narrow task (search, summarize, extract)</div>
+              <div class="wz-role" data-role="verifier"><b>Verifier</b>says <em>no</em> when output breaks the rules</div>
+            </div>
+
+            <label>Task <span class="hint">(the one job this agent does)</span></label>
+            <input type="text" id="a-task" placeholder="Classify each support email and choose a route.">
+
+            <label>Directive <span class="hint">(paste one, or make it in the <a href="create-directive.html">Directive wizard</a>)</span></label>
+            <textarea id="a-directive" placeholder="Paste the directive this agent must obey (purpose, prohibitions, governing invariant)."></textarea>
+
+            <label>EVALUATE: the core action <span class="hint">(what it actually does each turn)</span></label>
+            <textarea id="a-evaluate" placeholder="Run the classifier over the email; consult the order record; pick exactly one route from the allowed set."></textarea>
+
+            <label>VERIFY: the check that can reject it <span class="hint">(the falsifiable test)</span></label>
+            <textarea id="a-verify" placeholder="Reject if the route is outside the allowed set, or if any claim lacks a matching record. On reject, retry EVALUATE with the failure as context."></textarea>
+
+            <label>Tools / retrievers it may call <span class="hint">(optional, one per line)</span></label>
+            <textarea id="a-tools" placeholder="order-db.lookup(orderId)&#10;kb.search(query)"></textarea>
+
+            <label>Model policy</label>
+            <input type="text" id="a-model" value="Cheapest model that passes VERIFY; escalate to a stronger model only on repeated failure.">
+          </div>
+
+          <!-- ── OUTPUT ── -->
+          <div class="wz-out">
+            <div class="wz-tabs">
+              <button type="button" class="wz-tab active" data-fmt="md">Markdown (agent spec)</button>
+              <button type="button" class="wz-tab" data-fmt="json">JSON (config)</button>
+            </div>
+            <div class="wz-pre" id="a-preview"></div>
+            <div class="wz-actions">
+              <a href="#" id="a-dl" class="cta-btn">Download agent</a>
+              <button type="button" id="a-copy" class="cta-btn alt">Copy</button>
+            </div>
+            <p class="hint" style="margin-top:0.7rem;">The Markdown spec doubles as a system prompt; the JSON is a
+              config your runtime can load. The four-phase loop is filled in from your answers.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section glass">
+      <h2 class="section-title">About this project</h2>
+      <div class="section-content">
+        <p>This wizard is a free <strong>portfolio piece</strong> showing how I build agents: a directive plus one
+          disciplined loop and a verifier that can reject. It runs entirely client-side. I'm seeking a full-time AI
+          engineering role.</p>
+        <div class="hero-cta">
+          <a href="contact.html" class="cta-btn">Contact for hiring</a>
+          <a href="create-directive.html" class="cta-btn alt">&larr; Create a Directive</a>
+          <a href="agents.html" class="cta-btn alt">How my agents work</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 Kenneth W. Bingham &middot; ButterflyFx</p>
+    </footer>
+  </div>
+
+  <script src="manifold-bg.js" defer></script>
+  <script>
+  // ── Create-Agent wizard ───────────────────────────────────────────────────
+  // Builds an agent spec around one disciplined loop: SAMPLE -> EVALUATE ->
+  // PUBLISH -> VERIFY, with the user's directive and checks filled in. Renders
+  // a paste-ready Markdown spec and a JSON config. Pure client-side.
+  (function () {
+    'use strict';
+    var $ = function (id) { return document.getElementById(id); };
+    var fmt = 'md', role = 'director', lastText = '', lastName = 'agent.md';
+
+    var ROLE_LINE = {
+      director: 'Carry the directive and decide the next step. Do not perform narrow work yourself; dispatch it and judge the result.',
+      worker: 'Do exactly one narrow task and return a typed result. Do not decide strategy; that is the director’s job.',
+      verifier: 'Read a published result and try to reject it. Your only job is to say NO when it breaks the directive or lacks evidence.'
+    };
+
+    function model() {
+      return {
+        name: $('a-name').value.trim() || 'Untitled Agent',
+        role: role,
+        task: $('a-task').value.trim(),
+        directive: $('a-directive').value.trim(),
+        evaluate: $('a-evaluate').value.trim(),
+        verify: $('a-verify').value.trim(),
+        tools: $('a-tools').value.split('\n').map(function (s) { return s.trim(); }).filter(Boolean),
+        modelPolicy: $('a-model').value.trim()
+      };
+    }
+
+    function toMarkdown(m) {
+      var L = [];
+      L.push('# Agent: ' + m.name + '  (' + m.role + ')');
+      L.push('');
+      L.push('You are a **' + m.role + ' agent**. ' + ROLE_LINE[m.role]);
+      L.push('');
+      L.push('## Task');
+      L.push(m.task || '(the one job this agent does)');
+      L.push('');
+      L.push('## Directive you must obey');
+      L.push(m.directive || '(paste the directive: purpose, prohibitions, governing invariant)');
+      L.push('');
+      L.push('## Loop: run every turn');
+      L.push('1. **SAMPLE**: read the current state from the shared registry. Never call another agent directly; read what they published.');
+      L.push('2. **EVALUATE**: ' + (m.evaluate || 'run the directive’s allowed operations to produce a candidate result.'));
+      L.push('3. **PUBLISH**: write the result back as a typed record with full ancestry. No destructive updates.');
+      L.push('4. **VERIFY**: ' + (m.verify || 'check the result against the directive; if it fails, roll back and retry EVALUATE with the failure as context.'));
+      if (m.tools.length) { L.push(''); L.push('## Tools you may call'); m.tools.forEach(function (t) { L.push('- ' + t); }); }
+      L.push('');
+      L.push('## Model policy');
+      L.push(m.modelPolicy || 'Use the cheapest model that passes VERIFY; escalate only on repeated failure.');
+      L.push('');
+      L.push('---');
+      L.push('_Agent spec generated with the ButterflyFx Create-Agent wizard._');
+      return L.join('\n') + '\n';
+    }
+
+    function toJson(m) {
+      return JSON.stringify({
+        name: m.name, role: m.role, task: m.task, directive: m.directive,
+        loop: {
+          sample: 'read shared registry; do not call agents directly',
+          evaluate: m.evaluate, publish: 'write typed record with ancestry; no destructive updates', verify: m.verify
+        },
+        tools: m.tools, modelPolicy: m.modelPolicy
+      }, null, 2);
+    }
+
+    function render() {
+      var m = model();
+      lastText = (fmt === 'json') ? toJson(m) : toMarkdown(m);
+      lastName = (m.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'agent') + '.' + (fmt === 'json' ? 'json' : 'md');
+      $('a-preview').textContent = lastText;
+      var blob = new Blob([lastText], { type: 'text/plain;charset=utf-8' });
+      $('a-dl').href = URL.createObjectURL(blob);
+      $('a-dl').setAttribute('download', lastName);
+    }
+
+    document.querySelectorAll('.wz-role').forEach(function (r) {
+      r.addEventListener('click', function () {
+        document.querySelectorAll('.wz-role').forEach(function (x) { x.classList.toggle('active', x === r); });
+        role = r.getAttribute('data-role'); render();
+      });
+    });
+    document.querySelectorAll('.wz-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        document.querySelectorAll('.wz-tab').forEach(function (x) { x.classList.toggle('active', x === t); });
+        fmt = t.getAttribute('data-fmt'); render();
+      });
+    });
+    ['a-name', 'a-task', 'a-directive', 'a-evaluate', 'a-verify', 'a-tools', 'a-model'].forEach(function (id) { $(id).addEventListener('input', render); });
+    $('a-copy').addEventListener('click', async function () {
+      try { await navigator.clipboard.writeText(lastText); var b = $('a-copy'); var t = b.textContent; b.textContent = 'Copied ✓'; setTimeout(function () { b.textContent = t; }, 1400); } catch (_) {}
+    });
+
+    render();
+  })();
+  </script>
+</body>
+
+</html>

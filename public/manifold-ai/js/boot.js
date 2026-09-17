@@ -48,7 +48,7 @@ const state = {
   preferred: 'auto',
   pages: [],         // [{el, query, answerEl, toolHost, sub, point}]
   current: -1,       // -1 = hello
-  lastPoint: VOID,   // dimensional state — z becomes next x
+  lastPoint: VOID,   // dimensional state: z becomes next x
 };
 state.sandbox.register(state.reg);
 refreshToolList();
@@ -131,7 +131,7 @@ function showPage(idx) {
 
 function updateNav() {
   if (state.pages.length === 0) {
-    ui.pageIndicator.textContent = '— / —';
+    ui.pageIndicator.textContent = '... / ...';
     ui.prevBtn.disabled = true;
     ui.nextBtn.disabled = true;
     return;
@@ -146,7 +146,7 @@ function goNext() { if (state.current < state.pages.length - 1) showPage(state.c
 ui.prevBtn.addEventListener('click', goPrev);
 ui.nextBtn.addEventListener('click', goNext);
 
-// Initial state — hello page visible.
+// Initial state: hello page visible.
 ui.helloPage.classList.add('active');
 updateNav();
 
@@ -205,7 +205,7 @@ async function send(query) {
 
   const page = state.pages[idx];
 
-  // 1. INSTANT answer — render immediately, no waiting.
+  // 1. INSTANT answer: render immediately, no waiting.
   let instantPoint = null;
   try {
     const raw = await instant.generate(state.history, { substrate: route.substrate, prior: state.lastPoint });
@@ -282,7 +282,7 @@ function renderAnswerInto(page, point, fallbackSub, provisional) {
   page.answer.classList.remove('thinking');
   page.answer.classList.toggle('provisional', !!provisional);
   page.answer.textContent = point.answer || '(no answer)';
-  const ladder = point.ladder || { dim: point.dim || 1, label: '—', rung: 1, spiral: 0 };
+  const ladder = point.ladder || { dim: point.dim || 1, label: '...', rung: 1, spiral: 0 };
   const yScalar = (typeof point.yScalar === 'number') ? point.yScalar : 0;
   const dimLine = `dim ${ladder.dim} (${ladder.label}, F=${ladder.rung}) · φ-spiral ${ladder.spiral.toFixed(3)}`;
   const coreLine = sub.canonical
