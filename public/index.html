@@ -74,14 +74,8 @@
     <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham <span class="sub">AI Engineer</span></a>
     <nav>
       <a href="/" class="here">Home</a>
-      <a href="/work/citeline.html">RAG demo</a>
-      <a href="/work/mcp-gateway.html">MCP gateway</a>
-      <a href="/work/valuesai.html">Reliability</a>
+      <a href="/#work">Work</a>
       <a href="/the-case.html">The case</a>
-      <a href="/geometry-as-data.html">Geometry as data</a>
-      <a href="/self-healing.html">Self-healing</a>
-      <a href="/shape-of-a-file.html">Shape of a file</a>
-      <a href="/paint-by-numbers.html">Paint by numbers</a>
       <a href="/resume.html">Resume</a>
       <a href="/about.html">About</a>
       <a href="/contact.html">Contact</a>
@@ -94,20 +88,55 @@
 
 <!-- ============================ HERO ============================ -->
 <section class="hero">
-  <div class="wrap">
-    <p class="role">AI Engineer · Retrieval · Pipelines · Evaluation</p>
-    <h1>I build AI systems that can be audited.</h1>
-    <p class="lede">
-      Retrieval that cites the passage it used. Ingestion pipelines that are safe to
-      re-run on a timer. Evaluation harnesses that put a number on the hallucination
-      rate instead of an adjective. Everything below is running software, and the
-      numbers come from a test suite you can execute yourself.
-    </p>
-    <div class="btn-row" style="margin-top:1.6rem">
-      <a class="btn" href="/work/citeline.html#demo">Try the live RAG demo</a>
-      <a class="btn ghost" href="/resume.html">Resume</a>
-      <a class="btn ghost" href="https://github.com/kenbin64" rel="noopener">Source on GitHub</a>
+  <div class="wrap hero-grid">
+    <div>
+      <p class="role">AI Engineer &middot; Retrieval &middot; Pipelines &middot; Evaluation</p>
+      <h1>I build AI systems that can be audited.</h1>
+      <p class="lede">
+        Retrieval that cites the passage it used. Ingestion pipelines that are safe to
+        re-run on a timer. Evaluation harnesses that put a number on the hallucination
+        rate instead of an adjective. Everything below is running software, and the
+        numbers come from a test suite you can execute yourself.
+      </p>
+      <div class="btn-row" style="margin-top:1.6rem">
+        <a class="btn" href="/work/citeline.html#demo">Try the live RAG demo</a>
+        <a class="btn ghost" href="/resume.html">Resume</a>
+        <a class="btn ghost" href="https://github.com/kenbin64" rel="noopener">Source on GitHub</a>
+      </div>
     </div>
+    <figure class="hero-3d">
+      <canvas id="hero-shape" width="520" height="440"
+        aria-label="A saddle surface, z = x times y, turning slowly. It is drawn from straight lines, which is what the surface is made of."></canvas>
+      <figcaption>
+        <span class="eq">z = x&middot;y</span> turning. Every line you can see is straight, and the
+        surface is nothing but those lines. <a href="/the-case.html">Why that matters</a>.
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="wrap">
+    <ul class="proof">
+      <li>
+        <strong>28 question eval set</strong>
+        <span>20 the regulations answer and 8 they do not. Scored on exact strings, not by a model, so it cannot drift.</span>
+        <a href="/work/citeline.html">The RAG service</a>
+      </li>
+      <li>
+        <strong>Cites, or says nothing</strong>
+        <span>Three gates enforce it, and the last one re-checks the model's own output after the fact.</span>
+        <a href="/work/citeline.html#demo">Try to break it</a>
+      </li>
+      <li>
+        <strong>111&times; less work</strong>
+        <span>One change touched 0.18% of a 216,000 cell lattice instead of recomputing the whole thing.</span>
+        <a href="/the-case.html#ask">See it measured</a>
+      </li>
+      <li>
+        <strong>Runs in your browser</strong>
+        <span>Every benchmark here is a button, lossless and hash verified on the spot. No trust required.</span>
+        <a href="/geometry-bench.html">Run it yourself</a>
+      </li>
+    </ul>
   </div>
 </section>
 
@@ -210,7 +239,7 @@
 <!-- ===================== SELECTED WORK ========================= -->
 <section>
   <div class="wrap">
-    <h2>Selected work</h2>
+    <h2 id="work">Selected work</h2>
     <p class="lede" style="margin-bottom:1.6rem">
       Systems that are deployed and running, not slide decks.
     </p>
@@ -432,5 +461,7 @@
 })();
 </script>
 
+<script src="/js/three.min.js"></script>
+<script src="/js/hero-shape.js"></script>
 </body>
 </html>
