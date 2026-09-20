@@ -1,5 +1,41 @@
+# butterflyfx.us
+# Everything linked from the front page is public and meant to be read, by people and by machines.
+# The AI crawlers are named one by one rather than left to the wildcard, so there is no doubt.
+# Working pages that are not finished carry a noindex tag of their own.
+
 User-agent: *
 Allow: /
-Disallow: /assets/
+Disallow: /login/
+Disallow: /bench-data/
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
 
 Sitemap: https://butterflyfx.us/sitemap.xml

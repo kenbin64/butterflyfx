@@ -1,0 +1,53 @@
+# ButterflyFx, Kenneth W. Bingham
+
+> An AI engineer's site where nothing is asserted without something you can run. The work is
+> retrieval, pipelines and evaluation; the research is about holding data as geometry and deriving
+> it on demand instead of storing it. Every claim on this site has its boundary printed next to it,
+> including the places the method loses.
+
+## Start here
+
+- [The case for geometry as data](https://butterflyfx.us/the-case.html): the whole argument in one
+  page, with benchmarks that run in the browser tab you are reading it in. One surface, z = x times
+  y, used three ways: asked questions instead of searched, read as a complete set of logic gates,
+  and repaired from its own neighbours with no master copy. Section 03 states plainly why this is
+  not compression, and the two things that claim does not say.
+- [Geometry as a data source](https://butterflyfx.us/geometry-as-data.html): the whitepaper, with
+  fourteen reproducible proofs and the honest limits.
+- [Run the benchmark](https://butterflyfx.us/geometry-bench.html): on the sample data or on a file
+  you drop in. Lossless and hash verified every time.
+
+## Demonstrations you can break
+
+- [Paint by numbers](https://butterflyfx.us/paint-by-numbers.html): how much of a photograph one
+  simple rule can paint, and the exact remainder it cannot.
+- [Self healing lattice](https://butterflyfx.us/self-healing.html): damage it by hand and watch the
+  neighbours put it back.
+- [The shape of a file](https://butterflyfx.us/shape-of-a-file.html): any file drawn as a surface,
+  showing where its structure is and where it is only noise.
+
+## Who and how
+
+- [About](https://butterflyfx.us/about.html) and [Resume](https://butterflyfx.us/resume.html).
+- [Method](https://butterflyfx.us/method.html): verify first, label what is measured and what is
+  framing, and never present an untested idea as a finding.
+- [Directing AI](https://butterflyfx.us/directing-ai.html): why direction that requires judgement
+  beats instruction that removes it.
+- [Contact](https://butterflyfx.us/contact.html).
+
+## What is claimed, and what is not
+
+- Holding data as a generator plus a remainder is lossless and hash verified, and what it saves is
+  exactly the amount of geometry the data actually has: two orders of magnitude on generated fields,
+  a few percent on photographs, and nothing at all on random bytes.
+- It is not a better general purpose compressor, and nothing here gets around the Kolmogorov bound.
+- On real photographs, PNG beat every scheme tested.
+- Deriving rather than storing saves memory and is slower than a local read, about four and a half
+  times slower, while beating a remote fetch by about a hundred times. Both halves are always stated.
+- None of it is new mathematics and none of it overturns any. It is known mathematics presented
+  dimensionally.
+
+## Elsewhere
+
+- [zeqxy.com](https://zeqxy.com): the teaching side of the same idea, with three browser tools for
+  seeing what an expression looks like in 3D.
