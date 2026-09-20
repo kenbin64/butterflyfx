@@ -76,7 +76,9 @@
       is printed beside it rather than left for you to discover.
     </p>
     <p class="lede" style="margin-top:1rem">
-      This is not a compression trick. It is a way of answering: hold the shape, ask it
+      This is not a compression trick. It is not a smaller copy of the data, it is the thing the
+      data was a printout of, and <a href="#data">section 03</a> says exactly what that does and
+      does not mean. It is a way of answering: hold the shape, ask it
       questions and read the answers off it by observation instead of computing through the
       data, let a change travel through it, and let it repair itself.
       None of it is new mathematics, and none of it overturns any. It is known mathematics
@@ -448,6 +450,54 @@
       instead of as values. Keep the rule, derive the data when something asks for it. What you
       gain is exactly how much geometry the data actually has. On measured data, that
       is much less than the sales pitch would like.
+    </p>
+
+    <h3 style="margin-top:1.8rem">This is not compression, and the difference is not a slogan</h3>
+    <p>
+      Compression starts with the artifact. You must already have the bytes before you can shrink
+      them, and to answer any question about what is inside you have to put them back first. This
+      starts at the other end. The rule comes first and the field never has to exist at all. A
+      generator can exist for data that was never produced, which a compressor cannot do by
+      definition, because it has nothing to work on until the data is there.
+    </p>
+    <p>
+      Think of what <code>2 + 2</code> is. The 4 is not filed anywhere waiting to be looked up. The
+      invocation produces it, and until something invokes it there is no 4 in the world. Holding a
+      field as a shape works the same way: what is kept is the expression and the small remainder it
+      cannot account for, and the values appear while they are being produced and not before. It is
+      closer to an illustration than to a copy, in that structure carries the content rather than a
+      transcript of it, except that an illustration is loose and this is deterministic. Once it is
+      deterministic it is not an illustration any more. It is a specification.
+    </p>
+
+    <div class="callout">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <span class="tag t-est">established</span>
+        <strong style="margin-left:.4rem">Nothing sits in the shape of the answer.</strong>
+        What sits is a rule and a remainder, and the answer exists only while it is being produced.
+      </p>
+    </div>
+
+    <p>
+      Two things that sentence does <em>not</em> say, because both of them would be wrong and the
+      whole argument goes with them.
+    </p>
+    <p>
+      It does not say storage is unnecessary. The rule, its parameters and the remainder all have
+      to live somewhere, and a rule is itself data. The claim is narrower and it is the one the
+      table below measures: you store a generator instead of a materialisation, and what that saves
+      is exactly the amount of geometry the data actually has. On a generated field it is two orders
+      of magnitude. On a photograph it is a few percent. On random bytes it is nothing at all, and
+      correctly so.
+    </p>
+    <p>
+      It does not say the information is absent. Every row below is lossless and hash verified, and
+      anything that reconstructs losslessly still holds the information at rest, in another form.
+      Whoever holds the rule and the remainder holds the data. What changes is the form it rests in
+      and what it costs to get at it: there is no materialised copy sitting there to be read off,
+      and every read is a computation that has to happen. That is a real difference, and it is a
+      difference in form and cost, not a claim that the data is not there.
     </p>
 
     <div class="tbl-scroll"><table class="tradeoffs ledger">
