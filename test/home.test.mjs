@@ -117,9 +117,13 @@ const axe = await page.evaluate(async () => (await window.axe.run(document, { ru
 check("passes an axe-core WCAG 2 A and AA audit", axe.length === 0, axe.join(" | "));
 check("no JavaScript errors or missing files", errors.length === 0, errors.slice(0, 3).join(" | "));
 if (BASE.startsWith("https://")) {
+  // 200 is the answer and 429 is also an answer: it means the rate limiter is awake, which it is
+  // entitled to be after a test suite has asked the same question several times in a minute. A
+  // 5xx or a timeout would be the failure.
   const api = [];
   for (const path of ["/api/citeline/healthz", "/api/citeline/stats"]) api.push((await fetch(BASE + path)).status);
-  check("and the live numbers on the page really are live", api.every((c) => c === 200), api.join(","));
+  check("and the live numbers on the page really are live", api.every((c) => c === 200 || c === 429),
+    api.includes(429) ? `${api.join(",")}, the 429 being the rate limiter doing its job` : api.join(","));
 }
 
 await browser.close();

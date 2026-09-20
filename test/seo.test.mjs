@@ -14,7 +14,7 @@ const check = (name, ok, detail = "") => { ok ? pass++ : fail++; console.log(`${
 
 // The pages meant to be found. Working pages carry their own noindex and are checked separately.
 const PUBLIC = [
-  "/", "/the-case.html", "/geometry-as-data.html", "/geometry-bench.html", "/paint-by-numbers.html",
+  "/", "/the-case.html", "/geometry-as-data.html", "/geometry-bench.html", "/tiles.html", "/paint-by-numbers.html",
   "/self-healing.html", "/shape-of-a-file.html", "/research.html", "/resume.html", "/method.html",
   "/directing-ai.html", "/teach.html", "/about.html", "/contact.html",
   "/work/citeline.html", "/work/mcp-gateway.html", "/work/valuesai.html", "/podcast/",

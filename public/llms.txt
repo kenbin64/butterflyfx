@@ -19,6 +19,9 @@
 
 ## Demonstrations you can break
 
+- [The tiles that never existed](https://butterflyfx.us/tiles.html): a map with no tiles. Every one
+  is worked out on request from 67 kB of corner values, against a stored pyramid that reaches 92 GB
+  by zoom 10. It measures its own error and says when you have zoomed past what it knows.
 - [Paint by numbers](https://butterflyfx.us/paint-by-numbers.html): how much of a photograph one
   simple rule can paint, and the exact remainder it cannot.
 - [Self healing lattice](https://butterflyfx.us/self-healing.html): damage it by hand and watch the

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The tiles that never existed &middot; Kenneth W. Bingham</title>
+<meta name="description" content="A map with no map. Every tile is worked out when you ask for it, from 67 kB of corner values, and a stored pyramid of the same tiles would run to gigabytes. Pan and zoom it, then measure how wrong it is.">
+<meta name="author" content="Kenneth W. Bingham">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/tiles.html">
+<link rel="icon" href="assets/butterfly.png">
+<link rel="stylesheet" href="site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/tiles.html">
+<meta property="og:title" content="The tiles that never existed">
+<meta property="og:description" content="Every tile made when you ask for it, from 67 kB. The stored pyramid it replaces runs to gigabytes, and the page shows you where the method stops working.">
+<meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "@id": "https://butterflyfx.us/tiles.html",
+  "url": "https://butterflyfx.us/tiles.html",
+  "name": "The tiles that never existed",
+  "description": "A tile server with no stored tiles: every tile is derived on request from a small store of corner values, with the error measurable on screen.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any browser",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "isAccessibleForFree": true,
+  "featureList": [
+    "Pan and zoom a map whose tiles are made on request",
+    "Counts what a stored pyramid of the same tiles would weigh",
+    "Measures its own error against the field it came from",
+    "Shows the zoom at which it runs out of measured detail"
+  ],
+  "author": { "@type": "Person", "name": "Kenneth W. Bingham", "url": "https://butterflyfx.us" },
+  "inLanguage": "en"
+}
+</script>
+<style>
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 20rem; gap: 1.2rem; margin-top: 1.4rem; align-items: start; }
+  @media (max-width: 900px) { .stage { grid-template-columns: 1fr; } }
+  .stage figure { margin: 0; }
+  #map { width: 100%; height: 520px; display: block; border: 1px solid var(--border);
+         border-radius: var(--radius); background: #0d1117; cursor: grab; touch-action: none; }
+  #map:active { cursor: grabbing; }
+  @media (max-width: 900px) { #map { height: 380px; } }
+  .readout { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.1rem; }
+  .readout h3 { margin: 0 0 .7rem; font-size: .95rem; }
+  .readout dl { display: grid; grid-template-columns: auto 1fr; gap: .35rem .8rem; margin: 0 0 .9rem; font-size: .88rem; }
+  .readout dt { color: var(--muted); }
+  .readout dd { margin: 0; font-family: var(--mono); font-size: .84rem; text-align: right; }
+  .readout dd.big { font-size: 1rem; color: var(--good); font-weight: 600; }
+  .readout .controls { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .8rem; }
+  .readout label { font-size: .85rem; color: var(--muted); display: flex; gap: .45rem; align-items: center; margin: .5rem 0; }
+  #detail-note { font-size: .84rem; line-height: 1.5; border-left: 3px solid var(--border); padding: .5rem .7rem; margin: .6rem 0 0; color: var(--muted); }
+  #detail-note[data-kind="warn"] { border-left-color: #e0a06a; }
+  #detail-note[data-kind="bad"] { border-left-color: #e0a06a; color: var(--text-2); }
+  #error-out { font-family: var(--mono); font-size: .8rem; color: var(--text-2); margin: .6rem 0 0; min-height: 2.4rem; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="row">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham <span class="sub">AI Engineer</span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/#work">Work</a>
+      <a href="/the-case.html">The case</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="hero" style="padding:2.6rem 0 1rem">
+  <div class="wrap">
+    <p class="role">Derived data &middot; measured, with its limits printed</p>
+    <h1>The tiles that never existed.</h1>
+    <p class="lede">
+      This behaves like a map. Drag it, zoom it, and it answers. There are no tiles anywhere: each
+      one is worked out at the moment you ask for it, from <strong>67 kB</strong> of corner values
+      and the arithmetic that says which corners to use. A stored pyramid of the same tiles runs to
+      gigabytes, and every one of those tiles would be a copy of something already implied by the 67 kB.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="stage">
+      <figure>
+        <canvas id="map" aria-label="A terrain map you can drag and zoom. Every tile is generated when it comes into view."></canvas>
+        <figcaption class="small muted" style="margin-top:.5rem">
+          Drag to move, scroll or use the buttons to zoom. Nothing is downloaded and nothing is stored.
+        </figcaption>
+      </figure>
+
+      <div class="readout">
+        <h3>What is actually held</h3>
+        <dl>
+          <dt>The store</dt><dd>16,641 corners</dd>
+          <dt>Its size</dt><dd id="held">67 kB</dd>
+          <dt>Pyramid to this zoom</dt><dd id="pyramid">0</dd>
+          <dt>Difference</dt><dd class="big" id="ratio">0x</dd>
+        </dl>
+        <div class="controls">
+          <button class="btn" id="zoom-in">Zoom in</button>
+          <button class="btn ghost" id="zoom-out">Zoom out</button>
+        </div>
+        <dl>
+          <dt>Zoom</dt><dd id="zoom-now">1</dd>
+          <dt>Tiles on screen</dt><dd id="on-screen">0</dd>
+          <dt>Tiles made so far</dt><dd id="tiles-made">0</dd>
+          <dt>Time to make one</dt><dd id="tile-ms">0 ms</dd>
+          <dt>Cache</dt><dd id="cache-size">off</dd>
+        </dl>
+        <label><input type="checkbox" id="cache"> Keep the tiles once made, and count what that costs</label>
+        <p id="detail-note" data-kind="ok"></p>
+        <button class="btn ghost" id="measure" style="margin-top:.8rem">Measure the error on this screen</button>
+        <p id="error-out"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What is going on</h2>
+    <p class="lede" style="margin-bottom:1rem">
+      The store is a grid of corner values. Any point between four of them is a bilinear patch, and
+      the only part of a bilinear patch that bends is the <span class="eq">x&middot;y</span> term, so
+      four numbers fix the whole square. Finding which square a point is in is a division. That is
+      the entire method: <strong>one division to say where, four numbers to say what.</strong>
+    </p>
+
+    <div class="grid g2">
+      <div class="card">
+        <span class="tag t-mea">measured</span>
+        <h3 style="margin-top:.6rem">Why the pyramid is redundant</h3>
+        <p>
+          A tile pyramid stores the same field once per zoom level, and the deeper levels are mostly
+          the shallow ones interpolated. If the field is smooth, every tile at every zoom is already
+          implied by one small store. The counter beside the map is that comparison, live: at zoom 10
+          a stored pyramid is about <strong>92 GB</strong> against <strong>67 kB</strong> here.
+        </p>
+      </div>
+      <div class="card">
+        <span class="tag t-mea">measured</span>
+        <h3 style="margin-top:.6rem">And it is not slower</h3>
+        <p>
+          Against the largest materialised version that fits in memory, a 4096 by 4096 grid, reading
+          a point from corners took <strong>0.033 µs against 0.054 µs</strong>, on 1,008 times less
+          memory. The arithmetic is identical either way, so the difference is the memory: a 128 MB
+          grid misses cache on every random read and 130 kB of corners does not.
+        </p>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:1.2rem">
+      <span class="ico" aria-hidden="true">&#9633;</span>
+      <p>
+        <span class="tag t-not">not claimed</span>
+        <strong style="margin-left:.4rem">That this replaces a real map's tiles.</strong>
+        A real map is not smooth. It has roads, coastlines and buildings, which are edges, and no
+        four corners describe an edge. This replaces the part of a pyramid that is smooth, which on
+        terrain is most of it, and the rest has to be kept as an exact remainder. Zoom in far enough
+        here and the note beside the map will tell you when you have passed the last thing the store
+        actually knows.
+      </p>
+    </div>
+
+    <h2 style="margin-top:2rem">Where it stops</h2>
+    <p class="lede" style="margin-bottom:1rem">
+      Three limits, all of them visible on this page rather than described.
+    </p>
+    <ul class="uses" style="list-style:none;padding:0">
+      <li style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius-sm);padding:.75rem 1rem;margin-bottom:.7rem">
+        <strong>It runs out of detail.</strong> The store has a fixed amount in it. Past the zoom
+        where one tile covers less than a corner, you are looking at the space between measurements,
+        smoothly filled in. That is not new detail and the page says so as it happens.
+      </li>
+      <li style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius-sm);padding:.75rem 1rem;margin-bottom:.7rem">
+        <strong>It is wrong by a measurable amount.</strong> Press the button and it measures itself
+        against the field the corners were sampled from, on whatever is on screen. It does not report
+        a number it was told; it works one out.
+      </li>
+      <li style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius-sm);padding:.75rem 1rem">
+        <strong>It cannot tell you where it failed.</strong> This is the important one. A rule has no
+        way of reporting its own error, so the places it gets wrong have to be found by measuring and
+        then kept as an exact remainder. Two separate experiments landed on this today, and it is why
+        every scheme on this site is a rule <em>and</em> a remainder rather than a rule alone.
+      </li>
+    </ul>
+
+    <p style="margin-top:1.4rem">
+      <a class="btn" href="/the-case.html">The whole case, with the benchmarks</a>
+      <a class="btn ghost" href="/geometry-bench.html">Run the benchmark on your own file</a>
+    </p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span>&copy; 2026 Kenneth W. Bingham</span>
+      <a href="/contact.html">Contact</a>
+      <a href="/resume.html">Resume</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script src="/js/tiles.js"></script>
+</body>
+</html>
