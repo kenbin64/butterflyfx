@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chomp 3D · a 3D browser game directed by one person and built with AI · Kenneth W. Bingham</title>
+<meta name="description" content="Chomp 3D: Wally's Cairns Adventure. A complete 3D browser game, seven levels across real Far North Queensland, directed by Kenneth W. Bingham and written with an AI under his rules. 962 unit checks and 87 browser checks. Free to play.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/work/chomp.html">
+<link rel="icon" href="/assets/butterfly.png">
+<link rel="stylesheet" href="/site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/work/chomp.html">
+<meta property="og:title" content="Chomp 3D · a whole 3D game, one person directing, an AI writing the code">
+<meta property="og:image" content="https://butterflyfx.us/img/work/chomp.jpg">
+<meta property="og:description" content="Seven levels of real Cairns in the browser. 962 unit checks, 87 browser checks, free to play.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://butterflyfx.us/work/chomp.html",
+  "url": "https://butterflyfx.us/work/chomp.html",
+  "name": "Chomp 3D: Wally's Cairns Adventure",
+  "description": "A 3D browser game directed by Kenneth W. Bingham and written with an AI.",
+  "author": { "@type": "Person", "name": "Kenneth W. Bingham", "url": "https://butterflyfx.us" },
+  "inLanguage": "en"
+}
+</script>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham</a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/#work">Work</a>
+      <a href="/the-case.html">The case</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">case study · three.js · live and free to play</p>
+    <h1>A whole 3D game, with one person directing and an AI writing the code.</h1>
+    <p class="lede">
+      <b>Chomp 3D: Wally's Cairns Adventure</b> is a complete browser game: seven levels across real
+      places in Far North Queensland, a story with an ending, a points system and leaderboards. I
+      designed it and made every decision; an AI wrote the code under rules I set, and nothing was
+      called done until it had been run and tested.
+    </p>
+    <div class="btn-row">
+      <a class="btn" href="https://playbutterflyfx.com/chomp/" rel="noopener">Play it now</a>
+      <a class="btn ghost" href="https://github.com/kenbin64/chomp2" rel="noopener">Source on GitHub</a>
+      <a class="btn ghost" href="https://playbutterflyfx.com/chomp/guide.html" rel="noopener">The levels</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <h2>The problem</h2>
+    <p>
+      Everyone has seen an AI write a small demo. The open question for a team is whether a person
+      can direct an AI through something large, with many parts that have to keep working together,
+      and come out with software that is finished, tested and live rather than a pile of
+      half-working pieces.
+    </p>
+    <p>
+      A game is a hard way to answer it. It has to look right, feel right and run on a phone, and
+      every change can quietly break something three levels away.
+    </p>
+
+    <h2>Why it is hard</h2>
+    <ul>
+      <li><b>Size.</b> About 23,400 lines of the game's own code in 114 files, 74 3D models and 17
+          pages a player can open. No one keeps all of that in their head, human or AI.</li>
+      <li><b>Coupling.</b> A save file, a points book, an outfit and a hat all have to survive moving
+          between pages, a failed level, a return visit and a new game.</li>
+      <li><b>Feel.</b> Tests can prove a sum. They cannot prove a camera feels right, so the human has
+          to play it and say what is wrong, and the fixes have to land without breaking the rest.</li>
+      <li><b>Respect.</b> It is set on the country of real peoples, and shows real places. That needs
+          care, review and plain statements of what is and is not real.</li>
+    </ul>
+
+    <h2>What I did</h2>
+    <p>
+      I wrote the story, designed the levels, picked every place and character, and set the rules
+      the AI worked under. The AI wrote the code in VS Code and ran the tests. The rules that mattered:
+    </p>
+    <ul>
+      <li>Every rule of play lives in a plain module with its own tests, apart from the drawing, so it
+          can be checked without a browser.</li>
+      <li>Nothing is reported as working until it has been run. Claims are labelled as tested or not.</li>
+      <li>When I find a bug by playing, it is fixed and a test is written that would have caught it.</li>
+      <li>The AI says plainly what it did not check, and never fills a gap with a guess.</li>
+    </ul>
+
+    <h2>The proof</h2>
+    <ul>
+      <li><b>962 unit checks</b> in 27 suites cover the rules: the trip and its keys, scoring, return
+          visits getting harder, the currency, hats and outfits, the leaderboard's limits, and the
+          feedback form's defences.</li>
+      <li><b>87 browser checks</b> drive the real game in Chrome on desktop and phone sizes: every page
+          loads clean, a whole level is completed and then failed, the shop sells and saves a hat, the
+          rhythm game floats the boat on the beat and not off it, and the live site passes the same
+          suite.</li>
+      <li><b>Bugs the tests caught</b> before players did: a level that crashed only on phones, scores
+          that could come out as fractions a leaderboard would refuse, a swim where holding forward
+          pinned the player against an invisible wall, and pages that lost their place on the hosted
+          site because it serves addresses without ".html".</li>
+      <li><b>Bugs I caught by playing</b>, each now covered by a test: a map that, closed with its X,
+          left the camera circling with no player in sight.</li>
+    </ul>
+
+    <h2>Try it</h2>
+    <p>
+      It runs in any modern browser, on a phone or a computer, with nothing to install:
+      <a href="https://playbutterflyfx.com/chomp/" rel="noopener">playbutterflyfx.com/chomp</a>.
+      It is free, has no ads, and saves your game on your own device.
+    </p>
+
+    <h2>What it does not claim</h2>
+    <ul>
+      <li>It is a portfolio piece, not a commercial product.</li>
+      <li>The AI did not design it. The ideas, the story and the decisions are mine; the AI
+          implemented and tested them under my direction.</li>
+      <li>The cultural content is going to Aboriginal and Torres Strait Islander people for review, and
+          will change where they say it should.</li>
+      <li>How it runs on every phone is not yet measured across devices.</li>
+    </ul>
+
+    <div class="metrics">
+      <div class="metric"><span class="n">962</span><span class="l">unit checks</span></div>
+      <div class="metric"><span class="n">87</span><span class="l">browser checks</span></div>
+      <div class="metric"><span class="n">7</span><span class="l">levels</span></div>
+      <div class="metric"><span class="n">23k</span><span class="l">lines of game code</span></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <p>
+      <a href="/">Home</a> &middot;
+      <a href="https://playbutterflyfx.com/chomp/" rel="noopener">Play Chomp 3D</a> &middot;
+      <a href="https://github.com/kenbin64/chomp2" rel="noopener">Source</a> &middot;
+      <a href="/contact.html">Contact</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
