@@ -143,7 +143,7 @@
 <!-- ============================ INTRO ============================ -->
 <section class="hero">
   <div class="wrap">
-    <p class="role">Project · Python · FastAPI · Postgres + pgvector</p>
+    <p class="role">Project · Python · Postgres + pgvector · live on Cloudflare Workers AI + Vectorize</p>
     <h1>citeline</h1>
     <p class="lede">
       A retrieval augmented question answering service over the US National Primary
@@ -152,10 +152,11 @@
       enforced in code rather than requested in a prompt.
     </p>
     <div class="btn-row" style="margin-top:1.5rem">
-      <a class="btn" href="#demo">Query it live</a>
+      <a class="btn" href="https://github.com/kenbin64/citeline" rel="noopener">Source on GitHub</a>
+      <a class="btn ghost" href="#demo-live">Ask it a question</a>
       <a class="btn ghost" href="#results">Evaluation results</a>
-      <a class="btn ghost" href="https://github.com/kenbin64" rel="noopener">Source</a>
     </div>
+    <div class="note"><p><strong>The live demo runs on Cloudflare.</strong> The same parser, chunker, prompt and citation rules, with the request path moved to a Worker: embeddings and answers from Workers AI, vector search in Vectorize, keyword search inside the Worker. No server to keep running, and nothing stored about who asked what.</p></div>
   </div>
 </section>
 
@@ -245,6 +246,40 @@
       between those two cases, plus an independent requirement that the sparse retriever
       matched something at all. Fusion still decides the ordering. It just no longer
       pretends to measure confidence.
+    </p>
+
+    <h3>Similarity is not a coverage score either</h3>
+    <p>
+      Moving the service to the edge meant a new embedding model, so the threshold had to be
+      measured again. This time the sweep said something different: on this corpus, cosine
+      similarity does not separate the two cases at all. A real question scored as low as
+      <code>0.64</code> and <em>what is the maximum contaminant level for microplastics</em>
+      scored <code>0.73</code>, because it reads exactly like a question the regulations answer.
+      Every threshold above 0.64 only refused real questions.
+    </p>
+    <p>
+      What does separate them is vocabulary. "Microplastics", "OSHA", "caffeine" and
+      "1,4-dioxane" appear nowhere in Part 141, and that alone says the corpus cannot answer.
+      That check made 12 of the 15 correct refusals across both test sets. The other 3 use only
+      words the corpus contains, and all three score under a low similarity floor of 0.60, so
+      the two cheap checks stop all 15 before the model is ever asked. With the floor switched
+      off, the model declined those 3 itself, so there is a third line behind the first two.
+    </p>
+
+    <h3>The evaluation found that every table was missing</h3>
+    <p>
+      The first edge run refused the arsenic question, and the reason was not the model. The
+      eCFR serves tables as HTML rows, and the parser kept only paragraph elements, so all 139
+      tables in Part 141 had been dropped without a sound. The contaminant limits live in those
+      tables. The arsenic limit was not in the index at all.
+    </p>
+    <p>
+      The fix keeps each row with its column headers, <code>Contaminant: (16) Arsenic; MCL
+      (mg/l): 0.010</code>, so a row still says what its number measures after chunking. A test
+      now pins it, and that test fails on the old parser. Answerable questions answered correctly
+      went from 8 of 21 to 16 of 21 on that change alone. The same check turned up one wrong
+      label in the test set: it called PFOA out of scope, but this edition of 141.61 lists a PFOA
+      limit of 0.0000040 mg/L, from the 2024 PFAS rule.
     </p>
   </div>
 </section>
@@ -340,7 +375,7 @@
 
         <rect x="506" y="115" width="140" height="52" rx="8" class="d-box-warn"/>
         <text x="576" y="135" text-anchor="middle" class="d-label">similarity gate</text>
-        <text x="576" y="153" text-anchor="middle" class="d-sub">cosine &#8805; 0.62</text>
+        <text x="576" y="153" text-anchor="middle" class="d-sub">vocabulary + floor</text>
 
         <rect x="686" y="52" width="200" height="52" rx="8" class="d-box-good"/>
         <text x="786" y="72" text-anchor="middle" class="d-label">answer + verify citations</text>
@@ -374,9 +409,9 @@
       <div class="card">
         <p class="kicker">gate 1 · before the model</p>
         <p class="small mb0">
-          If no passage is semantically close enough, or no passage contains the
-          question's terms, the language model is never invoked. This is the cheap gate
-          and it catches the common case. Its threshold was chosen by sweeping the
+          If a word of the question appears nowhere in the corpus, or nothing is even
+          loosely similar, the language model is never invoked. This is the cheap gate
+          and it catches the common case. What it checks was chosen by sweeping the
           labelled set, not by judgement.
         </p>
       </div>
@@ -393,9 +428,9 @@
         <p class="kicker">gate 3 · after the model</p>
         <p class="small mb0">
           Every citation the model emitted is checked against the excerpts it was actually
-          handed. A citation to an excerpt that was never supplied, or a substantive
-          sentence carrying none, fails the whole answer. It is discarded, not served with
-          a warning attached.
+          handed. A citation to an excerpt that was never supplied, a substantive sentence
+          carrying none, or a number that is not in the passage it cites, fails the whole
+          answer. It is discarded, not served with a warning attached.
         </p>
       </div>
     </div>
@@ -430,21 +465,21 @@
           <td>
             RRF combines <em>ranks</em>, so it needs no shared score scale between a cosine
             distance and a lexical relevance score, and no model. A re-ranker would likely order
-            the top few better, but it adds a second model to the request path on a host that
-            already cannot afford the first one. The cost is real: RRF cannot tell that the third
+            the top few better, but it adds a second model call, and its latency, to every
+            request. The cost is real: RRF cannot tell that the third
             result is much better than the fourth, only that it ranked higher.
           </td>
         </tr>
         <tr>
-          <td>Abstention threshold</td>
-          <td>Cosine 0.62, measured</td>
-          <td>A tuned guess</td>
+          <td>Abstention signal</td>
+          <td>Vocabulary, plus a low similarity floor, measured</td>
+          <td>A similarity threshold alone</td>
           <td>
-            Swept against the eval set and chosen where out-of-scope questions were blocked
-            without starting to block answerable ones. The first attempt gated on the fused RRF
-            score, which was wrong: the highest possible fused score was lower than the threshold
-            being asked for, so nothing could ever pass. Raw cosine is comparable between
-            questions; a fused rank score is not.
+            Swept against the eval set. The first attempt gated on the fused RRF score, which could
+            never reach its own threshold. The second gated on cosine, which worked on the original
+            model and stopped working on the edge one: covered and uncovered questions overlapped
+            (0.64 against 0.73). Vocabulary separates them. The cost: a misspelled subject is
+            refused, and the reason shown says which word was not found.
           </td>
         </tr>
         <tr>
@@ -459,34 +494,37 @@
           </td>
         </tr>
         <tr>
-          <td>Embeddings</td>
-          <td>Local, nomic-embed-text</td>
-          <td>A hosted embedding API</td>
+          <td>Where it runs</td>
+          <td>Two builds: local, and Cloudflare</td>
+          <td>One hosted service</td>
           <td>
-            No key to leak, no per token cost, and no corpus text leaving the host, which is the
-            posture a regulated customer will ask about. The cost is quality: a larger hosted
-            model would almost certainly retrieve better.
+            The reference build runs everything locally (Postgres, nomic-embed-text, Ollama): no
+            key to leak and no corpus text leaving the machine, the posture a regulated customer
+            asks about. The live demo runs on Workers AI and Vectorize, because the small server it
+            used to run on took over four minutes per answer. The cost of two builds is keeping
+            them in step, so they share the parser, chunker, prompt and citation rules.
           </td>
         </tr>
         <tr>
-          <td>Generation on demand</td>
-          <td>Off, answers precomputed</td>
-          <td>Generating per request</td>
+          <td>Answer model</td>
+          <td>Llama 4 Scout, chosen by the eval</td>
+          <td>The largest model available</td>
           <td>
-            Measured on this host, one grounded answer ran past four minutes. The CPU is a
-            virtual one with no AVX or SSE4.2, so llama.cpp falls back to scalar arithmetic and
-            no amount of tuning closes that gap. Retrieval stays live because it is fast and it
-            is the part worth showing.
+            On the same retrieval, Llama 3.3 70B and Llama 4 Scout both answered 19 of 21. Scout
+            was faster (1.1 s median against 1.7 s), and where it could not read the arsenic limit
+            out of a table it refused, while Llama 3.3 served a muddled answer. gpt-oss-120b wrote
+            citations in its own format, which the contract correctly refused.
           </td>
         </tr>
       </tbody>
     </table>
     </div>
 
-    <h2>Query it</h2>
+    <h2 id="demo-live">Query it</h2>
     <p class="lede">
       This is the running service, not a recording. Try a question the regulations answer,
-      then try one they do not, and watch it decline.
+      then try one they do not, and watch it decline. Every answer lists the passages it
+      cites, with the text, so you can check it.
     </p>
 
     <div class="demo-panel play">
@@ -498,18 +536,20 @@
       </form>
 
       <ul class="examples">
-        <li><button type="button" data-q="What is the maximum contaminant level for arsenic in drinking water?">arsenic limit</button></li>
+        <li><button type="button" data-q="What is the drinking water MCL for PFOA?">PFOA limit</button></li>
         <li><button type="button" data-q="At what concentration is the lead action level exceeded?">lead action level</button></li>
         <li><button type="button" data-q="How quickly must a system issue a Tier 1 public notice?">Tier 1 notice</button></li>
-        <li><button type="button" class="oos" data-q="What is the national ambient air quality standard for benzene?">benzene in AIR</button></li>
-        <li><button type="button" class="oos" data-q="What is the drinking water MCL for PFOA?">PFOA</button></li>
+        <li><button type="button" class="oos" data-q="What is the maximum contaminant level for microplastics?">microplastics</button></li>
+        <li><button type="button" class="oos" data-q="What is the allowable level of glyphosate in agricultural soil?">glyphosate in SOIL</button></li>
         <li><button type="button" class="oos" data-q="What is the capital of France?">capital of France</button></li>
       </ul>
       <p class="small muted" style="margin-top:.7rem">
-        The dashed ones are outside the corpus. The last two are the interesting ones: benzene
-        <em>is</em> in these regulations with a drinking water limit, so asking for its air
-        standard is a near miss, and PFOA is a real contaminant that this edition of the corpus
-        genuinely does not cover. A keyword filter is fooled by both.
+        The dashed ones are outside the corpus, and two of them are near misses. Microplastics
+        reads exactly like a question these regulations answer, and its similarity score is
+        higher than some real questions get. Glyphosate <em>is</em> in these regulations, with a
+        drinking water limit, so asking about soil uses only words the corpus contains. The
+        first is refused because the word appears nowhere; the second scores just under the
+        similarity floor, and with the floor off, the model declines it too.
       </p>
 
       <div class="compare" id="compare" hidden aria-live="polite">
@@ -544,7 +584,25 @@
     </p>
 
     <div id="eval-block">
-      <p class="muted">Evaluation figures are generated by <code>eval/run_eval.py</code> and inserted here after each run.</p>
+      <div class="tbl-scroll">
+      <table class="tradeoffs">
+        <thead>
+          <tr><th>Set</th><th>Answerable, answered correctly</th><th>Out of scope, answered anyway</th><th>Right section in the top 4</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>The original 28 (one label corrected)</td><td><b>19 of 21</b></td><td><b>0 of 7</b></td><td>20 of 21</td></tr>
+          <tr><td>Held out: 22 new questions, written after all tuning</td><td><b>14 of 14</b></td><td><b>0 of 8</b></td><td>14 of 14</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="small muted">
+        Measured on the live Cloudflare build, 14 October 2026. The second set was written only
+        after every change was made, with each expected answer checked against the regulation
+        text first, so it is the real test of whether the tuning carried over to questions it had never seen. The two misses
+        on the first set: arsenic is refused (the model did not read the limit out of the table
+        it was given), and fluoride is answered "4 mg/l" from 141.208, the right value, but not
+        the "4.0" from 141.62 that the strict scorer asks for.
+      </p>
     </div>
 
     <h3 style="margin-top:2rem">What is measured, and why both halves matter</h3>
@@ -597,7 +655,7 @@ make install                      # venv + dependencies
 make migrate                      # apply the schema
 make ingest                       # fetch, gate, chunk, embed, index
 
-make check                        # ruff + mypy + 31 unit tests
+make check                        # ruff + mypy + 41 unit tests
 make eval                         # regenerate the numbers above
 
 citeline search "MCL for arsenic" # retrieval only
@@ -617,26 +675,28 @@ citeline ask    "MCL for arsenic" # full pipeline</code></pre>
     <p>Things this does not do, stated plainly so nobody has to discover them.</p>
 
     <div class="note limit">
-      <strong>The host CPU is weak, and it shows.</strong>
-      This VPS is a QEMU virtual CPU with no AVX, SSE4.2 or POPCNT exposed. Modern numpy
-      and ONNX runtime wheels will not execute on it at all, which ruled out the faster
-      embedding path and forced everything through Ollama's generic CPU build. Measured on
-      this host: embedding a passage takes about 4.5 seconds, so the full corpus build runs
-      for over an hour, and generation takes tens of seconds per answer. Short query
-      embedding stays near 200 ms, which is why the interactive demo defaults to the
-      retrieval path. On any ordinary machine these numbers change completely. The
-      architecture is not the bottleneck; this particular processor is.
+      <strong>The right section is found more often than it is ranked first.</strong>
+      It is in the top four for 34 of 35 answerable questions, but first for only about half.
+      The model is given all four, so this costs little most of the time. Arsenic is the case
+      where it does: an expired 2006 limit in 141.11 outranks the current one in 141.62, and
+      the model refuses rather than choose.
     </div>
 
     <ul class="clean">
       <li>
-        <b>No reranker.</b> A cross encoder would likely improve ranking, but it cannot run
-        on this CPU for the reason above. The interface for it exists; the model does not.
+        <b>No reranker.</b> A cross encoder would likely fix most of the ranking gap above. It
+        is the next change worth measuring, and the first one that would add a second model
+        call to every request.
       </li>
       <li>
-        <b>The eval set is small.</b> 28 questions written by one person. It is enough to
-        catch a broken gate and to set a threshold, and not enough to claim a general
-        accuracy figure. Treat the numbers as a regression baseline, not a benchmark.
+        <b>A misspelled subject is refused.</b> "arsnic" is not a word in the corpus. The
+        refusal says why, so the fix is obvious to the person asking.
+      </li>
+      <li>
+        <b>The eval sets are small.</b> 50 questions in two sets, written by one person. That
+        is enough to catch a broken gate, a dropped table and a wrong label, which it did, and
+        not enough to claim a general accuracy figure. Treat the numbers as a regression
+        baseline, not a benchmark.
       </li>
       <li>
         <b>One corpus, one part.</b> Part 141 only. Nothing about the design is specific to
@@ -644,14 +704,15 @@ citeline ask    "MCL for arsenic" # full pipeline</code></pre>
       </li>
       <li>
         <b>Gate 3 verifies grounding, not correctness.</b> It proves every claim carries a
-        citation to a passage that was actually supplied. It does not prove the model read
-        that passage correctly. That is a real gap, and it is why the answer always shows
-        its sources for a human to check.
+        citation to a passage that was actually supplied, and that every number stated is in
+        that passage. It does not prove the model drew the right conclusion from it. That is a
+        real gap, and it is why the answer always shows its sources for a human to check.
       </li>
       <li>
         <b>Abstention has a cost.</b> A tighter gate refuses some questions the corpus
-        genuinely answers. That trade is deliberate and the sweep table shows exactly what
-        it costs at each threshold.
+        genuinely answers. That trade is deliberate: a refusal is visible and recoverable, and
+        a confident wrong answer is neither. The threshold sweep, run on every change, shows
+        exactly what each setting costs.
       </li>
     </ul>
   </div>
@@ -682,7 +743,7 @@ citeline ask    "MCL for arsenic" # full pipeline</code></pre>
    retrieval. The difference on show is the decision, which is the part that
    actually differs. */
 (function () {
-  var API = '/api/citeline';
+  var API = 'https://citeline-edge.ken-bingham64.workers.dev/api/citeline';
   var form  = document.getElementById('demo-form');
   var input = document.getElementById('q');
   var btn   = document.getElementById('go');
@@ -697,7 +758,7 @@ citeline ask    "MCL for arsenic" # full pipeline</code></pre>
      and is free to disagree with it. The page now reports what the service
      decided and why. The constant below is used only to tint individual
      passages, never to decide the outcome. */
-  var TINT_AT = 0.62;
+  var TINT_AT = 0.60;
 
   function esc(v) {
     return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
@@ -733,21 +794,44 @@ citeline ask    "MCL for arsenic" # full pipeline</code></pre>
     naive.innerHTML = left;
 
     var right = '';
+    if (data.recordedOn) {
+      right += '<p class="small"><span class="pill warn">recorded ' + esc(data.recordedOn) + '</span> ' +
+               (data.recordedWhy === 'daily_allowance'
+                 ? "Today's model allowance is used up (it resets at 00:00 UTC), so this"
+                 : 'The live model is unavailable right now, so this') +
+               ' is the answer the live service gave to this question on its last recorded run.</p>';
+    }
+    var GATES = { retrieval: 'gate 1, before the model', model: 'gate 2, the model declined', verification: 'gate 3, the answer failed its checks' };
     if (data.abstained) {
-      right += '<div class="verdict"><span class="pill stop">abstained</span></div>';
-      right += '<p>' + esc(data.answer) + '</p>';
-    } else if (data.precomputed) {
-      right += '<div class="verdict"><span class="pill good">answered</span>' +
-               '<span class="pill">precomputed</span></div>';
+      right += '<div class="verdict"><span class="pill stop">abstained</span>' +
+               (data.gate ? '<span class="pill">' + esc(GATES[data.gate] || data.gate) + '</span>' : '') + '</div>';
       right += '<p>' + esc(data.answer) + '</p>';
     } else {
-      right += '<div class="verdict"><span class="pill good">passed the gate</span></div>';
+      right += '<div class="verdict"><span class="pill good">answered</span><span class="pill">citations checked</span></div>';
       right += '<p>' + esc(data.answer) + '</p>';
+      var cites = data.citations || [];
+      for (var j = 0; j < cites.length; j++) {
+        var c = cites[j];
+        right += '<details class="passage over"><summary><span class="ref">[' + c.n + '] ' + esc(c.ref) + '</span> ' +
+                 '<span class="ttl">' + esc(c.title || '') + '</span></summary>' +
+                 '<p class="small" style="white-space:pre-wrap">' + esc(String(c.text || '').replace(/^40 CFR [^\n]*\n+/, '')) + '</p>' +
+                 '<p class="small"><a href="' + esc(c.url) + '" rel="noopener">Read the section on eCFR</a></p></details>';
+      }
     }
     right += '<p class="small muted"><b>Why:</b> ' + esc(data.reason) + '</p>';
-    right += '<p class="small muted">Best passage similarity <b>' + best.toFixed(3) + '</b>. ' +
-             'The thresholds behind this decision were set by sweeping the eval set, not by taste.</p>';
+    right += '<p class="small muted">Best passage similarity <b>' + best.toFixed(3) + '</b>' +
+             (data.generate_ms ? ', answer written in ' + (data.generate_ms / 1000).toFixed(1) + ' s' : '') + '. ' +
+             'What each gate checks was set by sweeping two labelled question sets, not by taste.</p>';
     gated.innerHTML = right;
+  }
+
+  var saved = null;
+  function recorded(q) {
+    saved = saved || fetch('citeline-recorded.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+    return saved.then(function (s) {
+      var a = s && s.answers && s.answers[q];
+      return a ? Object.assign({}, a, { recordedOn: s.recorded }) : null;
+    });
   }
 
   function ask(q) {
@@ -764,6 +848,16 @@ citeline ask    "MCL for arsenic" # full pipeline</code></pre>
     })
     .then(function (r) {
       if (r.status === 429) throw new Error('Rate limited. Give it a minute.');
+      if (r.status === 503) {
+        // The model has a daily allowance. For the example questions, show the answer the live
+        // service gave on its last recorded run, labelled as recorded. Anything else gets the error.
+        return r.json().then(function (e) {
+          return recorded(q).then(function (saved) {
+            if (saved) return Object.assign(saved, { recordedWhy: e && e.code });
+            throw new Error((e && e.error) || 'The model service is unavailable. Please try again later.');
+          });
+        });
+      }
       if (!r.ok) throw new Error('The service returned ' + r.status + '.');
       return r.json();
     })

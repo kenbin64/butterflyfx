@@ -17,3 +17,6 @@ resume-draft.md
 # Editor backups
 *.bak
 public/*.bak
+
+# Wrangler's local cache
+.wrangler/

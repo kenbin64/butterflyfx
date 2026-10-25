@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Least Tokens: Kenneth W. Bingham</title>
+<meta name="description" content="A benchmark that finds the fewest tokens that still get the job done: 3,600 answers from 3 local models, six ways of writing the same instruction, every answer marked by fixed rules.">
+<meta name="author" content="Kenneth W. Bingham">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/least-tokens.html">
+<link rel="icon" href="assets/butterfly.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@700;800&display=swap">
+<link rel="stylesheet" href="portfolio.css">
+<style>
+  /* The tables of results on this page. */
+  .results { width: 100%; border-collapse: collapse; font-size: 16px; }
+  .results th, .results td { text-align: left; padding: 12px 14px; border-top: 1px solid var(--line); vertical-align: top; color: var(--ink-2); }
+  .results thead th { border-top: 0; font: 700 12px var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .results tbody th { color: var(--ink); font-weight: 600; }
+  .results td b { color: var(--ink); font: 700 18px var(--mono); }
+  .results tr.top th, .results tr.top td b { color: var(--a); }
+  .scroll { overflow-x: auto; }
+  .versus { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); }
+  .versus > div { padding: var(--s3); border-radius: var(--s3); border: 1px solid var(--line); background: rgba(255, 255, 255, 0.03); display: grid; gap: var(--s1); }
+  .versus code { font: 500 16px/1.45 var(--mono); color: #fff; }
+  .versus b { font: 800 clamp(34px, 3.6vw, 55px)/1 var(--display); color: var(--k); }
+  .versus span { color: var(--ink-2); font-size: 15px; }
+  @media (max-width: 640px) { .versus { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top">
+    <a class="brand" href="./"><img src="kennethbingham.webp" alt="" width="42" height="42"><span>Kenneth W. Bingham<small>AI Prototyping Engineer &middot; Full-Stack</small></span></a>
+    <nav aria-label="Site"><a href="./">Work</a><a href="how-i-direct-ai.html">How I direct AI</a><a href="what-i-put-in.html">What I put in</a><a href="resume.html">Resume</a><a class="hire" href="contact.html">Contact</a></nav>
+  </div>
+
+  <header class="split">
+    <div class="say">
+      <span class="eyebrow">A benchmark &middot; measured, not estimated</span>
+      <h1>The fewest tokens that <em>still get the job done.</em></h1>
+    </div>
+    <div class="prose">
+      <p class="lede" style="max-width: 60ch">Every request to an AI is paid for by the token. Shortening a prompt is easy. Knowing whether the shorter one still works is the part people skip.</p>
+      <p>This is a test bench for that question. It writes the same instruction six ways, gives each to three AI models many times, marks every answer by fixed rules, and reports one number: <b>tokens per correct answer</b>. A wrong answer costs its tokens and counts for nothing, so cutting too far is punished as hard as waste.</p>
+    </div>
+  </header>
+
+  <section class="facts" aria-label="The run">
+    <div class="fact"><b>3,600</b><span>answers, every one marked by rule, not by an AI</span></div>
+    <div class="fact"><b>3</b><span>models, run on a laptop, reporting exact token counts</span></div>
+    <div class="fact"><b>40</b><span>tasks of four kinds, each with a known right answer</span></div>
+    <div class="fact"><b>41%</b><span>lower cost per correct answer, best way of writing against polite prose</span></div>
+  </section>
+
+  <section class="block" aria-labelledby="head-title">
+    <div class="block-head">
+      <h2 id="head-title">The result</h2>
+      <p>All models and all tasks together. The instruction column is the length of the instruction alone. The last column is the measure: everything spent, divided by the answers that were right. Lower is better.</p>
+    </div>
+    <div class="scroll"><table class="results">
+      <thead><tr><th scope="col">Way of writing the instruction</th><th scope="col">Instruction, tokens</th><th scope="col">Answers right</th><th scope="col">Tokens per correct answer</th></tr></thead>
+      <tbody>
+          <tr class="top"><th scope="row">Mixed: plain direction plus the answer's shape</th><td>33</td><td>59%</td><td><b>179</b></td></tr>
+          <tr><th scope="row">Outline with the answer's shape</th><td>29</td><td>55%</td><td><b>182</b></td></tr>
+          <tr><th scope="row">Short plain lines</th><td>31</td><td>47%</td><td><b>191</b></td></tr>
+          <tr><th scope="row">Abbreviated</th><td>34</td><td>42%</td><td><b>232</b></td></tr>
+          <tr><th scope="row">Polite prose</th><td>92</td><td>49%</td><td><b>304</b></td></tr>
+          <tr><th scope="row">Function signature</th><td>42</td><td>36%</td><td><b>350</b></td></tr>
+      </tbody>
+    </table></div>
+    <p class="hint">The top three are close. The clear results are at the bottom: polite prose costs about three times the tokens to say the same thing, and the two forms that look most efficient to a programmer, abbreviation and code, did worse than plain short English.</p>
+  </section>
+
+  <section class="block" aria-labelledby="same-title">
+    <div class="block-head">
+      <h2 id="same-title">Same model. Same task. Same data.</h2>
+      <p>One model, asked to pull a date and an amount out of an invoice line and return them as JSON. The only difference is how it was told not to add anything else.</p>
+    </div>
+    <div class="versus">
+      <div style="--k: #ff6fb5"><code>JSON only.</code><b>0%</b><span>usable. It found the right values every time, then wrote "Here is the response" in front of them, which breaks any program reading the answer.</span></div>
+      <div style="--k: #2dd4bf"><code>Please give me your answer as a JSON object ... and please do not add any other words or explanation.</code><b>100%</b><span>usable. Longer, and on this model every extra word was doing work.</span></div>
+    </div>
+    <p class="hint">The model did not change between those two columns. What it was given did. That is the whole argument of <a href="what-i-put-in.html">What I put in</a>, as a measurement.</p>
+  </section>
+
+  <section class="block" aria-labelledby="kind-title">
+    <div class="block-head">
+      <h2 id="kind-title">No single way of writing wins</h2>
+      <p>Split by kind of task, the best form changes. That is the practical finding: choose the form to suit the job, and measure, because the right choice is not the one that looks shortest.</p>
+    </div>
+    <div class="scroll"><table class="results">
+      <thead><tr><th scope="col">Kind of task</th><th scope="col">Best way of writing</th><th scope="col">Tokens per correct answer</th><th scope="col">Worst that still worked</th></tr></thead>
+      <tbody>
+          <tr><th scope="row">Classify a review</th><td>Short plain lines</td><td><b>60</b> (99% right)</td><td>Function signature: 329</td></tr>
+          <tr><th scope="row">Pull fields from an invoice line</th><td>Mixed: plain direction plus the answer's shape</td><td><b>145</b> (75% right)</td><td>Abbreviated: 379</td></tr>
+          <tr><th scope="row">Do a sum</th><td colspan="2">No way of writing worked. See finding 4.</td><td>1% at best</td></tr>
+          <tr><th scope="row">Turn a note into a record</th><td>Outline with the answer's shape</td><td><b>153</b> (71% right)</td><td>Polite prose: 376</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="block" aria-labelledby="find-title">
+    <div class="block-head">
+      <h2 id="find-title">Four things the numbers showed</h2>
+      <p>Each was checked by reading the wrong answers themselves before it was written down here.</p>
+    </div>
+    <div class="work">
+      <div class="exchange"><h3>1. Written as code, the models wrote code</h3><p>Given a function signature and asked for the sentiment of a review, two of the three models produced a sentiment program instead of an answer: <b>0%</b> and <b>8%</b> right. An instruction that looks like something to be built gets built.</p></div>
+      <div class="exchange"><h3>2. Abbreviating lost twice</h3><p>"Clsfy rvw sntmnt" is shorter on the page than "Classify the review's sentiment". It cost <b>more</b> tokens, because a model splits unfamiliar spellings into more pieces, and it scored <b>42%</b> against <b>47%</b>. What looks minimal to a person is not minimal to a model.</p></div>
+      <div class="exchange"><h3>3. Sometimes the padding is carrying the load</h3><p>The comparison above. A short "JSON only." was ignored by one model every time; the long polite version was obeyed every time. Cutting words is only a saving while the answer stays usable.</p></div>
+      <div class="exchange"><h3>4. No wording fixed the arithmetic</h3><p>Asked for a sum and told "number only", the models were right <b>1%</b> of the time in every form. When they answered with a bare number they were right 1% of the time. When they broke the rule and showed their working, the right figure was in the answer <b>55%</b> of the time. Forbidding the working removed the tokens that were doing the job. A sum belongs in code, not in a prompt.</p></div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="how-title">
+    <div class="block-head">
+      <h2 id="how-title">How it works</h2>
+      <p>Three small stages. The output of each is the input of the next, and only the first one uses an AI. The thing being tested is never the judge.</p>
+    </div>
+    <div class="scroll"><table class="results">
+      <thead><tr><th scope="col">Stage</th><th scope="col">Goes in</th><th scope="col">Does the work</th><th scope="col">Comes out</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Answer</th><td>A task, and one way of writing its instruction</td><td>The AI model</td><td>An answer, with the exact count of tokens used</td></tr>
+        <tr><th scope="row">Mark</th><td>The answer, and the right answer already known</td><td>Fixed rules, covered by 65 tests</td><td>Right or wrong</td></tr>
+        <tr><th scope="row">Report</th><td>Every mark and every token count</td><td>Arithmetic</td><td>Tokens per correct answer</td></tr>
+      </tbody>
+    </table></div>
+    <p class="hint">The marking is strict on purpose. If the instruction said "JSON only" and the answer has a sentence in front of it, that is a fail, because a program reading the output would fail too. Each task is asked five times in each form, with fixed seeds so the run can be repeated exactly.</p>
+  </section>
+
+  <section class="split" aria-labelledby="limits-title">
+    <div class="say">
+      <h2 id="limits-title">What this does not show</h2>
+      <p class="lede">It is a real result for these models and these tasks. It is not a law.</p>
+    </div>
+    <div class="stackv">
+      <div class="exchange"><h3>Three small models</h3><p>llama3.1:8b, llama3.2:3b, qwen2.5-coder:7b, all run locally. Larger commercial models follow instructions better and would likely narrow the gaps. The ranking may differ on them.</p></div>
+      <div class="exchange"><h3>Forty tasks</h3><p>Enough to show the method works and to find the effects above. Not enough to claim a general rate for any way of writing.</p></div>
+      <div class="exchange"><h3>One wording of each form</h3><p>Each way of writing was tried with one phrasing per kind of task. A different phrasing of the same form could score differently, which is itself the point.</p></div>
+      <div class="exchange"><h3>It measures. It does not yet rewrite</h3><p>The next version feeds the result back: shorten a prompt, measure it, keep the change only if the cost per correct answer falls, and judge on tasks it was not tuned on.</p></div>
+    </div>
+  </section>
+
+  <section class="split">
+    <p class="quote">The model did not change. <em style="font-style: normal; color: var(--a)">The input did.</em></p>
+    <div class="prose">
+      <p>People say AI produces rubbish. Sometimes it does. This page is a measurement of how much of that is decided before the model reads a word of the task.</p>
+      <div class="cta" style="padding-top: var(--s2)"><a class="btn go" href="what-i-put-in.html">What I put in</a><a class="btn" href="how-i-direct-ai.html">How I direct AI</a><a class="btn" href="./#work">The work</a></div>
+    </div>
+  </section>
+
+  <footer class="foot hint">
+    <div class="row"><span>&copy; 2026 Kenneth W. Bingham &middot; St. George, Utah</span><span><a href="./">Work</a> &middot; <a href="how-i-direct-ai.html">How I direct AI</a> &middot; <a href="resume.html">Resume</a> &middot; <a href="contact.html">Contact</a></span></div>
+    <p>Run on 2026-10-14. Concept and direction: Kenneth W. Bingham. Built with Claude under a standing directive to be skeptical, to insist on proof, and to make no claim that has not been run. The ideas are mine. The AI implemented and verified them.</p>
+  </footer>
+
+</div>
+</body>
+</html>

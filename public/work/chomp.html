@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chomp 3D · a 3D browser game directed by one person and built with AI · Kenneth W. Bingham</title>
-<meta name="description" content="Chomp 3D: Wally's Cairns Adventure. A complete 3D browser game, seven levels across real Far North Queensland, directed by Kenneth W. Bingham and written with an AI under his rules. 962 unit checks and 87 browser checks. Free to play.">
+<meta name="description" content="Chomp 3D: Wally's Cairns Adventure. A complete 3D browser game, seven levels across real Far North Queensland, directed by Kenneth W. Bingham and written with an AI under his rules. 1,022 unit checks and 107 browser checks, versioned releases with rollback, playable in VR. Free to play.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://butterflyfx.us/work/chomp.html">
 <link rel="icon" href="/assets/butterfly.png">
@@ -13,7 +13,7 @@
 <meta property="og:url" content="https://butterflyfx.us/work/chomp.html">
 <meta property="og:title" content="Chomp 3D · a whole 3D game, one person directing, an AI writing the code">
 <meta property="og:image" content="https://butterflyfx.us/img/work/chomp.jpg">
-<meta property="og:description" content="Seven levels of real Cairns in the browser. 962 unit checks, 87 browser checks, free to play.">
+<meta property="og:description" content="Seven levels of real Cairns in the browser. 1,022 unit checks, 107 browser checks, free to play.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -78,7 +78,7 @@
 
     <h2>Why it is hard</h2>
     <ul>
-      <li><b>Size.</b> About 23,400 lines of the game's own code in 114 files, 74 3D models and 17
+      <li><b>Size.</b> About 24,100 lines of the game's own code in 116 files, 147 3D model files and 17
           pages a player can open. No one keeps all of that in their head, human or AI.</li>
       <li><b>Coupling.</b> A save file, a points book, an outfit and a hat all have to survive moving
           between pages, a failed level, a return visit and a new game.</li>
@@ -103,10 +103,10 @@
 
     <h2>The proof</h2>
     <ul>
-      <li><b>962 unit checks</b> in 27 suites cover the rules: the trip and its keys, scoring, return
+      <li><b>1,022 unit checks</b> in 30 suites cover the rules: the trip and its keys, scoring, return
           visits getting harder, the currency, hats and outfits, the leaderboard's limits, and the
           feedback form's defences.</li>
-      <li><b>87 browser checks</b> drive the real game in Chrome on desktop and phone sizes: every page
+      <li><b>107 browser checks</b> drive the real game in Chrome on desktop and phone sizes: every page
           loads clean, a whole level is completed and then failed, the shop sells and saves a hat, the
           rhythm game floats the boat on the beat and not off it, and the live site passes the same
           suite.</li>
@@ -118,6 +118,20 @@
           left the camera circling with no player in sight.</li>
     </ul>
 
+    <h2>After launch: a beta, run like a product</h2>
+    <ul>
+      <li><b>Versioned releases.</b> Fifteen beta releases so far. One script refuses to release if
+          anything is uncommitted or any test fails, then tags the version on GitHub and publishes a
+          labelled Cloudflare deployment that can be rolled back with one command.</li>
+      <li><b>Tester feedback, acted on.</b> A beta testers page and a feedback form that reaches me
+          without showing my address. The first tester found level one too hard, so the first visit now
+          starts gentle and builds. Playing it on my own phone showed the touch controls were awkward,
+          so they were redesigned as a diamond of buttons.</li>
+      <li><b>Every way to play.</b> Keyboard and mouse, a game controller, touch, and VR headsets
+          through WebXR, where the view turns in steps so it stays comfortable.</li>
+      <li><b>Installable,</b> with a prompt to update when a new version is out.</li>
+    </ul>
+
     <h2>Try it</h2>
     <p>
       It runs in any modern browser, on a phone or a computer, with nothing to install:
@@ -125,9 +139,21 @@
       It is free, has no ads, and saves your game on your own device.
     </p>
 
+    <h2>Technologies and skills</h2>
+    <ul>
+      <li><b>JavaScript and three.js (WebGL)</b>: seven levels, rigged and animated models, water, day and night, with no build step.</li>
+      <li><b>WebXR</b> for VR headsets, plus keyboard and mouse, game controllers and touch controls designed from play testing.</li>
+      <li><b>Cloudflare Workers and KV:</b> the leaderboard, and a feedback form that reaches me without showing my address.</li>
+      <li><b>Release engineering:</b> semantic versions, a release script that refuses to ship uncommitted or failing code, GitHub tags and labelled Cloudflare deployments with one-command rollback.</li>
+      <li><b>Testing:</b> Node.js unit suites and Puppeteer browser tests on desktop and phone sizes, run against the live site too.</li>
+      <li><b>Installable web app</b> with update prompts, and Web Audio for sound.</li>
+      <li><b>3D asset pipeline:</b> AI-generated models (Meshy) reduced, rigged and animated for real-time use.</li>
+      <li><b>AI-assisted engineering</b> with Claude Code in VS Code, under written standards.</li>
+    </ul>
+
     <h2>What it does not claim</h2>
     <ul>
-      <li>It is a portfolio piece, not a commercial product.</li>
+      <li>It is a personal portfolio piece and skills demonstration, not a commercial product.</li>
       <li>The AI did not design it. The ideas, the story and the decisions are mine; the AI
           implemented and tested them under my direction.</li>
       <li>The cultural content is going to Aboriginal and Torres Strait Islander people for review, and
@@ -136,10 +162,10 @@
     </ul>
 
     <div class="metrics">
-      <div class="metric"><span class="n">962</span><span class="l">unit checks</span></div>
-      <div class="metric"><span class="n">87</span><span class="l">browser checks</span></div>
+      <div class="metric"><span class="n">1,022</span><span class="l">unit checks</span></div>
+      <div class="metric"><span class="n">107</span><span class="l">browser checks</span></div>
       <div class="metric"><span class="n">7</span><span class="l">levels</span></div>
-      <div class="metric"><span class="n">23k</span><span class="l">lines of game code</span></div>
+      <div class="metric"><span class="n">15</span><span class="l">versioned releases</span></div>
     </div>
   </div>
 </section>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Process: Kenneth W. Bingham</title>
+<meta name="description" content="How Kenneth W. Bingham builds with AI from start to finish: the workbench, the standing instructions, the move from a self-managed server to Cloudflare, how every change is verified, and the conversations that took the work further than the first answer.">
+<meta name="author" content="Kenneth W. Bingham">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/process.html">
+<link rel="icon" href="assets/butterfly.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@700;800&display=swap">
+<link rel="stylesheet" href="portfolio.css">
+<style>
+  /* Tables on this page. */
+  .results { width: 100%; border-collapse: collapse; font-size: 16px; }
+  .results th, .results td { text-align: left; padding: 12px 14px; border-top: 1px solid var(--line); vertical-align: top; color: var(--ink-2); }
+  .results thead th { border-top: 0; font: 700 12px var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  .results tbody th { color: var(--ink); font-weight: 600; }
+  .scroll { overflow-x: auto; }
+  /* A conversation that went further: what was asked, what was found, what it gave. */
+  .deeper { display: grid; gap: var(--s2); align-content: start; padding: var(--s3); border-radius: var(--s3); border: 1px solid var(--line); background: rgba(255, 255, 255, 0.03); }
+  .deeper h3 { margin: 0; }
+  .deeper dl { display: grid; grid-template-columns: 1fr; gap: 4px; margin: 0; }
+  .deeper dt { font: 700 12px var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--k, var(--a)); padding-top: 10px; }
+  .deeper dd { margin: 0; color: var(--ink-2); font-size: 15.5px; }
+  .deeper .me-said { font: 500 16px/1.45 var(--mono); color: #fff; }
+  @media (max-width: 640px) { .deeper dl { grid-template-columns: 1fr; } .deeper dt { padding-top: 6px; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top">
+    <a class="brand" href="./"><img src="kennethbingham.webp" alt="" width="42" height="42"><span>Kenneth W. Bingham<small>AI Prototyping Engineer &middot; Full-Stack</small></span></a>
+    <nav aria-label="Site"><a href="./">Work</a><a href="how-i-direct-ai.html">How I direct AI</a><a href="what-i-put-in.html">What I put in</a><a href="process.html" aria-current="page">The process</a><a href="resume.html">Resume</a><a class="hire" href="contact.html">Contact</a></nav>
+  </div>
+
+  <header class="split">
+    <div class="say">
+      <span class="eyebrow">From the first message to the live address</span>
+      <h1>The work is on the other pages. <em>This is how it gets made.</em></h1>
+    </div>
+    <div class="prose">
+      <p class="lede" style="max-width: 60ch">Every project in this portfolio was built the same way: I direct, an AI coding agent writes and tests, and nothing is called finished until it has been run and checked on the live address.</p>
+      <p>This page shows the whole process, end to end: the workbench, the instructions the AI works under, where the work is hosted and why it moved, how each change is verified, and the conversations that took a project further than the first answer would have.</p>
+    </div>
+  </header>
+
+  <section class="facts" aria-label="The working record">
+    <div class="fact"><b>248</b><span>lines of standing instructions, loaded before every session</span></div>
+    <div class="fact"><b>82</b><span>saved notes the AI keeps between sessions, each a lesson from earlier work</span></div>
+    <div class="fact"><b>458</b><span>messages of direction from me in one working session</span></div>
+    <div class="fact"><b>0</b><span>servers to maintain since the move to Cloudflare</span></div>
+  </section>
+
+  <section class="block" aria-labelledby="bench-title">
+    <div class="block-head">
+      <h2 id="bench-title">The workbench</h2>
+      <p>Ordinary tools, used deliberately. Nothing here is exotic. The difference is in how they are set up and what the AI is required to do with them.</p>
+    </div>
+    <div class="scroll"><table class="results">
+      <thead><tr><th scope="col">Piece</th><th scope="col">What it is</th><th scope="col">What it does in the process</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Claude Code in VS Code</th><td>An AI coding agent working in my editor and terminal</td><td>Writes the code and the tests, runs them, deploys, and reports what it ran and what it did not.</td></tr>
+        <tr><th scope="row">Standing instructions</th><td>One file, written and revised by me</td><td>Loaded before any request. Sets how the AI must work: verify before claiming, label every claim, say what was run, never fill a gap with a guess.</td></tr>
+        <tr><th scope="row">Saved notes</th><td>Short notes the AI keeps between sessions</td><td>Each records a correction or a decision, so the same mistake is not made twice and nothing has to be explained again.</td></tr>
+        <tr><th scope="row">Model Context Protocol (MCP)</th><td>The standard way to give a model tools</td><td>Used every day as the agent's toolset, and built from scratch in <a href="work/mcp-gateway.html">mcp-gateway</a>, an audited tool server.</td></tr>
+        <tr><th scope="row">Local models</th><td>Open models run on my own laptop with Ollama</td><td>For experiments that must cost nothing and report exact token counts, such as the <a href="least-tokens.html">Least Tokens</a> benchmark.</td></tr>
+        <tr><th scope="row">A headless browser</th><td>A real browser driven by a script</td><td>Opens every page after every change, walks it, measures it and takes screenshots, so "it works" is something seen, not assumed.</td></tr>
+        <tr><th scope="row">Git and GitHub</th><td>Version control, public repositories</td><td>The source of each project is <a href="https://github.com/kenbin64">public</a>, with what is kept out, and why, written in its README.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="block" aria-labelledby="host-title">
+    <div class="block-head">
+      <h2 id="host-title">From a server to a platform</h2>
+      <p>The projects began on a self-managed Linux server: nginx in front, services under systemd, one machine to patch and watch. Most of them now run on Cloudflare, and the move was done project by project with the AI doing the work and me making the calls.</p>
+    </div>
+    <div class="scroll"><table class="results">
+      <thead><tr><th scope="col">Then</th><th scope="col">Now</th><th scope="col">What changed</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Static sites served by nginx</th><td>Cloudflare static assets</td><td>No server to patch, served from the edge, deployed with one command.</td></tr>
+        <tr><th scope="row">Small back-end services</th><td>Cloudflare Workers</td><td>A contact form, a feedback form and a visit counter, each a few dozen lines, each with its own tests.</td></tr>
+        <tr><th scope="row">A database for small records</th><td>Workers key-value storage</td><td>Only what a feature needs, for example one daily count to stop a form being abused.</td></tr>
+        <tr><th scope="row">Email from a mail server</th><td>Cloudflare Email Routing and outbound email</td><td>A visitor's message reaches me without my address appearing in any page.</td></tr>
+        <tr><th scope="row">Domains at another registrar</th><td>Domains moved to Cloudflare</td><td>Registration, DNS and hosting in one place, at cost.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="hint">Not everything has moved. The two Python services, <a href="work/citeline.html">citeline</a> and <a href="work/mcp-gateway.html">mcp-gateway</a>, need a host that runs Python and Postgres. Their case studies say plainly that the live demos are offline, and the source and tests are public in the meantime.</p>
+  </section>
+
+  <section class="block" aria-labelledby="check-title">
+    <div class="block-head">
+      <h2 id="check-title">How a change is checked</h2>
+      <p>The rule is the same for every project: the AI does not report a change as done until it has run the evidence and shown it to me.</p>
+    </div>
+    <div class="rules">
+      <div class="rule" style="--k: #ffd166"><h3>Tests first</h3><p>Every calculation has a case worked by hand, the edges are tried, and the test suite runs before anything is published. Cost of Saving runs 517 checks on every build.</p></div>
+      <div class="rule" style="--k: #2dd4bf"><h3>Then the real page</h3><p>A real browser opens the built site, clicks through it, and measures it: links, layout on a phone, whether a 3D tour ever walks through a wall.</p></div>
+      <div class="rule" style="--k: #8b7dff"><h3>Then the live address</h3><p>After deploying, the published copy is checked again, file by file, against what was built.</p></div>
+      <div class="rule" style="--k: #ff6fb5"><h3>Then my eyes</h3><p>A test proves what it was written to prove. Whether the thing is right for the person using it is my judgment, and I make it by using it.</p></div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="deeper-title">
+    <div class="block-head">
+      <h2 id="deeper-title">The conversations that went further</h2>
+      <p>The first answer is rarely the best one. These are real exchanges, my words quoted with only the spelling tidied, where pushing back or asking one more question changed what got built.</p>
+    </div>
+    <div class="work">
+
+      <div class="deeper" style="--k: #ffd166"><h3>A hypothesis tested, not trusted</h3><dl>
+        <dt>I asked</dt><dd class="me-said">We are forcing AI to be like humans that require high-level languages. AI could talk directly to the CPU, or at least a lower-level language.</dd>
+        <dt>What we found</dt><dd>Instead of agreeing or arguing, the AI measured it. The same small program cost 14 tokens in Python and 138 in assembly. Lower level was more expensive, not less.</dd>
+        <dt>What it gave</dt><dd>A better question: what is the least an AI needs to be told to still get it right? That became <a href="least-tokens.html">Least Tokens</a>, a benchmark of 3,600 answers from three models.</dd>
+      </dl></div>
+
+      <div class="deeper" style="--k: #2dd4bf"><h3>The test that was looking at the wrong thing</h3><dl>
+        <dt>I asked</dt><dd class="me-said">So far no traction, so it could be the fault of the resume not being read.</dd>
+        <dt>What we found</dt><dd>The AI read the resume the way an applicant tracking system does, by extracting its text. Dates were merged, jobs were out of order and part of the history was missing, all of which a parser can stumble on.</dd>
+        <dt>What it gave</dt><dd>A rebuilt resume in plain, machine-readable form, checked by pulling the text back out of the PDF to confirm every date and keyword survived.</dd>
+      </dl></div>
+
+      <div class="deeper" style="--k: #8b7dff"><h3>Working, tested, and still not right</h3><dl>
+        <dt>I asked</dt><dd class="me-said">Is there any way to make the 3D part look more like an art gallery and not just hallways with art?</dd>
+        <dt>What we found</dt><dd>The hallways passed every test. They were still the wrong thing: no test can tell you a space does not feel like a gallery.</dd>
+        <dt>What it gave</dt><dd>A rebuild into rooms joined by doorways, with benches, track lighting and room names. The <a href="https://kensartgallery.com/built">gallery's own page</a> records the 67 messages of direction behind its first three days.</dd>
+      </dl></div>
+
+      <div class="deeper" style="--k: #ff6fb5"><h3>Checking my own argument before I published it</h3><dl>
+        <dt>I asked</dt><dd class="me-said">Evaluate it, fact-check it, and make it conform with the facts.</dd>
+        <dt>What we found</dt><dd>On an article I had drafted about business cost-cutting, the AI checked each claim against the record. The headline claim did not hold. The point underneath it did.</dd>
+        <dt>What it gave</dt><dd>A rewritten article that keeps my argument and could survive a knowledgeable reader. An assistant that only agreed with me would have let me publish the first version.</dd>
+      </dl></div>
+
+      <div class="deeper" style="--k: #ffd166"><h3>Saying so when something is offline</h3><dl>
+        <dt>I asked</dt><dd class="me-said">See what is in mcp-gateway.</dd>
+        <dt>What we found</dt><dd>The project was strong, with 29 passing tests, lint and type checks, and barely visible. Its "live" link, and citeline's, now led nowhere after the server move.</dd>
+        <dt>What it gave</dt><dd>Both moved to the top of this portfolio, with notices saying the demos are offline and how to run them, in place of links that would have failed in front of a reader.</dd>
+      </dl></div>
+
+    </div>
+  </section>
+
+  <section class="split" aria-labelledby="who-title">
+    <div class="say">
+      <h2 id="who-title">Who does what</h2>
+      <p class="lede">Stated the same way on everything I publish.</p>
+    </div>
+    <div class="prose">
+      <p><b>I conceive, direct and decide.</b> What gets built, who it is for, what must stay true, and when it is finished.</p>
+      <p><b>The AI writes and tests.</b> It produces the code, runs it, and reports what was and was not checked. It does not originate the ideas, and I do not claim to have typed every line.</p>
+      <p><b>The record is open.</b> The source is on GitHub, the tests can be run, and each site says how it was built.</p>
+      <div class="cta" style="padding-top: var(--s2)"><a class="btn go" href="./#work">See the work</a><a class="btn" href="how-i-direct-ai.html">The rules I give the AI</a><a class="btn" href="what-i-put-in.html">What I put in</a></div>
+    </div>
+  </section>
+
+  <footer class="foot hint">
+    <div class="row"><span>&copy; 2026 Kenneth W. Bingham &middot; St. George, Utah</span><span><a href="./">Work</a> &middot; <a href="how-i-direct-ai.html">How I direct AI</a> &middot; <a href="resume.html">Resume</a> &middot; <a href="contact.html">Contact</a></span></div>
+    <p>Concept and direction: Kenneth W. Bingham. Built with Claude under a standing directive to be skeptical, to insist on proof, and to make no claim that has not been run. The ideas are mine. The AI implemented and verified them.</p>
+  </footer>
+
+</div>
+</body>
+</html>

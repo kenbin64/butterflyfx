@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What I Put In: Kenneth W. Bingham</title>
+<meta name="description" content="What an AI gives back depends on what it is given. The standing instructions Kenneth W. Bingham loads before any work starts, and the actual messages behind two things he shipped.">
+<meta name="author" content="Kenneth W. Bingham">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/what-i-put-in.html">
+<link rel="icon" href="assets/butterfly.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@700;800&display=swap">
+<link rel="stylesheet" href="portfolio.css">
+<style>
+/* The three boxes: what goes in, what does the work, what comes out. */
+.io { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: var(--s3); align-items: stretch; }
+.io > div { border: 1px solid color-mix(in srgb, var(--k) 50%, var(--line)); border-radius: var(--s3); padding: var(--s3); background: color-mix(in srgb, var(--k) 10%, var(--panel)); }
+.io b { display: block; font: 800 24px/1.2 var(--display); padding-bottom: 4px; color: var(--k); filter: brightness(1.2); }
+.io small { display: block; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 12px; color: var(--muted); padding-bottom: 6px; }
+.io i { align-self: center; font-style: normal; font-size: 28px; color: var(--muted); }
+/* A run of my messages in the order I sent them. */
+.stream { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); counter-reset: msg; }
+.stream li { counter-increment: msg; display: grid; grid-template-columns: 34px 1fr; gap: var(--s2); align-items: start; padding: 12px var(--s3); border-radius: 14px; border: 1px solid var(--line); background: var(--panel); font: 500 15.5px/1.55 "JetBrains Mono", ui-monospace, monospace; color: var(--ink, #fff); }
+.stream li::before { content: counter(msg, decimal-leading-zero); color: var(--k, var(--a)); font-weight: 700; }
+.stream li.last { border-color: color-mix(in srgb, var(--a) 60%, var(--line)); }
+.came { display: grid; gap: var(--s2); align-content: start; }
+.came img { width: 100%; height: auto; border-radius: var(--s3); border: 1px solid var(--line); }
+.pair { display: grid; grid-template-columns: 1.618fr 1fr; gap: var(--s4, 40px); align-items: start; }
+@media (max-width: 1100px) { .io, .pair { grid-template-columns: 1fr; } .io i { transform: rotate(90deg); justify-self: center; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top">
+    <a class="brand" href="./"><img src="kennethbingham.webp" alt="" width="42" height="42"><span>Kenneth W. Bingham<small>AI Prototyping Engineer &middot; Full-Stack</small></span></a>
+    <nav aria-label="Site"><a href="./">Work</a><a href="how-i-direct-ai.html">How I direct AI</a><a href="what-i-put-in.html" aria-current="page">What I put in</a><a href="resume.html">Resume</a><a class="hire" href="contact.html">Contact</a></nav>
+  </div>
+
+  <header class="split">
+    <div class="say">
+      <span class="eyebrow">The input</span>
+      <h1>What comes out depends on <em>what goes in.</em></h1>
+    </div>
+    <div class="prose">
+      <p class="lede" style="max-width: 60ch">Two people can use the same AI on the same day and get very different work back. The tool did not change between them. What they gave it did.</p>
+      <p>I do not train the AI. That word has a real meaning, and it belongs to the people who build the model. I direct it and I conduct it. What I put into it is my own: my philosophy, my values, my conditions, my guardrails, and my personality.</p>
+      <p>When I tell it to take something in, I am not reprogramming anything. The model stays as its builders made it, and no one else's instance is affected. I am only shaping the one in front of me. A session forgets everything when it ends, so I write my direction down in plain text files that it reads at the start of the next one.</p>
+      <p>Most portfolios show the result. This page shows the other end: the instructions I load before any work starts, and the actual messages I typed to get two things built. You can open both results and judge the input by the output.</p>
+    </div>
+  </header>
+
+  <section class="block" aria-labelledby="io-title">
+    <div class="block-head">
+      <h2 id="io-title">Three parts, and only one is mine</h2>
+      <p>An AI is the part in the middle. It does work on whatever it is handed. It cannot supply the purpose, the audience, or the standard for "done". Those have to come in from the left.</p>
+    </div>
+    <div class="io">
+      <div style="--k: #ffd166"><small>Goes in</small><b>My direction</b><p>What it is for, who will use it, what must stay true, and what I will not accept.</p></div>
+      <i aria-hidden="true">&rarr;</i>
+      <div style="--k: #8b7dff"><small>Does the work</small><b>The AI</b><p>Writes the code and the tests, runs them, and reports what it did and did not check.</p></div>
+      <i aria-hidden="true">&rarr;</i>
+      <div style="--k: #2dd4bf"><small>Comes out</small><b>The product</b><p>A working thing on a live address that a stranger can open and use.</p></div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="standing-title">
+    <div class="block-head">
+      <h2 id="standing-title">Before the first message</h2>
+      <p>These lines are quoted from the instruction file that loads into every session. I wrote it, and I revise it when something goes wrong. The AI reads it before it reads my request.</p>
+    </div>
+    <div class="work">
+      <div class="exchange"><p class="me-said">This is direction, not commands. A command executes the same way regardless of context. Direction orients judgment and then requires it.</p><p><b>Why it is there:</b> I want the AI to think about the job, so that I can see its thinking and correct it.</p></div>
+      <div class="exchange"><p class="me-said">Not a yes-man. Everything is tested. Nothing is accepted as truth until it is verified.</p><p><b>Why it is there:</b> an assistant that agrees with everything gives me speed in the wrong direction.</p></div>
+      <div class="exchange"><p class="me-said">It is okay to say "I don't have all the answers." Say so plainly rather than fill the void.</p><p><b>Why it is there:</b> a confident guess looks exactly like a fact until someone relies on it.</p></div>
+      <div class="exchange"><p class="me-said">Mark whether a command was run by me or is for Ken to run. Never present un-run steps as done.</p><p><b>Why it is there:</b> "it should work" and "I ran it and it worked" are different statements, and I need to know which one I am reading.</p></div>
+      <div class="exchange"><p class="me-said">Code must be modular, simple, and never spaghetti. Functions stay small, clean, and focused. Clarity over cleverness.</p><p><b>Why it is there:</b> I have to be able to read what was built, and so does whoever comes after me.</p></div>
+      <div class="exchange"><p class="me-said">Don't deny anything until there is reason to deny. Don't believe anything until there is reason to believe.</p><p><b>Why it is there:</b> it keeps new ideas open long enough to be tested, and no longer.</p></div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="cinema-title">
+    <div class="block-head">
+      <h2 id="cinema-title">Nine messages, one cinema</h2>
+      <p>These are my messages for one feature, in the order I sent them, with only the spelling tidied. None of them contains code. Each one carries a decision.</p>
+    </div>
+    <div class="pair">
+      <ol class="stream" style="--k: #ff6fb5">
+        <li>How about a gallery cinema? I have some animations of my paintings. They are impressive. The paintings come alive.</li>
+        <li>Also give openart.ai credit for animating the images.</li>
+        <li>Make sure there are people watching in the cinema too. Make it look like a real gallery cinema, with dark walls in purple, green and indigo.</li>
+        <li>On the outside of the cinema, the sign should say "Art in Motion, powered by openart.ai".</li>
+        <li>I want the cinema to be at the end of the gallery, just off the digital image room.</li>
+        <li>Have lighting similar to real cinemas.</li>
+        <li>Have it cycle in all three.</li>
+        <li>Right now the button says Pause. It needs to say Play at first, then Pause if you want to stop the motion.</li>
+        <li class="last">It is correct now.</li>
+      </ol>
+      <div class="came">
+        <img src="img/work/cinema.jpg" alt="The finished cinema: a dark room with an audience watching a painting in motion on the screen" loading="lazy" width="1200" height="750">
+        <p><b>What came out:</b> a screening room inside a walk-through 3D gallery, with an audience, cinema lighting, a doorway that cycles through the films, and credit to the service that animated them.</p>
+        <p><b>What to notice:</b> the first message is an idea. The next six are about how it should feel to someone standing in it. The eighth is a fault I found by using it. The ninth is the only one that says it is finished, and I am the one who says it.</p>
+        <div class="cta"><a class="btn go" href="https://kensartgallery.com/cinema.html">Open the cinema</a><a class="btn" href="https://kensartgallery.com/">Walk the gallery</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="front-title">
+    <div class="block-head">
+      <h2 id="front-title">Eight messages, one front page</h2>
+      <p>The same thing on a different job: the front page of a site of free decision calculators. Again, spelling tidied and nothing else.</p>
+    </div>
+    <div class="pair">
+      <ol class="stream" style="--k: #2dd4bf">
+        <li>The front page is too busy. It needs to present the problem, a reason to visit and look around.</li>
+        <li>Useful right up front. Not just informational, but useful to them.</li>
+        <li>Always list the type of gain or loss with the answer, with its graphic.</li>
+        <li>I do like the piggy bank too, so that stays.</li>
+        <li>I think the most-used case should be first.</li>
+        <li>If I was to stumble on this site right now, I would think it was mainly to compare airline fares and charges.</li>
+        <li>It should not be opinionated. And I like "a dollar saved is a dollar earned", because this questions that assumption.</li>
+        <li class="last">Use the space of the whole page, not the old-fashioned middle of the screen. Golden ratio principles, panels in a color palette, a modern look. It is kind of dull right now.</li>
+      </ol>
+      <div class="came">
+        <img src="img/work/cos.jpg" alt="The finished front page of Cost of Saving, with a calculator beside the headline" loading="lazy" width="1200" height="750">
+        <p><b>What came out:</b> a page that opens on a working calculator for five everyday decisions, reports the figures without telling anyone what to conclude, and is backed by 517 automated checks.</p>
+        <p><b>What to notice:</b> the sixth message. The page worked and its tests passed. It was still wrong, and the only way to know was to look at it as a stranger would.</p>
+        <div class="cta"><a class="btn go" href="https://costofsaving.com/">Open the page</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="split" aria-labelledby="take-title">
+    <p class="quote" id="take-title">The AI does the typing. <em style="font-style: normal; color: var(--a)">The input is the engineering.</em></p>
+    <div class="prose">
+      <p><b>Purpose comes from a person.</b> None of the messages above could have been written by the tool, because each one depends on knowing who the thing is for.</p>
+      <p><b>The standard comes from a person.</b> An AI will hand over something that looks finished. Whether it is finished is a judgment, and I do not delegate it.</p>
+      <p><b>Short is fine. Vague is not.</b> My messages are a sentence or two, typed fast. They work because each one says exactly one thing that has to change, and why.</p>
+      <p><b>It still gets things wrong.</b> Good input lowers the error rate. It does not remove it, which is why everything is run and checked. The failures I watch for are listed on <a href="how-i-direct-ai.html">How I direct AI</a>.</p>
+      <div class="cta" style="padding-top: var(--s2)"><a class="btn go" href="how-i-direct-ai.html">The method</a><a class="btn" href="./#work">The work</a><a class="btn" href="contact.html">Contact</a></div>
+    </div>
+  </section>
+
+  <footer class="foot hint">
+    <div class="row"><span>&copy; 2026 Kenneth W. Bingham &middot; St. George, Utah</span><span><a href="./">Work</a> &middot; <a href="how-i-direct-ai.html">How I direct AI</a> &middot; <a href="resume.html">Resume</a> &middot; <a href="contact.html">Contact</a></span></div>
+    <p>Concept and direction: Kenneth W. Bingham. Built with Claude under a standing directive to be skeptical, to insist on proof, and to make no claim that has not been run. The ideas are mine. The AI implemented and verified them.</p>
+  </footer>
+
+</div>
+</body>
+</html>

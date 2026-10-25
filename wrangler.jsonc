@@ -1,0 +1,12 @@
+{
+  // Publishes the public folder of butterflyfx.us to Cloudflare as plain files.
+  // The parts that sat behind a login on the old server are left out by
+  // public/.assetsignore, because there is no login service here to guard them.
+  // Deploy:  npx wrangler deploy   (from this folder)
+  "name": "butterflyfx",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./public", "not_found_handling": "404-page" },
+  "routes": [ { "pattern": "butterflyfx.us", "custom_domain": true }, { "pattern": "www.butterflyfx.us", "custom_domain": true } ],
+  // The workers.dev address stays on as a fallback while the nameserver change settles.
+  "workers_dev": true
+}

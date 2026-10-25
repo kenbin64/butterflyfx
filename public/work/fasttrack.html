@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FastTrack 3D · a 3D board game and the bug that wasn't the network · Kenneth W. Bingham</title>
+<meta name="description" content="FastTrack 3D: a card-driven 3D board race with bots at three difficulties, directed by Kenneth W. Bingham and built with AI. How a multiplayer turn bug was traced to turn ownership, and the technologies and skills behind it. Free to play.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/work/fasttrack.html">
+<link rel="icon" href="/assets/butterfly.png">
+<link rel="stylesheet" href="/site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/work/fasttrack.html">
+<meta property="og:title" content="FastTrack 3D · the multiplayer bug that wasn't the network">
+<meta property="og:image" content="https://butterflyfx.us/img/work/fasttrack.jpg">
+<meta property="og:description" content="A 3D board game with bots, a turn bug traced to its real cause, and a headless test that proved the fix.">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham</a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/#work">Work</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">case study · three.js · live and free to play</p>
+    <h1>A 3D board game, and the multiplayer bug that wasn't the network.</h1>
+    <p class="lede">
+      <b>FastTrack 3D</b> is a card-driven race around a 3D board: draw a card, move a peg, take the fast
+      track through the middle and send rivals back to the start. You play against up to five bots, at
+      easy, normal or hard. I designed and directed it; an AI coding assistant wrote and tested the code
+      to my rules.
+    </p>
+    <div class="btn-row">
+      <a class="btn" href="https://playbutterflyfx.com/fasttrack/" rel="noopener">Play it now</a>
+      <a class="btn ghost" href="/resume.html">Resume</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <h2>The problem</h2>
+    <p>
+      In online games, turns sometimes skipped or a player got two in a row. It looked like a network
+      fault, and the obvious fix was a different way of connecting players, peer to peer instead of
+      through a relay.
+    </p>
+
+    <h2>What I found</h2>
+    <ul>
+      <li><b>It was a question of who owns the turn, not of the network.</b> Each player's game was
+          allowed to move the turn on by itself, and some fallbacks let two games both believe it was
+          their turn. Changing how players connect would not have fixed that.</li>
+      <li><b>The fix: one game decides.</b> The host's game now replays every move and is the only one
+          that advances the turn; the others apply what it sends.</li>
+      <li><b>A second bug hid inside the first.</b> The host was swallowing its own turn messages while
+          it replayed another player's move, so players drifted out of step on some cards. Found, fixed
+          and covered by a test.</li>
+      <li><b>A third: bots in mixed games.</b> With two people and a bot, the host could not drive the
+          bot's turn, so the bot was skipped. Fixed with a single clear rule for who may act.</li>
+      <li><b>Bots that respect difficulty.</b> The difficulty setting used to be stored and never read,
+          so every level played the same. Now easy bots cut a rival only as a last resort, normal bots
+          when it pays, and hard bots hunt the human players. 27 checks pin that behavior.</li>
+    </ul>
+
+    <h2>How I worked with the AI</h2>
+    <p>
+      I set the rules of the game and the standards for the code; the AI wrote and tested it. The rules
+      that mattered: reproduce a bug in a test before fixing it, never call something done until it has
+      been run, and say plainly what was and was not checked. When I found a problem by playing, it
+      became a test so it could not come back.
+    </p>
+
+    <h2>The proof</h2>
+    <ul>
+      <li><b>A headless test that plays two games at once</b>, host and guest, over a simulated relay. It
+          reproduced the turn drift before the fix and passes after it.</li>
+      <li><b>44 test files</b> across the rules engine, turn rotation, the card 7 split, card 4 moving
+          backward, the deck and the bots.</li>
+      <li><b>The public version is checked in a real browser</b> on every publish: four players take turns
+          round the table, nothing is missing, and nothing loads from any other site.</li>
+      <li><b>A deploy bug, caught and fixed:</b> the publish script skipped every folder named "engine",
+          which included the game's own rules, so the board went black. The folder was renamed and the
+          game came back.</li>
+    </ul>
+
+    <h2>Technologies and skills</h2>
+    <ul>
+      <li><b>JavaScript and three.js (WebGL)</b> for the 3D board, camera views and graphics quality settings.</li>
+      <li><b>WebSockets</b> and host-authoritative state for multiplayer; deterministic replay of moves.</li>
+      <li><b>Game rules as a state machine</b>, separate from the drawing, so it can be tested without a browser.</li>
+      <li><b>Node.js test suites</b>, a headless two-client harness, jsdom and Puppeteer browser tests.</li>
+      <li><b>Web Audio:</b> the music is generated in code, with no recordings.</li>
+      <li><b>Cloudflare</b> hosting, and an installable app that plays offline (service worker).</li>
+      <li><b>AI-assisted engineering</b> with Claude Code in VS Code, under written standards.</li>
+    </ul>
+
+    <h2>What it does not claim</h2>
+    <ul>
+      <li>It is a personal portfolio piece and skills demonstration, not a commercial product. It is free,
+          with no ads, no cookies and no sign-in.</li>
+      <li>Online play with other people is switched off in the public version for now; you play the bots.</li>
+      <li>The ideas and decisions are mine; the AI implemented and tested them under my direction.</li>
+    </ul>
+
+    <div class="metrics">
+      <div class="metric"><span class="n">125</span><span class="l">changes, Apr to Oct 2026</span></div>
+      <div class="metric"><span class="n">44</span><span class="l">test files</span></div>
+      <div class="metric"><span class="n">3</span><span class="l">bot difficulties</span></div>
+      <div class="metric"><span class="n">0</span><span class="l">third-party requests</span></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <p>
+      <a href="/">Home</a> &middot;
+      <a href="https://playbutterflyfx.com/fasttrack/" rel="noopener">Play FastTrack 3D</a> &middot;
+      <a href="/resume.html">Resume</a> &middot;
+      <a href="/contact.html">Contact</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

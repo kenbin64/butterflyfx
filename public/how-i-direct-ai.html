@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How I Direct AI: Kenneth W. Bingham</title>
+<meta name="description" content="How Kenneth W. Bingham works with Claude Code in VS Code: the standing rules he gives the AI, real exchanges from the build record, where the AI gets it wrong and how he catches it.">
+<meta name="author" content="Kenneth W. Bingham">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/how-i-direct-ai.html">
+<link rel="icon" href="assets/butterfly.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@700;800&display=swap">
+<link rel="stylesheet" href="portfolio.css">
+</head>
+<body>
+<div class="page">
+
+  <div class="top">
+    <a class="brand" href="./"><img src="kennethbingham.webp" alt="" width="42" height="42"><span>Kenneth W. Bingham<small>AI Prototyping Engineer &middot; Full-Stack</small></span></a>
+    <nav aria-label="Site"><a href="./">Work</a><a href="how-i-direct-ai.html" aria-current="page">How I direct AI</a><a href="what-i-put-in.html">What I put in</a><a href="resume.html">Resume</a><a class="hire" href="contact.html">Contact</a></nav>
+  </div>
+
+  <header class="split">
+    <div class="say">
+      <span class="eyebrow">Claude Code in VS Code</span>
+      <h1>Anyone can type a prompt. <em>The work is in the direction.</em></h1>
+    </div>
+    <div class="prose">
+      <p class="lede" style="max-width: 60ch">I cannot change the model. The provider owns the weights and the training. What I can change is how the instance in front of me behaves, by what I have it read before it starts and by what I refuse to accept when it finishes.</p>
+      <p>This page is that method: the loop I run, the standing rules I give the AI, real exchanges from the build record, and the times it got things wrong. None of it is secret, and it works on any capable model.</p>
+    </div>
+  </header>
+
+  <section class="block" aria-labelledby="loop-title">
+    <div class="block-head">
+      <h2 id="loop-title">The loop</h2>
+      <p>Five steps, repeated until the thing is right. The AI does most of the second. The rest is the job.</p>
+    </div>
+    <div class="loop">
+      <div style="--k: #ffd166"><b>Direct</b><span>Say what it is for, who will use it, and what must stay true. Not how to type it.</span></div>
+      <div style="--k: #8b7dff"><b>Build</b><span>The AI writes the code and the tests, in small focused pieces I can read.</span></div>
+      <div style="--k: #2dd4bf"><b>Verify</b><span>It runs what it wrote and shows the output. I look at the real thing, in a browser, on the live address.</span></div>
+      <div style="--k: #ff6fb5"><b>Correct</b><span>I say what is wrong in plain words. Most of my messages are this step.</span></div>
+      <div style="--k: #2dd4bf"><b>Ship</b><span>Tests pass, links are checked, it is published, and the published copy is checked again.</span></div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="rules-title">
+    <div class="block-head">
+      <h2 id="rules-title">The standing rules</h2>
+      <p>These are loaded into every session before any work starts. Each one exists because of something that went wrong without it.</p>
+    </div>
+    <div class="rules">
+      <div class="rule" style="--k: #ffd166"><h3>Direction, not commands</h3><p>A command is carried out the same way whatever the context. Direction orients judgment and then requires it. I want to see the AI's judgment so I can correct it.</p></div>
+      <div class="rule" style="--k: #2dd4bf"><h3>Not a yes-man</h3><p>Everything is tested. Nothing is accepted as true until it is verified, including what I say. If I am wrong it tells me and shows why.</p></div>
+      <div class="rule" style="--k: #8b7dff"><h3>Say what was run</h3><p>Every command is marked as run by the AI or left for me to run. A step that was not run is never presented as done.</p></div>
+      <div class="rule" style="--k: #ff6fb5"><h3>Label the claim</h3><p>Established, measured, an interpretation, or not claimed. Unverified is a holding state, not false, and not to be stated as fact.</p></div>
+      <div class="rule" style="--k: #2dd4bf"><h3>Never fill the void</h3><p>Where there is no evidence, mark the edge and stop. "I don't know" is an acceptable answer. A confident guess is not.</p></div>
+      <div class="rule" style="--k: #ffd166"><h3>Tests that try to break it</h3><p>A case worked by hand, the edges tried, and every tipping point checked by putting it back in. When a sound result fails a test, suspect the test first.</p></div>
+      <div class="rule" style="--k: #8b7dff"><h3>Small, plain code</h3><p>Functions stay short and focused. Clarity over cleverness. Comments say why, in words a newcomer could follow.</p></div>
+      <div class="rule" style="--k: #ff6fb5"><h3>Finish before switching</h3><p>A new request is queued, not dropped into the middle of half-done work.</p></div>
+      <div class="rule" style="--k: #2dd4bf"><h3>One style rule, to prove it listens</h3><p>No long dashes, anywhere. It is trivial, instantly checkable, and shows whether an instruction is still being held an hour in.</p></div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="log-title">
+    <div class="block-head">
+      <h2 id="log-title">Real exchanges</h2>
+      <p>My messages are quoted from the record with only the spelling tidied. I type fast and in my own voice. What matters is that each one carries a decision the AI could not have made for me.</p>
+    </div>
+    <div class="work">
+      <div class="exchange"><p class="me-said">If I stumbled on this site right now, I would think it was mainly to compare airline fares.</p><p><b>What had happened:</b> the AI led the page with a single example because it was the easiest to demonstrate.</p><p><b>What I was doing:</b> reading it as a stranger would. The code was fine. The first impression was wrong.</p></div>
+      <div class="exchange"><p class="me-said">Useful right up front. Not just informational, but useful to them.</p><p><b>What had happened:</b> a tidy page that explained things well and gave a visitor nothing to do.</p><p><b>What I was doing:</b> holding the work to its purpose. The page became a calculator that takes the visitor's own numbers.</p></div>
+      <div class="exchange"><p class="me-said">It should not be opinionated.</p><p><b>What had happened:</b> the AI invented two thresholds so a picture could show a verdict, and said so.</p><p><b>What I was doing:</b> setting a principle. The tool reports figures. The person decides what they mean.</p></div>
+      <div class="exchange"><p class="me-said">It says "none was made by AI". Some of the reference pictures were. All the paintings were painted by hand.</p><p><b>What had happened:</b> my statement had been shortened into something that sounded better than it was.</p><p><b>What I was doing:</b> correcting my own site so that it claims only what is true.</p></div>
+      <div class="exchange"><p class="me-said">Not the feeling of the piece. The look and feel of the piece.</p><p><b>What had happened:</b> the AI had smoothed my phrase into its own.</p><p><b>What I was doing:</b> keeping my words mine. It renders what I mean. It does not get to decide it.</p></div>
+      <div class="exchange"><p class="me-said">Right now the button says Pause. It needs to say Play at first.</p><p><b>What had happened:</b> the logic was correct and the experience was backwards.</p><p><b>What I was doing:</b> using the thing. No test catches what a person notices in two seconds.</p></div>
+    </div>
+  </section>
+
+  <section class="split" aria-labelledby="wrong-title">
+    <div class="say">
+      <h2 id="wrong-title">Where the AI gets it wrong</h2>
+      <p class="lede">It is fast, tireless and often right. These are the failures I watch for. The first three are from this month's work.</p>
+    </div>
+    <div class="stackv">
+      <div class="exchange"><h3>It builds the wrong thing, well</h3><p>I said to make one page look "more like the other one". It picked the wrong one, restyled the page, tested it, published it and reported success. Everything it said was true. It was the wrong job. I found it by opening the live site.</p></div>
+      <div class="exchange"><h3>It prefers the tidy version of the truth</h3><p>Left alone, it will round a qualified statement into a clean one. On a site that makes claims, that is how a small inaccuracy gets published under my name.</p></div>
+      <div class="exchange"><h3>Its tests can be wrong too</h3><p>A check failed on a result that was correct, because the test was stricter than the method it was testing. The rule is to chase every disagreement to its cause before believing either side.</p></div>
+      <div class="exchange"><h3>It will fill a gap if you let it</h3><p>Asked for a number it does not have, an unprompted model supplies one. Mine is told to stop and say what it would need. That rule is there to stop invented detail at the source.</p></div>
+    </div>
+  </section>
+
+  <section class="split" aria-labelledby="human-title">
+    <p class="quote" id="human-title">Technology should leave the person using it <em style="font-style: normal; color: var(--a)">more capable, not more dependent.</em></p>
+    <div class="prose">
+      <p><b>The person decides.</b> Software recommends, a named human makes the call. I build that into the tools, and it is how I work with the AI itself.</p>
+      <p><b>Show the working.</b> A tool that gives an answer without its reasoning asks to be trusted. One that shows the sum can be checked, argued with and learned from.</p>
+      <p><b>People do the work.</b> In every system I have worked on, the value came from the people running it and what they knew. Good software carries more of the load for them.</p>
+      <p><b>Credit honestly.</b> I conceive, direct and decide. The AI writes and tests. It does not originate the ideas, and I do not claim to have typed every line. Both halves are stated on everything I publish.</p>
+      <div class="cta" style="padding-top: var(--s2)"><a class="btn go" href="./#work">See what it produced</a><a class="btn" href="create-directive.html">Write a directive of your own</a><a class="btn" href="contact.html">Contact</a></div>
+    </div>
+  </section>
+
+  <footer class="foot hint">
+    <div class="row"><span>&copy; 2026 Kenneth W. Bingham &middot; St. George, Utah</span><span><a href="./">Work</a> &middot; <a href="resume.html">Resume</a> &middot; <a href="contact.html">Contact</a> &middot; <a href="research.html">Research and experiments</a></span></div>
+    <p>Concept and direction: Kenneth W. Bingham. Built with Claude under a standing directive to be skeptical, to insist on proof, and to make no claim that has not been run. The ideas are mine. The AI implemented and verified them.</p>
+  </footer>
+
+</div>
+</body>
+</html>

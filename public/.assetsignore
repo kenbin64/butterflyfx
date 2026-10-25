@@ -1,0 +1,9 @@
+# Not published to Cloudflare.
+# These sat behind a login on the old server. There is no login service here, so they stay off.
+manifold-ai
+manifold-ide
+login
+# Leftovers that are not pages.
+index.html.bak
+CNAME
+bfx-ingest.bat

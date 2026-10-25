@@ -3,475 +3,306 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kenneth W. Bingham · AI Engineer: RAG, Pipelines, Evaluation</title>
-<meta name="description" content="AI engineer building retrieval systems that cite their sources, ingestion pipelines that are safe to re-run, and evaluation harnesses that measure hallucination rates. Live demo and reproducible numbers.">
+<title>Kenneth W. Bingham: AI Prototyping Engineer and Full-Stack Developer</title>
+<meta name="description" content="Kenneth W. Bingham directs AI to build tested, live software. More than fifteen years of full-stack work in Java, Spring Boot, .NET and Python across healthcare, defense and enterprise. See the work, and how the AI was directed.">
 <meta name="author" content="Kenneth W. Bingham">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://butterflyfx.us/">
 <link rel="icon" href="assets/butterfly.png">
-<link rel="stylesheet" href="site.css">
+<meta property="og:title" content="Kenneth W. Bingham: I don't prompt AI. I direct it.">
+<meta property="og:description" content="More than fifteen years of full-stack engineering, now building with an AI at the keyboard and human judgment in charge. Live, tested work you can open.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://butterflyfx.us/">
-<meta property="og:title" content="Kenneth W. Bingham · AI Engineer: RAG, Pipelines, Evaluation">
-<meta property="og:description" content="Retrieval systems that cite their sources. Pipelines that are safe to re-run. Evaluation that measures the hallucination rate. With a live demo.">
-<meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://butterflyfx.us/kennethbingham.jpg">
+<meta property="og:image" content="https://butterflyfx.us/img/work/cos.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Plus+Jakarta+Sans:wght@700;800&display=swap">
+<link rel="stylesheet" href="portfolio.css">
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebSite",
-      "name": "ButterflyFx",
-      "url": "https://butterflyfx.us",
-      "publisher": {
-        "@type": "Person",
-        "name": "Kenneth W. Bingham",
-        "url": "https://butterflyfx.us",
-        "jobTitle": "AI Engineer",
-        "knowsAbout": [
-          "Artificial intelligence",
-          "Retrieval augmented generation",
-          "Data pipelines",
-          "Model evaluation",
-          "Computational geometry",
-          "Lossless codecs"
-        ],
-        "sameAs": [
-          "https://zeqxy.com"
-        ]
-      },
-      "inLanguage": "en"
-    },
-    {
-      "@type": "Person",
-      "name": "Kenneth W. Bingham",
-      "url": "https://butterflyfx.us",
-      "jobTitle": "AI Engineer",
-      "knowsAbout": [
-        "Artificial intelligence",
-        "Retrieval augmented generation",
-        "Data pipelines",
-        "Model evaluation",
-        "Computational geometry",
-        "Lossless codecs"
-      ],
-      "sameAs": [
-        "https://zeqxy.com"
-      ],
-      "@id": "https://butterflyfx.us/#me",
-      "mainEntityOfPage": "https://butterflyfx.us/"
-    }
-  ]
-}
+{ "@context": "https://schema.org", "@type": "Person", "name": "Kenneth W. Bingham", "url": "https://butterflyfx.us",
+  "jobTitle": "AI Prototyping Engineer and Full-Stack Developer", "address": { "@type": "PostalAddress", "addressLocality": "St. George", "addressRegion": "UT" },
+  "knowsAbout": ["AI-assisted software development", "Claude Code", "Model Context Protocol", "Java", "Spring Boot", ".NET", "Python", "Angular", "React", "PostgreSQL", "FHIR", "Evaluation of language models"],
+  "sameAs": ["https://www.linkedin.com/in/kenneth-bingham-11378b10", "https://github.com/kenbin64"] }
 </script>
 </head>
 <body>
+<div class="page">
 
-<header class="masthead">
-  <div class="row">
-    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham <span class="sub">AI Engineer</span></a>
-    <nav>
-      <a href="/" class="here">Home</a>
-      <a href="/#work">Work</a>
-      <a href="/the-case.html">The case</a>
-      <a href="/resume.html">Resume</a>
-      <a href="/about.html">About</a>
-      <a href="/contact.html">Contact</a>
-      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
-    </nav>
+  <div class="top">
+    <a class="brand" href="./"><img src="kennethbingham.webp" alt="" width="42" height="42"><span>Kenneth W. Bingham<small>AI Prototyping Engineer &middot; Full-Stack</small></span></a>
+    <nav aria-label="Site"><a href="./" aria-current="page">Work</a><a href="how-i-direct-ai.html">How I direct AI</a><a href="what-i-put-in.html">What I put in</a><a href="resume.html">Resume</a><a class="hire" href="contact.html">Contact</a></nav>
   </div>
-</header>
 
-<main>
-
-<!-- ============================ HERO ============================ -->
-<section class="hero">
-  <div class="wrap hero-grid">
-    <div>
-      <p class="role">AI Engineer &middot; Retrieval &middot; Pipelines &middot; Evaluation</p>
-      <h1>I build AI systems that can be audited.</h1>
-      <p class="lede">
-        Retrieval that cites the passage it used. Ingestion pipelines that are safe to
-        re-run on a timer. Evaluation harnesses that put a number on the hallucination
-        rate instead of an adjective. Everything below is running software, and the
-        numbers come from a test suite you can execute yourself.
-      </p>
-      <div class="btn-row" style="margin-top:1.6rem">
-        <a class="btn" href="/work/citeline.html#demo">Try the live RAG demo</a>
-        <a class="btn ghost" href="/resume.html">Resume</a>
-        <a class="btn ghost" href="https://github.com/kenbin64" rel="noopener">Source on GitHub</a>
-      </div>
+  <header class="hero">
+    <div class="say">
+      <span class="eyebrow">St. George, Utah &middot; open to remote work</span>
+      <h1>I don't prompt AI. <em>I direct it.</em></h1>
+      <p class="lede">More than fifteen years of shipping software where being wrong gets audited: healthcare claims, the Air Force, enterprise systems. Now I build with an AI at the keyboard and my judgment in charge. Everything on this page is live, tested, and open for you to check.</p>
+      <div class="cta"><a class="btn go" href="#work">See the work</a><a class="btn" href="how-i-direct-ai.html">How I direct AI</a><a class="btn" href="resume/Kenneth_Bingham_Resume.pdf">Download resume (PDF)</a></div>
     </div>
-    <figure class="hero-3d">
-      <canvas id="hero-shape" width="520" height="440"
-        aria-label="A saddle surface, z = x times y, turning slowly. It is drawn from straight lines, which is what the surface is made of."></canvas>
-      <figcaption>
-        <span class="eq">z = x&middot;y</span> turning. Every line you can see is straight, and the
-        surface is nothing but those lines. <a href="/the-case.html">Why that matters</a>.
-      </figcaption>
-    </figure>
-  </div>
 
-  <div class="wrap">
-    <ul class="proof">
-      <li>
-        <strong>28 question eval set</strong>
-        <span>20 the regulations answer and 8 they do not. Scored on exact strings, not by a model, so it cannot drift.</span>
-        <a href="/work/citeline.html">The RAG service</a>
-      </li>
-      <li>
-        <strong>Cites, or says nothing</strong>
-        <span>Three gates enforce it, and the last one re-checks the model's own output after the fact.</span>
-        <a href="/work/citeline.html#demo">Try to break it</a>
-      </li>
-      <li>
-        <strong>111&times; less work</strong>
-        <span>One change touched 0.18% of a 216,000 cell lattice instead of recomputing the whole thing.</span>
-        <a href="/the-case.html#ask">See it measured</a>
-      </li>
-      <li>
-        <strong>Runs in your browser</strong>
-        <span>Every benchmark here is a button, lossless and hash verified on the spot. No trust required.</span>
-        <a href="/geometry-bench.html">Run it yourself</a>
-      </li>
-    </ul>
-  </div>
-</section>
+    <section class="log" aria-label="A real exchange between Ken and the AI">
+      <div class="log-top"><span class="eyebrow" style="color: var(--b)">From the build log, spelling tidied</span><div class="dots" id="dots" role="group" aria-label="Choose an exchange"></div></div>
+      <div class="turn"><span class="who me">I said</span><p class="said" id="said"></p></div>
+      <div class="turn"><span class="who ai">The AI had</span><p id="had"></p></div>
+      <div class="turn"><span class="who out">So it became</span><p id="became"></p></div>
+    </section>
+  </header>
 
-<!-- ========================= FEATURED ========================== -->
-<section>
-  <div class="wrap">
-    <h2>Featured: a RAG service that refuses to guess</h2>
-    <p class="lede" style="margin-bottom:1.5rem">
-      Most retrieval demos answer every question you ask. That is the problem, not the
-      feature. <strong>citeline</strong> answers questions about US federal drinking
-      water regulations, and when the corpus does not contain the answer it says so and
-      stops.
-    </p>
+  <section class="facts" aria-label="In numbers">
+    <div class="fact"><b>15+</b><span>years building software, from startups' first prototype to systems under DoD change control</span></div>
+    <div class="fact"><b>517</b><span>automated checks on Cost of Saving, all passing, across 13 test suites</span></div>
+    <div class="fact"><b>67</b><span>messages of direction behind the 3D gallery in its first three days, most of them "not that, this"</span></div>
+    <div class="fact"><b>117</b><span>pages on Cost of Saving, with every link checked on every build</span></div>
+  </section>
 
-    <div class="feature">
-      <p class="kicker mono">citeline · python · fastapi · postgres + pgvector · hybrid retrieval</p>
-      <h3 style="font-size:1.2rem">Retrieval augmented QA over 40 CFR Part 141, with an enforced citation contract</h3>
-      <p>
-        A regulation is a good test of a retrieval system because a plausible wrong
-        answer is worse than no answer. Every response either carries a citation to the
-        exact section it came from, or the service abstains. Three independent gates
-        enforce that, and the last one re-checks the model's own output after the fact.
-      </p>
-
-      <div class="metrics" id="live-metrics" style="margin:1.3rem 0">
-        <div class="metric"><span class="n" id="m-docs">...</span><span class="l">regulation sections indexed</span></div>
-        <div class="metric"><span class="n" id="m-chunks">...</span><span class="l">retrievable passages</span></div>
-        <div class="metric"><span class="n" id="m-latency">...</span><span class="l">median retrieval latency</span></div>
-        <div class="metric"><span class="n" id="m-status">...</span><span class="l">service health, live</span></div>
-      </div>
-      <p class="small muted mt0" id="live-note">Reading live figures from the running service…</p>
-
-      <ul class="tags">
-        <li>hybrid search</li><li>reciprocal rank fusion</li><li>pgvector HNSW</li>
-        <li>postgres full text</li><li>abstention gate</li><li>citation verification</li>
-        <li>idempotent ingestion</li><li>golden set evaluation</li><li>prometheus</li>
-        <li>systemd</li><li>github actions</li>
-      </ul>
-
-      <div class="btn-row" style="margin-top:1.3rem">
-        <a class="btn" href="/work/citeline.html#demo">Ask it a question</a>
-        <a class="btn ghost" href="/work/citeline.html">How it is built</a>
-      </div>
+  <section class="block" id="work" aria-labelledby="work-title">
+    <div class="block-head">
+      <h2 id="work-title">Work you can <em>open right now</em></h2>
+      <p>Each of these was conceived and directed by me and written by an AI under my rules: nothing is called done until it has been run, every sum has a test that tries to break it, and I am told plainly what was and was not checked.</p>
     </div>
-  </div>
-</section>
-
-<!-- ======================= WHAT I BUILD ======================== -->
-<section>
-  <div class="wrap">
-    <h2>What I build</h2>
-    <p class="lede" style="margin-bottom:1.6rem">
-      Three things, and they are the three places most AI projects fail on the way to
-      production.
-    </p>
-
-    <div class="grid g3">
-      <div class="card">
-        <p class="kicker">01 · retrieval</p>
-        <h3>RAG that holds up</h3>
-        <p>
-          Structure aware chunking, dense plus lexical retrieval fused by rank, and a
-          confidence gate that can decline. Grounded generation where citations are
-          verified against the passages actually supplied, not trusted.
-        </p>
-        <ul class="tags">
-          <li>pgvector</li><li>hybrid + RRF</li><li>chunking</li><li>grounding</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <p class="kicker">02 · pipelines</p>
-        <h3>Ingestion you can schedule</h3>
-        <p>
-          Content hashed for idempotency, so a re-run over unchanged input writes
-          nothing. Incremental, so only what changed is re-embedded. Quality gated at
-          three stages, and every run recorded with a terminal status.
-        </p>
-        <ul class="tags">
-          <li>idempotent</li><li>incremental</li><li>data quality</li><li>observability</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <p class="kicker">03 · evaluation</p>
-        <h3>Numbers, not adjectives</h3>
-        <p>
-          Labelled golden sets, retrieval metrics (recall@k, MRR), and an explicit false
-          answer rate measured against questions the corpus cannot answer. Thresholds
-          chosen by sweeping the data, not by taste.
-        </p>
-        <ul class="tags">
-          <li>recall@k · MRR</li><li>abstention</li><li>threshold sweeps</li><li>CI gates</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== SELECTED WORK ========================= -->
-<section>
-  <div class="wrap">
-    <h2 id="work">Selected work</h2>
-    <p class="lede" style="margin-bottom:1.6rem">
-      Systems that are deployed and running, not slide decks.
-    </p>
-
-    <div class="grid g2">
-      <div class="card">
-        <h3>The tiles that never existed</h3>
-        <p>
-          A map you can drag and zoom, with no tiles anywhere. Each one is worked out when it comes
-          into view from 67 kB of corner values, and the counter shows what a stored pyramid of the
-          same tiles would have weighed: 92 GB by zoom 10. It measures its own error on demand, and
-          says the moment you have zoomed past what it actually knows.
-        </p>
-        <a class="go" href="/tiles.html">Open the map with no map</a>
-      </div>
-      <div class="card accent">
-        <p class="kicker">flagship · python</p>
-        <h3><a href="/work/citeline.html">citeline</a></h3>
-        <p>
-          RAG over federal regulations with an enforced citation contract, a three stage
-          abstention gate, an idempotent ingestion pipeline, and a reproducible eval
-          harness. Live demo on this site.
-        </p>
-        <ul class="tags"><li>FastAPI</li><li>pgvector</li><li>asyncpg</li><li>pytest</li></ul>
-      </div>
-
-      <div class="card accent-2">
-        <p class="kicker">flagship · python · security</p>
-        <h3><a href="/work/mcp-gateway.html">mcp-gateway</a></h3>
-        <p>
-          An audited Model Context Protocol server that gives a language model a closed set
-          of read only tools over internal services. Arguments are validated rather than
-          coerced, every call is logged including the refused ones, and a crash cannot leak
-          internals to the model. Running on this site.
-        </p>
-        <ul class="tags"><li>MCP</li><li>JSON-RPC 2.0</li><li>FastAPI</li><li>audit trail</li></ul>
-      </div>
-
-      <div class="card accent">
-        <p class="kicker">deployed · node · evaluation</p>
-        <h3><a href="/work/valuesai.html">valuesai</a></h3>
-        <p>
-          A reliability engine that answers a question several times, embeds the answers, and
-          measures whether they agree. A real fact scores 91 of 100. An invented town scores 32
-          and abstains, because each attempt invented a different answer. Enter anything.
-        </p>
-        <ul class="tags"><li>self-consistency</li><li>embeddings</li><li>job queue</li><li>abstention</li></ul>
-      </div>
-
-      <div class="card">
-        <p class="kicker">deployed · node · industrial</p>
-        <h3><a href="https://theconduit.me" rel="noopener">The Conduit</a></h3>
-        <p>
-          Water system telemetry, health scoring and regulatory compliance. Deterministic
-          test suite, a signed go live gate that requires a named human authority, and a
-          tamper evident audit trail.
-        </p>
-        <ul class="tags"><li>telemetry</li><li>compliance</li><li>audit trail</li><li>systemd</li></ul>
-      </div>
-
-      <div class="card">
-        <p class="kicker">deployed · realtime</p>
-        <h3><a href="https://kensgames.com" rel="noopener">KensGames</a></h3>
-        <p>
-          Real time multiplayer where game state is derived from a seed and an append only
-          log, so every client reaches byte identical state. Authoritative server, relay
-          netcode, verified legal move paths.
-        </p>
-        <ul class="tags"><li>WebSockets</li><li>authoritative server</li><li>determinism</li></ul>
-      </div>
-
-      <div class=card>
-        <p class=kicker>deployed &middot; front end &middot; search</p>
-        <h3><a href=https://showcase.butterflyfx.us rel=noopener>Demo sites</a></h3>
-        <p>
-          Three complete small-business sites, hand written, no page builder. Structured data
-          that matches the visible text, answer blocks that survive being quoted out of
-          context, a WebGL hero, and an image pipeline that strips GPS from photographs while
-          preserving provenance on a generated one.
-        </p>
-        <ul class="tags"><li>schema.org</li><li>Core Web Vitals</li><li>WebGL</li><li>accessibility</li></ul>
-      </div>
-
-      <div class="card">
-        <p class="kicker">tool · deterministic context</p>
-        <h3><a href="/bfx-ingest.html">bfx-ingest</a></h3>
-        <p>
-          Packs a repository into one content addressed artifact for LLM context. The same
-          input produces a hash identical output, which makes prompt caching and cost
-          attribution actually possible.
-        </p>
-        <ul class="tags"><li>content addressed</li><li>prompt caching</li><li>zero deps</li></ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ========================== STACK ============================ -->
-<section>
-  <div class="wrap">
-    <h2>Stack</h2>
-    <div class="grid g2" style="margin-top:1.2rem">
-      <div class="stack">
-        <div>
-          <h3>AI and retrieval</h3>
-          <p class="small muted mb0">
-            RAG architecture, hybrid retrieval, vector databases (pgvector), embedding
-            models, reranking, chunking strategy, prompt design, structured outputs,
-            tool and function calling, model routing, token budgeting, prompt caching,
-            evaluation harnesses, hallucination measurement, self hosted local models
-            (Ollama), LLM API integration.
-          </p>
+    <div class="work">
+      <article class="card" style="--k: #6ccf5a">
+        <img src="img/work/chomp.jpg" alt="Chomp 3D: Wally's Cairns Adventure, the title art: Wally the crocodile leaping over a wooden sign on the Cairns waterfront" loading="lazy" width="1200" height="750">
+        <div class="card-in">
+          <small>Game &middot; three.js &middot; live and free to play</small>
+          <h3>A whole 3D game, directed by me, written with AI</h3>
+          <dl>
+            <dt>The problem</dt><dd>Can one person direct an AI through something large, with parts that must keep working together, and ship it finished and tested?</dd>
+            <dt>What I built</dt><dd>Chomp 3D: Wally's Cairns Adventure. Seven levels across real Far North Queensland, a story, points and leaderboards, on phones and computers. My design and decisions; the AI wrote the code under my rules.</dd>
+            <dt>The proof</dt><dd>1,022 unit checks and 107 browser checks, the browser suite run against the live site too. Fifteen versioned beta releases with one-command rollback, changes made from tester feedback, and VR headset play.</dd>
+          </dl>
+          <div class="links"><a href="https://playbutterflyfx.com/chomp/">Play it</a><a href="work/chomp.html">Read the case study</a><a href="https://github.com/kenbin64/chomp2">Source</a></div>
         </div>
-        <div>
-          <h3>Data and pipelines</h3>
-          <p class="small muted mb0">
-            ETL and ingestion pipeline design, idempotency and incremental loads, data
-            quality gates, schema migrations, content addressed storage, PostgreSQL,
-            SQL Server, SQLite, SQL performance and indexing (GIN, HNSW).
-          </p>
+      </article>
+      <article class="card" style="--k: #8fd3ff">
+        <img src="img/work/fasttrack.jpg" alt="FastTrack 3D: coloured pegs racing round a hexagonal board in a starfield" loading="lazy" width="1200" height="760">
+        <div class="card-in">
+          <small>Game &middot; three.js &middot; live and free to play</small>
+          <h3>A board game whose turns had to be right</h3>
+          <dl>
+            <dt>The problem</dt><dd>In online games, turns sometimes skipped or doubled. It looked like a network fault.</dd>
+            <dt>What I found</dt><dd>It was a question of who owns the turn, not the network. One player's game now decides every turn and tells the others, and bots at three difficulties play the board position.</dd>
+            <dt>The proof</dt><dd>A headless test runs two players' games side by side and reproduced the fault before the fix. The public version plays against bots, loads nothing from any other site, and is checked in a browser on every publish.</dd>
+          </dl>
+          <div class="links"><a href="https://playbutterflyfx.com/fasttrack/">Play it</a><a href="work/fasttrack.html">Read the case study</a></div>
         </div>
-      </div>
-      <div class="stack">
-        <div>
-          <h3>Backend and platform</h3>
-          <p class="small muted mb0">
-            Python (FastAPI, asyncio, pydantic, pytest), Node.js, C#/.NET, Java, REST API
-            design, WebSockets, OpenAPI, authentication, rate limiting, Linux, nginx,
-            Docker, systemd, CI/CD with GitHub Actions, zero downtime deploys.
-          </p>
+      </article>
+      <article class="card" style="--k: #ffd166">
+        <img src="img/work/mcp-gateway.jpg" alt="The mcp-gateway case study: a tool server a security review would pass" loading="lazy" width="1200" height="750">
+        <div class="card-in">
+          <small>AI system &middot; Model Context Protocol &middot; Python</small>
+          <h3>A tool server a security review would pass</h3>
+          <dl>
+            <dt>The problem</dt><dd>Connecting a language model to internal data takes an afternoon. Answering the security review afterwards is the hard part.</dd>
+            <dt>What I built</dt><dd>An audited MCP server in Python and FastAPI: a closed list of read-only tools, every argument validated against a schema, every call logged including the ones it refused, and errors that cannot leak.</dd>
+            <dt>The proof</dt><dd>29 tests with lint and type checks, all passing. One test raises an error containing a database password and proves it never reaches the model.</dd>
+          </dl>
+          <div class="links"><a href="work/mcp-gateway.html">Read the case study</a><a href="https://github.com/kenbin64/mcp-gateway">Source</a></div>
         </div>
-        <div>
-          <h3>Operations</h3>
-          <p class="small muted mb0">
-            Prometheus metrics, structured JSON logging, health checks and deploy gates,
-            observability for batch jobs, incident triage, VPS administration, TLS and
-            certificate automation, secrets handling.
-          </p>
+      </article>
+      <article class="card" style="--k: #2dd4bf">
+        <img src="img/work/citeline.jpg" alt="The citeline case study: retrieval that cites the exact regulation or abstains" loading="lazy" width="1200" height="750">
+        <div class="card-in">
+          <small>AI system &middot; RAG &middot; Postgres and pgvector</small>
+          <h3>Answers with a citation, or says it does not know</h3>
+          <dl>
+            <dt>The problem</dt><dd>A retrieval system that always answers is worse than useless in regulated work, because the confident wrong answer looks the same as the right one.</dd>
+            <dt>What I built</dt><dd>A question-answering service over US drinking water regulations (40 CFR Part 141). Hybrid search, a gate that declines when the text does not support an answer, and a rule enforced in code: a citation to a passage that was never retrieved is rejected. Runs on local models.</dd>
+            <dt>The proof</dt><dd>31 unit tests, and an evaluation set of 28 cases, 8 of them deliberately out of scope to measure whether it stays quiet. 185 documents and 908 chunks indexed.</dd>
+          </dl>
+          <div class="links"><a href="work/citeline.html">Read the case study</a><a href="https://github.com/kenbin64/citeline">Source</a></div>
         </div>
+      </article>
+      <article class="card" style="--k: #2dd4bf">
+        <img src="img/work/cos.jpg" alt="The front page of Cost of Saving: a calculator beside the line, they say a dollar saved is a dollar earned" loading="lazy" width="1200" height="750">
+        <div class="card-in">
+          <small>Product &middot; decision tools</small>
+          <h3>Cost of Saving</h3>
+          <dl>
+            <dt>The problem</dt><dd>A saving and what it costs are recorded in different places, so nobody adds them up.</dd>
+            <dt>What I built</dt><dd>Free calculators that put the two side by side for purchases, jobs, repairs, business cuts and hiring steps. Every formula is published. Nothing typed leaves the browser.</dd>
+            <dt>The proof</dt><dd>13 test suites and 517 checks, with sums worked by hand in the tests. 117 pages, 0 broken links, checked on every build.</dd>
+          </dl>
+          <div class="links"><a href="https://costofsaving.com/">Open it</a><a href="work/costofsaving.html">Read the case study</a><a href="https://costofsaving.com/formulas">Read the formulas</a></div>
+        </div>
+      </article>
+      <article class="card" style="--k: #8b7dff">
+        <img src="img/work/systems.jpg" alt="The Systems page: a tool that sorts any part of a system into input, engine or output" loading="lazy" width="1200" height="750">
+        <div class="card-in">
+          <small>Teaching tool &middot; interactive</small>
+          <h3>How Systems Work</h3>
+          <dl>
+            <dt>The problem</dt><dd>Most costly decisions come from mistaking one part of a system for another, such as counting the people who do the work as only a cost.</dd>
+            <dt>What I built</dt><dd>A page where you sort your own system into what goes in, what does the work, and what comes out, then wire it wrongly and watch the result come apart.</dd>
+            <dt>The proof</dt><dd>The model behind it has 59 checks, including hand-worked cases and every combination of settings.</dd>
+          </dl>
+          <div class="links"><a href="https://costofsaving.com/systems">Try it</a></div>
+        </div>
+      </article>
+      <article class="card" style="--k: #ff6fb5">
+        <img src="img/work/cinema.jpg" alt="A 3D cinema room with an audience watching a painting set in motion" loading="lazy" width="1200" height="750">
+        <div class="card-in">
+          <small>3D on the web &middot; three.js</small>
+          <h3>A gallery you walk through</h3>
+          <dl>
+            <dt>The problem</dt><dd>A page of thumbnails does not feel like standing in front of a painting.</dd>
+            <dt>What I built</dt><dd>Rooms to walk through, every picture framed and lit, visitors and sound, and a cinema with an audience where the paintings move. Drawn entirely in code, with no 3D model files.</dd>
+            <dt>The proof</dt><dd>59 works catalogued (38 paintings, 21 digital), with a build that refuses duplicate pictures. Shaped by 67 messages of direction in its first three days, and a page that says who did what.</dd>
+          </dl>
+          <div class="links"><a href="https://kensartgallery.com/walk">Walk in</a><a href="https://kensartgallery.com/cinema">The cinema</a><a href="https://kensartgallery.com/built">How it was built</a></div>
+        </div>
+      </article>
+      <article class="card" style="--k: #ff6fb5">
+        <div class="card-in">
+          <small>Teaching &middot; video series</small>
+          <h3>Demystifying AI</h3>
+          <dl>
+            <dt>The problem</dt><dd>Most people either fear AI or expect too much of it, and neither helps them use it well.</dd>
+            <dt>What I made</dt><dd>A series of standalone videos, from "What is AI?" to advanced topics, each one topic in depth with concrete examples, including how to spot and reduce made-up answers.</dd>
+            <dt>Why it matters</dt><dd>Explaining AI plainly to non-technical people, without overselling it, is half of getting a team to use it well.</dd>
+          </dl>
+          <div class="links"><a href="https://www.youtube.com/@kbingh/videos">Watch the series</a></div>
+        </div>
+      </article>
+      <article class="card" style="--k: #ffd166">
+        <div class="card-in">
+          <small>Contract &middot; Handshake AI &middot; 2026</small>
+          <h3>Measuring whether a model can be trusted</h3>
+          <dl>
+            <dt>The problem</dt><dd>"It seems to work" is not evidence that a language model is reliable.</dd>
+            <dt>What I built</dt><dd>Adversarial benchmarks and evaluation harnesses that score tool use and step-by-step behavior against a written rubric, sampled many times over.</dd>
+            <dt>The result</dt><dd>Recommendations to scale, iterate or stop, each backed by measurements instead of impressions.</dd>
+          </dl>
+        </div>
+      </article>
+      <article class="card" style="--k: #2dd4bf">
+        <div class="card-in">
+          <small>Humana &middot; healthcare &middot; 2022 to 2024</small>
+          <h3>Claims pipelines under HIPAA</h3>
+          <dl>
+            <dt>The problem</dt><dd>High volumes of healthcare claims, handled by hand, under strict privacy rules.</dd>
+            <dt>What I built</dt><dd>.NET 6 services and HL7 and FHIR data pipelines, with Python automation that removed manual processing cycles.</dd>
+            <dt>How</dt><dd>Working directly with clinical, operations and data teams to agree the rules before writing the code.</dd>
+          </dl>
+        </div>
+      </article>
+      <article class="card" style="--k: #8b7dff">
+        <div class="card-in">
+          <small>U.S. Air Force, Hill AFB &middot; defense</small>
+          <h3>Modernizing systems that cannot fail</h3>
+          <dl>
+            <dt>The problem</dt><dd>Aging hazardous-waste and asset-tracking systems, in an environment where every change is controlled.</dd>
+            <dt>What I built</dt><dd>Replacements in Java, Spring Boot, .NET and SQL Server, prototyped with the people who use them, with automated harnesses that prove the old behavior still holds.</dd>
+            <dt>Context</dt><dd>Delivered under DoD change control while holding a Secret clearance.</dd>
+          </dl>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="direct-title">
+    <div class="block-head">
+      <h2 id="direct-title">Five rules the AI works under</h2>
+      <p>An AI will happily produce something that looks finished. These are the standing rules I give it so that what comes back is actually finished, and so I can tell the difference.</p>
+    </div>
+    <div class="rules">
+      <div class="rule" style="--k: #2dd4bf"><h3>Direction, not commands</h3><p>I say what it is for and who will use it. A command gets carried out the same way whatever the situation. Direction makes the AI use judgment, and lets me see where its judgment is off.</p></div>
+      <div class="rule" style="--k: #8b7dff"><h3>Nothing is true until it runs</h3><p>No "this should work". It runs the code, shows me the output, and tells me separately what it ran and what is still mine to run.</p></div>
+      <div class="rule" style="--k: #ff6fb5"><h3>Tests that try to break it</h3><p>Every sum gets a case worked by hand, the edges get tried, and a tipping point is checked by feeding it back in.</p></div>
+      <div class="rule" style="--k: #ffd166"><h3>Say what kind of claim it is</h3><p>Measured, established, an interpretation, or not claimed. A confident guess is a defect, and the AI is told to stop at the edge of what it knows.</p></div>
+      <div class="rule" style="--k: #2dd4bf"><h3>No yes-man</h3><p>If I am wrong, it says so and shows why. Agreement without checking is how projects go in circles.</p></div>
+    </div>
+    <div class="cta"><a class="btn go" href="how-i-direct-ai.html">See the method, with real exchanges</a></div>
+  </section>
+
+  <section class="block" aria-labelledby="stack-title">
+    <div class="block-head">
+      <h2 id="stack-title">What I build with</h2>
+      <p>The AI is a tool I am fluent in. The engineering underneath is more than fifteen years old.</p>
+    </div>
+    <div class="stack">
+      <div><h3>Back end</h3><ul class="chips"><li class="lead">Java</li><li class="lead">Spring Boot</li><li>REST services, datasource to controller</li><li>.NET 6 / C#</li><li>Python</li><li>FastAPI</li><li>Node.js</li></ul></div>
+      <div><h3>Front end</h3><ul class="chips"><li class="lead">Angular</li><li>React 19</li><li>Next.js 15</li><li>TypeScript</li><li>JavaScript</li><li>three.js</li></ul></div>
+      <div><h3>Data and cloud</h3><ul class="chips"><li class="lead">PostgreSQL</li><li>pgvector</li><li>Oracle</li><li>SQL Server</li><li>AWS Lambda, CloudFront</li><li>Azure</li><li>Cloudflare Workers</li><li>Docker</li></ul></div>
+      <div><h3>AI engineering</h3><ul class="chips"><li class="lead">Claude Code in VS Code</li><li>Model Context Protocol</li><li>Cursor</li><li>GitHub Copilot</li><li>RAG pipelines</li><li>Evaluation harnesses</li><li>Private multi-model AI with Ollama</li><li>MCP connected to my own Ubuntu server</li><li>Standing directives and memory</li></ul></div>
+      <div><h3>Servers and Linux</h3><ul class="chips"><li class="lead">Ubuntu server admin</li><li>nginx virtual hosts</li><li>Let's Encrypt</li><li>PM2 and systemd</li><li>Git push-to-deploy</li><li>Cloudflare Workers, KV, Email Routing</li><li>WebXR</li></ul></div>
+      <div><h3>Regulated work</h3><ul class="chips"><li>HIPAA and PHI handling</li><li>HL7 / FHIR</li><li>DoD change control</li><li>USAF Secret clearance, previously held</li></ul></div>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="time-title">
+    <div class="block-head">
+      <h2 id="time-title">Where I have done it</h2>
+      <p>The through line is places where somebody eventually audits the trail.</p>
+    </div>
+    <div class="time">
+      <div class="job"><h3>AI Engineer, evaluation and prototyping<small>Handshake AI &middot; contract &middot; 2026 to now</small></h3><ul><li>Adversarial benchmarks and agent workflows that test reliability, tool use and step-by-step safety.</li><li>Evaluation harnesses that encode a rubric and sample repeatedly, so failure is measured and not guessed.</li></ul></div>
+      <div class="job"><h3>Software Developer, contract<small>DTSI and Software Implementers &middot; U.S. Air Force, Hill AFB</small></h3><ul><li>Modernized mission-critical systems in Java, Spring Boot, .NET and SQL Server under DoD change control.</li><li>Built test harnesses that validate legacy behavior before each deployment.</li></ul></div>
+      <div class="job"><h3>Software Developer, claims and data automation<small>Humana &middot; 2022 to 2024</small></h3><ul><li>.NET 6 microservices and HL7 and FHIR pipelines for high-volume claims under HIPAA.</li><li>Python ETL and Linux automation that removed manual processing.</li></ul></div>
+      <div class="job"><h3>Enterprise Software Consultant<small>Software Technology Group &middot; The Church of Jesus Christ of Latter-day Saints</small></h3><ul><li>Prototyped a worldwide missionary portal for executive leadership before the full build.</li><li>Delivered features in Java, Spring, AngularJS, Oracle and MarkLogic, and handed them to the enterprise team with architecture notes.</li></ul></div>
+    </div>
+    <div class="cta"><a class="btn" href="resume.html">Resume</a><a class="btn" href="resume/Kenneth_Bingham_Resume.pdf">Download (PDF, 2 pages)</a><a class="btn" href="resume/Kenneth_Bingham_Resume_Full.pdf">Full version (PDF, 5 pages)</a></div>
+  </section>
+
+  <section class="split" aria-labelledby="believe-title">
+    <p class="quote" id="believe-title">The AI writes the code. <em style="font-style: normal; color: var(--a)">I am responsible for it.</em></p>
+    <div class="stackv">
+      <div class="prose">
+        <p><b>The person stays in charge.</b> Software can recommend. A named human decides. I build that into the tools and I work that way with the AI.</p>
+        <p><b>A tool should leave its user more capable.</b> The calculators above ask for your own numbers and show their working, so you can disagree with them. That is on purpose.</p>
+        <p><b>Credit is stated exactly.</b> I conceive, direct and decide. The AI writes and tests. It does not originate the ideas, and I do not pretend I typed every line.</p>
+        <p><b>If it cannot be checked, it is not finished.</b></p>
       </div>
+      <div class="cta"><a class="btn go" href="contact.html">Talk to me about a role</a><a class="btn" href="https://www.linkedin.com/in/kenneth-bingham-11378b10">LinkedIn</a><a class="btn" href="https://github.com/kenbin64">GitHub</a></div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ========================== HIRING =========================== -->
-<section>
-  <div class="wrap narrow">
-    <span class="avail">Open to work</span>
-    <h2>What I am looking for</h2>
-    <p class="lede">
-      An AI or backend engineering role where reliability is the point: retrieval systems,
-      data pipelines, evaluation infrastructure, or the platform work underneath them.
-      Remote or hybrid.
-    </p>
-    <div class="btn-row" style="margin-top:1.3rem">
-      <a class="btn" href="/contact.html">Get in touch</a>
-      <a class="btn ghost" href="/resume.html">Read the resume</a>
-      <a class="btn ghost" href="https://www.linkedin.com/in/kenneth-bingham-11378b10" rel="noopener">LinkedIn</a>
-    </div>
-  </div>
-</section>
+  <footer class="foot hint">
+    <div class="row"><span>&copy; 2026 Kenneth W. Bingham &middot; St. George, Utah</span><span><a href="how-i-direct-ai.html">How I direct AI</a> &middot; <a href="resume.html">Resume</a> &middot; <a href="contact.html">Contact</a> &middot; <a href="bfx-ingest.html">A tool: files into clean AI context</a> &middot; <a href="research.html">Research and experiments</a></span></div>
+    <p>Concept and direction: Kenneth W. Bingham. Built with Claude under a standing directive to be skeptical, to insist on proof, and to make no claim that has not been run. The ideas are mine. The AI implemented and verified them.</p>
+  </footer>
 
-</main>
-
-<footer>
-  <div class="wrap">
-    <div class="row">
-      <span>© 2026 Kenneth W. Bingham</span>
-      <a href="/contact.html">Contact</a>
-      <a href="/resume.html">Resume</a>
-      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
-      <a href="https://www.linkedin.com/in/kenneth-bingham-11378b10" rel="noopener">LinkedIn</a>
-    </div>
-    <div class="aside-research">
-      <div class="callout">
-        <span class="ico" aria-hidden="true">&#9633;</span>
-        <p>
-          <strong>Independent research, kept separate from the client work above.</strong>
-          <a href=/the-case.html>The case</a> lays it out in order with live benchmarks, and
-          <a href=/geometry-as-data.html>Geometry as a data source</a> is the tested version:
-          store the generating rule, derive the data on demand. Fourteen of fourteen proofs
-          pass, and the same suite proves it is <em>not</em> faster than a local read. Longer
-          form at <a href=https://dimensionalprogramming.com rel=noopener>dimensionalprogramming.com</a>.
-        </p>
-      </div>
-    </div>
-  </div>
-</footer>
+</div>
 
 <script>
-/* Pull the live corpus figures from the running service. If the service is down
-   the metrics stay as dashes and say so, rather than showing a stale number
-   baked into the page at build time. */
+// The direction log. Each entry is a real exchange from the build record, with only spelling tidied:
+// what I said, what the AI had done, and what it became. They are shown in turn and typed out.
 (function () {
-  var fmt = function (n) { return n.toLocaleString('en-US'); };
-  var set = function (id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
-
-  Promise.all([
-    fetch('/api/citeline/stats').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
-    fetch('/api/citeline/healthz').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
-  ]).then(function (res) {
-    var s = res[0], h = res[1];
-    if (!s && !h) {
-      set('m-status', 'offline');
-      document.getElementById('live-note').textContent =
-        'The live service is not responding right now. The figures on the project page are from the last recorded evaluation run.';
-      return;
-    }
-    if (s) {
-      set('m-docs', fmt(s.documents));
-      set('m-chunks', fmt(s.chunks));
-      set('m-latency', s.median_retrieve_ms != null ? s.median_retrieve_ms + ' ms' : 'no queries yet');
-    }
-    if (h) set('m-status', h.status === 'ok' ? 'healthy' : 'degraded');
-
-    var note = 'Live from the service. Corpus edition ' + ((s && s.corpus_version) || 'unknown') + '.';
-    // Only quote an abstention rate once there are enough queries for it to
-    // mean anything. Below that, report the count and say plainly that it is
-    // too few, rather than presenting "100% declined" off a single question.
-    if (s && s.queries_total > 0) {
-      var n = s.queries_total;
-      note += ' ' + fmt(n) + (n === 1 ? ' question' : ' questions') + ' asked so far';
-      note += (n >= 20)
-        ? ', ' + Math.round(s.abstention_rate * 100) + '% of which it declined to answer.'
-        : ', too few to quote an abstention rate from.';
-    }
-    document.getElementById('live-note').textContent = note;
-  });
+  var LOG = [
+    { said: 'If I stumbled on this site right now, I would think it was mainly to compare airline fares.',
+      had: 'Led the front page with one worked example, a cheap flight, because it was the easiest to show.',
+      became: 'A front page that opens on five decisions, each with its own calculator. <a href="https://costofsaving.com/">See it</a>' },
+    { said: 'It should not be opinionated.',
+      had: 'Invented two cut-off points of its own so a picture could show "good" or "bad".',
+      became: 'Those are gone. The page states the figures and leaves the verdict to the reader.' },
+    { said: 'It says "none was made by AI". Some of the reference pictures were. All the paintings were painted by hand.',
+      had: 'Shortened my statement for the foot of the page, and dropped the part that mattered.',
+      became: 'A statement that says exactly what was and was not made by hand, on every page. <a href="https://kensartgallery.com/about">Read it</a>' },
+    { said: 'The site has not been updated yet.',
+      had: 'Misread which design I meant and restyled the wrong page, then reported it as done.',
+      became: 'Caught on the live site the same evening and put right. The AI is fast. Checking is still my job.' },
+    { said: 'Make sure there are people watching in the cinema too.',
+      had: 'Built a clean page with a video player on it.',
+      became: 'A room with an audience in it, and later house lights that go down as the film starts. <a href="https://kensartgallery.com/cinema">Sit in</a>' },
+  ];
+  var said = document.getElementById('said'), had = document.getElementById('had'), became = document.getElementById('became'), dots = document.getElementById('dots');
+  var at = 0, typing = null, turn = null;
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  dots.innerHTML = LOG.map(function (_, i) { return '<button type="button" aria-label="Exchange ' + (i + 1) + '" data-i="' + i + '"></button>'; }).join('');
+  function show(i, byHand) {
+    at = i; clearInterval(typing); clearTimeout(turn);
+    var e = LOG[i], n = 0;
+    Array.prototype.forEach.call(dots.children, function (b, j) { b.setAttribute('aria-pressed', String(j === i)); });
+    had.textContent = ''; became.innerHTML = '';
+    function rest() { had.textContent = e.had; became.innerHTML = e.became; if (!byHand) turn = setTimeout(function () { show((at + 1) % LOG.length); }, 7000); }
+    if (still) { said.textContent = e.said; rest(); return; }
+    said.textContent = '';
+    typing = setInterval(function () { n += 2; said.textContent = e.said.slice(0, n); if (n >= e.said.length) { clearInterval(typing); rest(); } }, 28);
+  }
+  dots.addEventListener('click', function (ev) { var b = ev.target.closest('button[data-i]'); if (b) show(Number(b.dataset.i), true); });
+  show(0);
 })();
 </script>
-
-<script src="/js/three.min.js"></script>
-<script src="/js/hero-shape.js"></script>
 </body>
 </html>
