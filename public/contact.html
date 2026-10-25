@@ -13,6 +13,20 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap">
 <link rel="stylesheet" href="portfolio.css">
+<style>
+  .contact-form { display: grid; gap: 6px; }
+  .contact-form label { font: 600 14px var(--body); color: var(--ink-2); margin-top: 6px; }
+  .contact-form .opt { font-weight: 400; color: var(--muted); }
+  .contact-form input, .contact-form textarea { font: 16px var(--body); color: var(--ink); background: var(--page); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; box-sizing: border-box; }
+  .contact-form textarea { resize: vertical; min-height: 120px; }
+  .contact-form input:focus-visible, .contact-form textarea:focus-visible, .contact-form button:focus-visible { outline: 2px solid var(--a); outline-offset: 2px; }
+  .contact-form button { justify-self: start; margin-top: 10px; cursor: pointer; }
+  .contact-form button:disabled { opacity: 0.6; cursor: default; }
+  .contact-form .hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+  .form-msg { margin: 0; min-height: 1.4em; font-size: 15px; color: var(--ink-2); }
+  .form-msg.bad { color: var(--c); }
+  .form-msg.good { color: var(--a); }
+</style>
 </head>
 <body>
 <div class="page">
@@ -29,7 +43,20 @@
       <p class="lede">For roles in AI prototyping, AI-assisted development, or full-stack engineering in Java and Spring Boot, .NET, Python or Angular. I am glad to travel for key meetings and periodic on-sites.</p>
     </div>
     <div class="rules" style="grid-template-columns: 1fr">
-      <div class="rule" style="--k: #2dd4bf"><h3>Email</h3><p><a href="mailto:ken.bingham64@gmail.com">ken.bingham64@gmail.com</a></p></div>
+      <form class="rule contact-form" id="contactForm" style="--k: #2dd4bf" novalidate>
+        <h3>Send me a message</h3>
+        <label for="cName">Your name</label>
+        <input id="cName" name="name" type="text" autocomplete="name" maxlength="100" required>
+        <label for="cEmail">Your email, so I can reply <span class="opt">(optional)</span></label>
+        <input id="cEmail" name="email" type="email" autocomplete="email" maxlength="200">
+        <label for="cSubject">Subject <span class="opt">(optional)</span></label>
+        <input id="cSubject" name="subject" type="text" maxlength="150" placeholder="For example: a remote Java role">
+        <label for="cMessage">Message</label>
+        <textarea id="cMessage" name="message" rows="6" maxlength="5000" required></textarea>
+        <div class="hp" aria-hidden="true"><label for="cWebsite">Leave this empty</label><input id="cWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+        <button class="btn go" type="submit" id="cSend">Send</button>
+        <p class="form-msg" id="cMsg" role="status"></p>
+      </form>
       <div class="rule" style="--k: #8b7dff"><h3>LinkedIn</h3><p><a href="https://www.linkedin.com/in/kenneth-bingham-11378b10">linkedin.com/in/kenneth-bingham-11378b10</a></p></div>
       <div class="rule" style="--k: #ff6fb5"><h3>GitHub</h3><p><a href="https://github.com/kenbin64">github.com/kenbin64</a></p></div>
     </div>
@@ -40,5 +67,26 @@
   </footer>
 
 </div>
+<script>
+// The contact form: sends to /api/contact (worker.js), which emails Ken. His address is never on the page.
+(function () {
+  var form = document.getElementById('contactForm'), msg = document.getElementById('cMsg'), btn = document.getElementById('cSend');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var data = { name: form.name.value, email: form.email.value, subject: form.subject.value, message: form.message.value, website: form.website.value };
+    if (!data.name.trim()) { msg.className = 'form-msg bad'; msg.textContent = 'Please add your name.'; form.name.focus(); return; }
+    if (data.message.trim().length < 10) { msg.className = 'form-msg bad'; msg.textContent = 'Please write a little more in the message.'; form.message.focus(); return; }
+    btn.disabled = true; msg.className = 'form-msg'; msg.textContent = 'Sending...';
+    fetch('/api/contact', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data) })
+      .then(function (r) { return r.json().then(function (body) { return { ok: r.ok, body: body }; }); })
+      .then(function (res) {
+        if (res.ok) { form.reset(); msg.className = 'form-msg good'; msg.textContent = 'Sent. Thank you, I will get back to you soon.'; }
+        else { msg.className = 'form-msg bad'; msg.textContent = (res.body && res.body.error) || 'The message could not be sent. Please try again.'; }
+      })
+      .catch(function () { msg.className = 'form-msg bad'; msg.textContent = 'The message could not be sent. Check your connection and try again.'; })
+      .then(function () { btn.disabled = false; });
+  });
+})();
+</script>
 </body>
 </html>

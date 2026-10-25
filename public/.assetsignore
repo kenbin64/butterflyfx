@@ -7,3 +7,7 @@ login
 index.html.bak
 CNAME
 bfx-ingest.bat
+
+# An outdated resume and an old design preview: kept in the repo, not published.
+assets/Kenneth_Bingham_Resume.html
+sleek-preview.html

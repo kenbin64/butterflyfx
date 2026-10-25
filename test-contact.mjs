@@ -1,0 +1,20 @@
+// Tests for the contact form's checks (worker.js checkContact). Run: node test-contact.mjs
+import { readFileSync } from 'node:fs';
+const src = readFileSync(new URL('./worker.js', import.meta.url), 'utf8').replace(/^import .*cloudflare:email.*$/m, 'class EmailMessage {}');
+const { checkContact } = await import('data:text/javascript,' + encodeURIComponent(src));
+let passed = 0, failed = 0;
+const check = (n, ok, d = '') => { if (ok) passed++; else { failed++; console.log('FAIL', n, d); } };
+const good = { name: 'Jane Recruiter', email: 'jane@example.com', subject: 'A role', message: 'We have a remote Java role you might like.' };
+check('a good message passes', checkContact(good).entry && checkContact(good).entry.name === 'Jane Recruiter');
+check('email is optional', checkContact({ ...good, email: '' }).entry);
+check('no subject gets a default one', checkContact({ ...good, subject: '' }).entry.subject === 'Message from butterflyfx.us');
+check('a robot that fills the hidden field is quietly ignored', checkContact({ ...good, website: 'http://spam' }).spam === true);
+check('a name is required', /name/.test(checkContact({ ...good, name: ' ' }).error));
+check('a too-short message is refused', /more/.test(checkContact({ ...good, message: 'hi' }).error));
+check('a bad email is refused', /email/.test(checkContact({ ...good, email: 'not-an-email' }).error));
+check('a very long message is refused', /too long/.test(checkContact({ ...good, message: 'x'.repeat(5001) }).error));
+check('a very long name is refused', /name is too long/.test(checkContact({ ...good, name: 'n'.repeat(101) }).error));
+const inj = checkContact({ ...good, name: 'Eve\r\nBcc: victim@example.com', subject: 'Hi\nBcc: x@y.z' }).entry;
+check('line breaks cannot sneak extra email headers in', inj && !/[\r\n]/.test(inj.name) && !/[\r\n]/.test(inj.subject));
+check('an empty form is refused, not crashed', !!checkContact({}).error);
+console.log(`${passed} passed, ${failed} failed`); if (failed) process.exit(1);

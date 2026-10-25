@@ -5,7 +5,11 @@
   // Deploy:  npx wrangler deploy   (from this folder)
   "name": "butterflyfx",
   "compatibility_date": "2026-10-01",
-  "assets": { "directory": "./public", "not_found_handling": "404-page" },
+  "main": "worker.js",
+  "assets": { "directory": "./public", "binding": "ASSETS", "not_found_handling": "404-page" },
+  // The contact form's email (worker.js). The two addresses are secrets, never written here:
+  //   npx wrangler secret put CONTACT_TO      and      npx wrangler secret put CONTACT_BACKUP
+  "send_email": [ { "name": "MAIL" } ],
   "routes": [ { "pattern": "butterflyfx.us", "custom_domain": true }, { "pattern": "www.butterflyfx.us", "custom_domain": true } ],
   // The workers.dev address stays on as a fallback while the nameserver change settles.
   "workers_dev": true
