@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schwarz Diamond · AI-style tools that run by rule, in your browser · Kenneth W. Bingham</title>
+<meta name="description" content="Schwarz Diamond: thirteen tools that do AI-style work by rule instead of AI, in the visitor's own browser. Bank statement PDFs checked against the bank's own totals, a humanizer that never changes a fact, photo cleaning with pixel-identical proof. Directed by Kenneth W. Bingham, built with AI.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/work/schwarzdiamond.html">
+<link rel="icon" href="/assets/butterfly.png">
+<link rel="stylesheet" href="/site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/work/schwarzdiamond.html">
+<meta property="og:title" content="Schwarz Diamond · AI-style tools that run by rule, in your browser">
+<meta property="og:image" content="https://butterflyfx.us/img/work/schwarzdiamond.jpg">
+<meta property="og:description" content="Tools that measure and check instead of predicting: statements read to the cent, text humanized without changing a fact, nothing uploaded.">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham</a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/#work">Work</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">case study · tools without AI · live and free to use</p>
+    <h1>AI-style tools that measure instead of guess.</h1>
+    <p class="lede">
+      <b>Schwarz Diamond</b> is a set of thirteen tools that do the kind of work people now hand to AI: read a bank
+      statement, make AI-written text sound natural, answer questions from your documents, clean a photo before you
+      post it. They work by rule instead, run in the visitor's own browser, and show their work. I designed it and
+      made every decision; an AI wrote the code and tests to my standards.
+    </p>
+    <div class="btn-row">
+      <a class="btn" href="https://schwarzdiamond.com/" rel="noopener">Open it</a>
+      <a class="btn ghost" href="https://schwarzdiamond.com/#m-budget" rel="noopener">Try the statement reader</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <h2>The problem</h2>
+    <p>
+      The tools people reach for to sort out a bank statement, polish a draft or answer questions about a document
+      increasingly mean uploading the file to someone's server, and an answer that can change from one try to the
+      next. For a bank statement, a draft or a family photo, many people would rather not do either. A lot of this
+      work does not need a prediction at all: it needs careful measurement, and a check that the result is right.
+    </p>
+
+    <h2>What it does</h2>
+    <ul>
+      <li><b>Bank statements:</b> reads the PDF your bank gives you (or a CSV), finds merchants charged many times,
+          subscriptions billed twice, money in and out of advance and pay-later apps, payments returned unpaid and
+          fees, and keeps moves between your own accounts apart. It then checks what it read against the
+          statement's own printed totals, to the cent, and says so if they ever differ.</li>
+      <li><b>Humanizer:</b> takes text an AI wrote and makes it read like a person wrote it: plain words for stock
+          phrasing, empty lead-ins removed, contractions used, long sentences split. Every number, name and
+          quotation is counted before and after, and a rewrite that would change one is held back.</li>
+      <li><b>Pictures and sound:</b> removes what rides along in a file (where a photo was taken, the software,
+          comments), then decodes both versions and confirms every pixel, or every sample, is identical.</li>
+      <li><b>And more:</b> questions answered from your own documents with the source line (or "your documents do
+          not say"), coverage of one event split into sides with what all sides agree on, a code checker that proves
+          runaway patterns by timing them, and text fixes and word-for-word summaries.</li>
+    </ul>
+
+    <h2>Who did what</h2>
+    <ul>
+      <li><b>Me:</b> the concept and every decision: the design rules (input, transform, output; each part knowing only
+          its neighbours; the work built in a fixed sequence of steps), which tools to build and for whom, what each
+          one may and may not change, and the call to show results people can check rather than claim them.</li>
+      <li><b>The AI (Claude, in VS Code):</b> the code, the tests and the site, under written standards, with a plain
+          report of what it checked and what it did not.</li>
+    </ul>
+
+    <h2>How the work was kept honest</h2>
+    <ul>
+      <li><b>Tests that try to break it:</b> 95 hostile edge cases (empty input, huge files, emoji, damaged and
+          wrong-type files, malformed statements) and 6,000 randomized texts in which no number, name or quotation was
+          ever changed.</li>
+      <li><b>Testing found real bugs, and each is now guarded by a test:</b> one step took 90 seconds on a large
+          document and now takes a tenth of a second; four inputs that crashed now get plain messages.</li>
+      <li><b>Proved, not guessed:</b> the code checker times each risky pattern on longer and longer input; on patterns
+          shaped like real published advisories it flags the three that truly run away and none of the four
+          look-alikes, and it raised no false alarm on 606 files from widely used packages.</li>
+      <li><b>Real data:</b> the statement reader was tested on a real bank statement and matched its totals exactly,
+          without the statement leaving the computer or entering any repository.</li>
+      <li><b>Checkable privacy:</b> a recorded network audit shows the page sends nothing while the tools run; the site
+          invites visitors to watch their browser's network panel and see the same.</li>
+    </ul>
+
+    <h2>Why it matters to an employer</h2>
+    <ul>
+      <li><b>AI-assisted development done properly:</b> fast output from the AI, with direction, standards and checks
+          from a person.</li>
+      <li><b>Product judgment:</b> tested with real data, which exposed that the first version could not read the files
+          banks actually hand out; that changed the design.</li>
+      <li><b>Evidence over assertion:</b> results that verify themselves, honest limits, and no claims a visitor cannot
+          check.</li>
+      <li><b>Privacy by design:</b> no accounts, no uploads, no stored data; the work happens on the visitor's device.</li>
+    </ul>
+
+    <h2>Technologies and skills</h2>
+    <ul>
+      <li><b>JavaScript</b> (ES modules) shared between a desktop app and the website, packed for the browser with
+          <b>esbuild</b>; the same tested code runs in both.</li>
+      <li><b>pdf.js</b> for reading statements by position on the page; <b>Web Workers</b> for timing patterns
+          safely; an <b>abstract syntax tree</b> parser (acorn) for reading code.</li>
+      <li><b>WebGL:</b> the hero image is the Schwarz Diamond surface drawn live from its equation.</li>
+      <li><b>Cloudflare</b> hosting with a custom domain; <b>Node.js</b> test suites and headless-Chrome tests run
+          against the live site.</li>
+      <li><b>AI-assisted engineering</b> with Claude Code in VS Code, under written standards.</li>
+    </ul>
+
+    <h2>What it does not claim</h2>
+    <ul>
+      <li>It is a portfolio piece and skills demonstration, not a commercial product: free, with no ads, no cookies
+          and no sign-in.</li>
+      <li>Rules cannot write new sentences: the humanizer rewrites less freely than an AI paraphraser, and the question
+          tool can miss an answer worded differently from the question.</li>
+      <li>The statement reader has been tested on one bank's layout so far. It points out patterns; it is not
+          financial advice.</li>
+    </ul>
+
+    <div class="metrics">
+      <div class="metric"><span class="n">13</span><span class="l">tools</span></div>
+      <div class="metric"><span class="n">95</span><span class="l">hostile edge cases</span></div>
+      <div class="metric"><span class="n">6,000</span><span class="l">randomized texts, 0 facts changed</span></div>
+      <div class="metric"><span class="n">0</span><span class="l">bytes sent while tools run</span></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <p>
+      <a href="/">Home</a> &middot;
+      <a href="https://schwarzdiamond.com/" rel="noopener">Open Schwarz Diamond</a> &middot;
+      <a href="/resume.html">Resume</a> &middot;
+      <a href="/contact.html">Contact</a>
+    </p>
+    <p>Concept and direction: Kenneth W. Bingham. Built with the help of Claude AI under a standing directive to be
+      skeptical, to insist on proof, and to allow no claim that is not demonstrated in tested code. The ideas are the
+      author's; the AI implemented and verified them, it did not originate them.</p>
+  </div>
+</footer>
+
+</body>
+</html>
