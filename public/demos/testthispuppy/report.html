@@ -1,0 +1,73 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TestThisPuppy report</title><style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#16202a;--mute:#5b6875;--line:#dde3e9;--ok:#0f7b4a;--bad:#b3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1117;--card:#161b22;--ink:#e6edf3;--mute:#9aa7b4;--line:#2b333d;--ok:#3fb97a;--bad:#ff7b72}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,Segoe UI,sans-serif}
+main{max-width:1200px;margin:0 auto;padding:24px 16px}
+h1{margin:0 0 4px;font-size:24px} .sub{color:var(--mute);margin:0 0 18px}
+.totals{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.big{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 18px}
+.big b{display:block;font-size:28px} .big.ok b{color:var(--ok)} .big.bad b{color:var(--bad)}
+.kinds{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-bottom:16px}
+.kind{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column}
+.kind span{color:var(--mute);font-size:13px} .kind em{color:var(--bad);font-style:normal}
+label{display:inline-flex;gap:6px;align-items:center;margin-bottom:10px;cursor:pointer}
+.wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:760px} td{padding:7px 10px;border-top:1px solid var(--line);vertical-align:top}
+.st{font-weight:700} tr.pass .st{color:var(--ok)} tr.fail .st{color:var(--bad)} .ms{color:var(--mute);white-space:nowrap}
+body.only-fail tr.pass{display:none}
+</style></head><body><main>
+<h1>TestThisPuppy report</h1><p class="sub">Ran 2026-11-17 00:24:02. Every row is one step or test, in the order it ran.</p>
+<div class="totals"><div class="big ok"><b>49</b>passed</div><div class="big bad"><b>0</b>failed</div><div class="big"><b>49</b>in all</div></div>
+<div class="kinds"><div class="kind"><b>setup</b><span>3 passed</span></div><div class="kind"><b>network</b><span>4 passed</span></div><div class="kind"><b>http</b><span>6 passed</span></div><div class="kind"><b>race</b><span>1 passed</span></div><div class="kind"><b>browser</b><span>2 passed</span></div><div class="kind"><b>wrong</b><span>6 passed</span></div><div class="kind"><b>injection</b><span>18 passed</span></div><div class="kind"><b>macro</b><span>6 passed</span></div><div class="kind"><b>cleanup</b><span>2 passed</span></div><div class="kind"><b>log</b><span>1 passed</span></div></div>
+<label><input type="checkbox" onchange="document.body.classList.toggle('only-fail', this.checked)"> Show only failures</label>
+<div class="wrap"><table><tr class="pass"><td class="st">PASS</td><td>setup</td><td>create a throwaway database</td><td class="ms">3030 ms</td><td>PostgreSQL 16 in Docker, schema schema.sql</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>setup</td><td>start the app on the throwaway database</td><td class="ms">4407 ms</td><td>answering at http://localhost:8081</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>network</td><td>resolve the database host</td><td class="ms">0 ms</td><td>localhost is 127.0.0.1</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>network</td><td>reach the database port</td><td class="ms">1 ms</td><td>localhost:51225 accepted a connection</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>network</td><td>ping the database</td><td class="ms">13 ms</td><td>logged in and SELECT 1 answered; PostgreSQL 16.16 (Debian 16.16-1.pgdg13+1) on x86_64-pc-linux-gnu</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>network</td><td>trace the route to the database</td><td class="ms">39 ms</td><td>1 hop(s) to localhost</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>setup</td><td>seed dummy data</td><td class="ms">19 ms</td><td>6 rows into 2 tables [customer, purchase_order]</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>http</td><td>list customers</td><td class="ms">138 ms</td><td>status 200 (expected 200)</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>http</td><td>read a seeded customer</td><td class="ms">20 ms</td><td>status 200 (expected 200)</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>http</td><td>a missing customer is 404</td><td class="ms">11 ms</td><td>status 404 (expected 404)</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>http</td><td>create a customer</td><td class="ms">54 ms</td><td>status 201 (expected 201)</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>http</td><td>reject a customer with no email</td><td class="ms">8 ms</td><td>status 400 (expected 400)</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>http</td><td>list orders</td><td class="ms">16 ms</td><td>status 200 (expected 200)</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>race</td><td>25 POST /api/customers at once</td><td class="ms">78 ms</td><td>25 of 25 succeeded; customer grew by 25 (exact)</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>browser</td><td>fill the customer form</td><td class="ms">4675 ms</td><td>filled 3 fields; page said &quot;Saved customer 30&quot;</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>wrong</td><td>fill the customer form: required name left empty</td><td class="ms">1430 ms</td><td>refused cleanly: New customer</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>wrong</td><td>fill the customer form: email = &quot;not-an-email&quot;</td><td class="ms">1458 ms</td><td>refused cleanly: New customer</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>fill the customer form: name = ' OR '1'='1</td><td class="ms">739 ms</td><td>stored safely as plain text; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>fill the customer form: name = x'); DROP TABLE customer; --</td><td class="ms">751 ms</td><td>stored safely as plain text; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>fill the customer form: name = 1; DELETE FROM customer; --</td><td class="ms">768 ms</td><td>stored safely as plain text; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>fill the customer form: email = ' OR '1'='1</td><td class="ms">703 ms</td><td>refused; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>fill the customer form: email = x'); DROP TABLE customer; --</td><td class="ms">720 ms</td><td>refused; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>fill the customer form: email = 1; DELETE FROM customer; --</td><td class="ms">777 ms</td><td>refused; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>fill the customer form: phone = ' OR '1'='1</td><td class="ms">730 ms</td><td>stored safely as plain text; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>fill the customer form: phone = x'); DROP TABLE customer; --</td><td class="ms">675 ms</td><td>stored safely as plain text; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>fill the customer form: phone = 1; DELETE FROM customer; --</td><td class="ms">675 ms</td><td>stored safely as plain text; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>browser</td><td>fill the order form</td><td class="ms">5620 ms</td><td>filled 4 fields; page said &quot;Saved order 4&quot;</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>wrong</td><td>fill the order form: customerId set to an option that does not exist</td><td class="ms">1881 ms</td><td>refused cleanly: New order</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>wrong</td><td>fill the order form: required product left empty</td><td class="ms">1999 ms</td><td>refused cleanly: New order</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>wrong</td><td>fill the order form: quantity = &quot;abc&quot;</td><td class="ms">1847 ms</td><td>refused cleanly: Whitelabel Error Page</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>wrong</td><td>fill the order form: orderDate = &quot;not-a-date&quot;</td><td class="ms">1936 ms</td><td>refused cleanly: Whitelabel Error Page</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>fill the order form: product = ' OR '1'='1</td><td class="ms">1183 ms</td><td>stored safely as plain text; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>fill the order form: product = x'); DROP TABLE customer; --</td><td class="ms">1091 ms</td><td>stored safely as plain text; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>fill the order form: product = 1; DELETE FROM customer; --</td><td class="ms">1123 ms</td><td>stored safely as plain text; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>macro</td><td>customer-then-order #1</td><td class="ms">11135 ms</td><td>14 steps passed</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>macro</td><td>customer-then-order #2</td><td class="ms">1668 ms</td><td>14 steps passed</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>macro</td><td>customer-then-order #3</td><td class="ms">1617 ms</td><td>14 steps passed</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>macro</td><td>refuses-bad-email #1</td><td class="ms">5315 ms</td><td>7 steps passed</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>macro</td><td>refuses-bad-email #2</td><td class="ms">488 ms</td><td>7 steps passed</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>macro</td><td>refuses-bad-email #3</td><td class="ms">533 ms</td><td>7 steps passed</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>api path: /api/customers/' OR '1'='1</td><td class="ms">20 ms</td><td>refused; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>api path: /api/customers/x'); DROP TABLE customer; --</td><td class="ms">19 ms</td><td>refused; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>api path: /api/customers/1; DELETE FROM customer; --</td><td class="ms">18 ms</td><td>refused; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>api body: /api/customers name = ' OR '1'='1</td><td class="ms">24 ms</td><td>stored safely as plain text; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>api body: /api/customers name = x'); DROP TABLE customer; --</td><td class="ms">21 ms</td><td>stored safely as plain text; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>injection</td><td>api body: /api/customers name = 1; DELETE FROM customer; --</td><td class="ms">20 ms</td><td>stored safely as plain text; tables intact</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>cleanup</td><td>restore the database</td><td class="ms">43 ms</td><td>deleted 52, set back 0, put back 0, reset 2 sequences; database matches the snapshot exactly (0 rows)</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>cleanup</td><td>delete the throwaway database</td><td class="ms">0 ms</td><td>container stopped and removed</td></tr>
+<tr class="pass"><td class="st">PASS</td><td>log</td><td>read the app log</td><td class="ms">0 ms</td><td>no stack traces; 0 ERROR line(s)</td></tr></table></div>
+</main></body></html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TestThisPuppy demo · watch a real run, step by step · Kenneth W. Bingham</title>
+<meta name="description" content="Watch a recorded run of TestThisPuppy, QA in a box: a throwaway database, API tests, forms filled in a real browser, wrong input, SQL injection, race conditions and workflows, then an exact restore. 49 of 49 passed. Run it yourself with one command.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/work/testthispuppy-demo.html">
+<link rel="icon" href="/assets/butterfly.png">
+<link rel="stylesheet" href="/site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/work/testthispuppy-demo.html">
+<meta property="og:title" content="TestThisPuppy demo · watch QA in a box run">
+<meta property="og:description" content="A real run, step by step: 49 of 49 checks passed, and the database was left exactly as it was found.">
+<style>
+  .player { border: 1px solid rgba(127,127,127,.35); border-radius: 12px; overflow: hidden; margin: 1.2rem 0 .6rem; background: #fff; }
+  .player img { display: block; width: 100%; height: auto; aspect-ratio: 1000 / 420; object-fit: cover; object-position: top left; }
+  .caption { padding: .8rem 1rem; background: #11161d; color: #e9eef3; min-height: 3.2em; font-size: .98rem; line-height: 1.4; }
+  .caption b { color: #7fe0c4; margin-right: .4rem; }
+  .controls { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; margin: .4rem 0 1.4rem; }
+  .controls button { font: inherit; padding: .45rem .9rem; border-radius: 8px; border: 1px solid rgba(127,127,127,.45); background: transparent; color: inherit; cursor: pointer; }
+  .controls button.primary { background: #2dd4bf; border-color: #2dd4bf; color: #062a26; font-weight: 600; }
+  .controls input[type=range] { flex: 1 1 160px; min-width: 120px; }
+  .controls .count { font-variant-numeric: tabular-nums; opacity: .8; }
+  pre.cmd { overflow-x: auto; padding: .8rem 1rem; border-radius: 8px; background: rgba(127,127,127,.12); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham</a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/#work">Work</a>
+      <a href="/work/testthispuppy.html">Case study</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">demo · a recording of a real run · TestThisPuppy</p>
+    <h1>Watch QA in a box run, step by step.</h1>
+    <p class="lede">
+      This is a recording of a real run on November 17, 2026, made by the demo that ships with the app. The website
+      cannot run the tool itself, because it needs Docker and a browser, so each browser step was saved as it
+      happened, with a caption saying what was done. Below the player is the full report from the same run, and
+      the one command that runs it on your own machine.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <div class="player" aria-live="polite">
+      <img id="frame" src="/demos/testthispuppy/frames/frame-001.jpg" alt="The demo app's new customer form, opened by the tester" width="1000" height="420">
+      <div class="caption" id="caption"><b>1</b>Happy path: open /customers/new and scan it for fields</div>
+    </div>
+    <div class="controls">
+      <button type="button" id="back" aria-label="Previous step">Back</button>
+      <button type="button" id="play" class="primary">Play</button>
+      <button type="button" id="next" aria-label="Next step">Next</button>
+      <input type="range" id="seek" min="1" max="38" value="1" aria-label="Choose a step">
+      <span class="count" id="count">1 / 38</span>
+    </div>
+
+    <h2>What the run did</h2>
+    <p>
+      The browser steps above are only part of it. The whole run, in order, with every result in the
+      <a href="/demos/testthispuppy/report.html">full report</a>:
+    </p>
+    <ul>
+      <li><b>Created a throwaway database.</b> A fresh PostgreSQL 16 in Docker, with the schema applied, and the demo app started against it.</li>
+      <li><b>Checked the connection.</b> The host resolved, the port answered, a login ran <code>SELECT 1</code>, and the route was traced.</li>
+      <li><b>Tested the API.</b> Six requests, including a missing record (404) and a customer with no email (refused).</li>
+      <li><b>Raced it.</b> 25 create requests released at the same instant: all 25 succeeded, and exactly 25 rows appeared.</li>
+      <li><b>Filled every form.</b> Good values first, then a wrong value in each field with the browser's own checks switched off. The server refused every one cleanly.</li>
+      <li><b>Attacked it.</b> 18 SQL injection attempts through the forms and the API. No table was dropped, no row was deleted, and anything saved was stored as plain text.</li>
+      <li><b>Ran the workflows.</b> Two multi-step macros, three times each with fresh Latin dummy data.</li>
+      <li><b>Cleaned up.</b> 52 rows removed, both id sequences reset, the database matched its starting snapshot exactly, and then the database was deleted.</li>
+    </ul>
+    <div class="metrics">
+      <div class="metric"><span class="n">49/49</span><span class="l">passed</span></div>
+      <div class="metric"><span class="n">18</span><span class="l">injection attacks stopped</span></div>
+      <div class="metric"><span class="n">25/25</span><span class="l">simultaneous requests</span></div>
+      <div class="metric"><span class="n">0</span><span class="l">rows left behind</span></div>
+    </div>
+
+    <h2>Run it yourself</h2>
+    <p>You need Java 21, Maven, Docker and Google Chrome. Then one command builds everything and runs this same demo, with Chrome visible so you can watch it work. The HTML report opens at the end.</p>
+    <pre class="cmd">git clone https://github.com/kenbin64/testthispuppy.git
+cd testthispuppy
+demo.cmd        (Windows)
+./demo.sh       (Mac and Linux)</pre>
+    <div class="btn-row">
+      <a class="btn" href="https://github.com/kenbin64/testthispuppy" rel="noopener">Source on GitHub</a>
+      <a class="btn ghost" href="/work/testthispuppy.html#how-it-was-built">How it was built, prompt by prompt</a>
+      <a class="btn ghost" href="/demos/testthispuppy/report.html">The full report</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <p>
+      <a href="/">Home</a> &middot;
+      <a href="/work/testthispuppy.html">Case study</a> &middot;
+      <a href="https://github.com/kenbin64/testthispuppy" rel="noopener">Source</a> &middot;
+      <a href="/contact.html">Contact</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+// The player: frames.json lists every recorded frame and its caption, in the order they happened.
+(function () {
+  var img = document.getElementById('frame'), cap = document.getElementById('caption'), seek = document.getElementById('seek'),
+      count = document.getElementById('count'), play = document.getElementById('play');
+  var frames = [], at = 0, timer = null;
+  function show(i) {
+    if (!frames.length) return;
+    at = (i + frames.length) % frames.length;
+    img.src = '/demos/testthispuppy/' + frames[at].file;
+    img.alt = frames[at].caption;
+    cap.innerHTML = '<b>' + (at + 1) + '</b>';
+    cap.appendChild(document.createTextNode(frames[at].caption));
+    seek.value = at + 1;
+    count.textContent = (at + 1) + ' / ' + frames.length;
+  }
+  function stop() { clearInterval(timer); timer = null; play.textContent = 'Play'; }
+  function start() { timer = setInterval(function () { if (at === frames.length - 1) { stop(); } else { show(at + 1); } }, 1800); play.textContent = 'Pause'; }
+  play.addEventListener('click', function () { if (timer) { stop(); } else { if (at === frames.length - 1) show(0); start(); } });
+  document.getElementById('next').addEventListener('click', function () { stop(); show(at + 1); });
+  document.getElementById('back').addEventListener('click', function () { stop(); show(at - 1); });
+  seek.addEventListener('input', function () { stop(); show(Number(seek.value) - 1); });
+  fetch('/demos/testthispuppy/frames.json').then(function (r) { return r.json(); }).then(function (list) {
+    frames = list; seek.max = list.length; show(0);
+    list.forEach(function (f) { var pre = new Image(); pre.src = '/demos/testthispuppy/' + f.file; });
+  }).catch(function () { cap.textContent = 'The recording could not be loaded. The full report below has every result.'; });
+})();
+</script>
+</body>
+</html>

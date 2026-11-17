@@ -1,0 +1,154 @@
+[
+ {
+  "file": "frames/frame-001.jpg",
+  "caption": "Happy path: open /customers/new and scan it for fields"
+ },
+ {
+  "file": "frames/frame-002.jpg",
+  "caption": "Happy path: fill name (text) with a dummy value"
+ },
+ {
+  "file": "frames/frame-003.jpg",
+  "caption": "Happy path: fill email (email) with a dummy value"
+ },
+ {
+  "file": "frames/frame-004.jpg",
+  "caption": "Happy path: fill phone (tel) with a dummy value"
+ },
+ {
+  "file": "frames/frame-005.jpg",
+  "caption": "Happy path: submit, and the page says \"Saved customer 30\""
+ },
+ {
+  "file": "frames/frame-006.jpg",
+  "caption": "Wrong input, browser checks off: required name left empty, and the server refused it"
+ },
+ {
+  "file": "frames/frame-007.jpg",
+  "caption": "Wrong input, browser checks off: email = \"not-an-email\", and the server refused it"
+ },
+ {
+  "file": "frames/frame-008.jpg",
+  "caption": "Happy path: open /orders/new and scan it for fields"
+ },
+ {
+  "file": "frames/frame-009.jpg",
+  "caption": "Happy path: fill customerId (select) with a dummy value"
+ },
+ {
+  "file": "frames/frame-010.jpg",
+  "caption": "Happy path: fill product (text) with a dummy value"
+ },
+ {
+  "file": "frames/frame-011.jpg",
+  "caption": "Happy path: fill quantity (number) with a dummy value"
+ },
+ {
+  "file": "frames/frame-012.jpg",
+  "caption": "Happy path: fill orderDate (date) with a dummy value"
+ },
+ {
+  "file": "frames/frame-013.jpg",
+  "caption": "Happy path: submit, and the page says \"Saved order 4\""
+ },
+ {
+  "file": "frames/frame-014.jpg",
+  "caption": "Wrong input, browser checks off: customerId set to an option that does not exist, and the server refused it"
+ },
+ {
+  "file": "frames/frame-015.jpg",
+  "caption": "Wrong input, browser checks off: required product left empty, and the server refused it"
+ },
+ {
+  "file": "frames/frame-016.jpg",
+  "caption": "Wrong input, browser checks off: quantity = \"abc\", and the server refused it"
+ },
+ {
+  "file": "frames/frame-017.jpg",
+  "caption": "Wrong input, browser checks off: orderDate = \"not-a-date\", and the server refused it"
+ },
+ {
+  "file": "frames/frame-018.jpg",
+  "caption": "Workflow customer-then-order, step 1: open /customers/new"
+ },
+ {
+  "file": "frames/frame-019.jpg",
+  "caption": "Workflow customer-then-order, step 2: type name=name \"Sunt Id 52\""
+ },
+ {
+  "file": "frames/frame-020.jpg",
+  "caption": "Workflow customer-then-order, step 3: type name=email \"culpa.qui53@example.test\""
+ },
+ {
+  "file": "frames/frame-021.jpg",
+  "caption": "Workflow customer-then-order, step 4: type name=phone \"801-555-0054\""
+ },
+ {
+  "file": "frames/frame-022.jpg",
+  "caption": "Workflow customer-then-order, step 5: submit"
+ },
+ {
+  "file": "frames/frame-023.jpg",
+  "caption": "Workflow customer-then-order, step 6: expect-text \"Saved customer\""
+ },
+ {
+  "file": "frames/frame-024.jpg",
+  "caption": "Workflow customer-then-order, step 7: remember id=result \"savedCustomer\""
+ },
+ {
+  "file": "frames/frame-025.jpg",
+  "caption": "Workflow customer-then-order, step 8: open /orders/new"
+ },
+ {
+  "file": "frames/frame-026.jpg",
+  "caption": "Workflow customer-then-order, step 9: select name=customerId \"last\""
+ },
+ {
+  "file": "frames/frame-027.jpg",
+  "caption": "Workflow customer-then-order, step 10: type name=product \"Officia anim est 55\""
+ },
+ {
+  "file": "frames/frame-028.jpg",
+  "caption": "Workflow customer-then-order, step 11: type name=quantity \"3\""
+ },
+ {
+  "file": "frames/frame-029.jpg",
+  "caption": "Workflow customer-then-order, step 12: type name=orderDate \"2026-11-17\""
+ },
+ {
+  "file": "frames/frame-030.jpg",
+  "caption": "Workflow customer-then-order, step 13: submit"
+ },
+ {
+  "file": "frames/frame-031.jpg",
+  "caption": "Workflow customer-then-order, step 14: expect-text \"Saved order\""
+ },
+ {
+  "file": "frames/frame-032.jpg",
+  "caption": "Workflow refuses-bad-email, step 1: open /customers/new"
+ },
+ {
+  "file": "frames/frame-033.jpg",
+  "caption": "Workflow refuses-bad-email, step 2: type name=name \"Consectetur Incididunt 67\""
+ },
+ {
+  "file": "frames/frame-034.jpg",
+  "caption": "Workflow refuses-bad-email, step 3: type name=email \"not-an-email\""
+ },
+ {
+  "file": "frames/frame-035.jpg",
+  "caption": "Workflow refuses-bad-email, step 4: no-validate"
+ },
+ {
+  "file": "frames/frame-036.jpg",
+  "caption": "Workflow refuses-bad-email, step 5: click text=Save customer"
+ },
+ {
+  "file": "frames/frame-037.jpg",
+  "caption": "Workflow refuses-bad-email, step 6: expect-text \"Email must be a valid email address\""
+ },
+ {
+  "file": "frames/frame-038.jpg",
+  "caption": "Workflow refuses-bad-email, step 7: expect-no-text \"Saved customer\""
+ }
+]
