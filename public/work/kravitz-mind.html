@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>kravitz-mind · memory that makes an AI assistant cheaper and more careful · Kenneth W. Bingham</title>
+<meta name="description" content="kravitz-mind is an MCP memory server for AI assistants. Recall returns one line per match, full notes open only when needed, and a deterministic gate marks unsourced notes as unverified. Measured on 116 real notes: right note in the top three for all 30 test questions, 7 to 34 times fewer tokens on short sessions, with the limits stated.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/work/kravitz-mind.html">
+<link rel="icon" href="/assets/butterfly.png">
+<link rel="stylesheet" href="/site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/work/kravitz-mind.html">
+<meta property="og:title" content="kravitz-mind · AI memory that costs fewer tokens and refuses unsourced facts">
+<meta property="og:description" content="An MCP memory server. 7 to 34 times fewer tokens on short sessions, measured, with the limits stated.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://butterflyfx.us/work/kravitz-mind.html",
+  "url": "https://butterflyfx.us/work/kravitz-mind.html",
+  "name": "kravitz-mind: memory for an AI assistant",
+  "description": "An MCP memory server for AI assistants, directed by Kenneth W. Bingham and built with an AI.",
+  "author": { "@type": "Person", "name": "Kenneth W. Bingham", "url": "https://butterflyfx.us" },
+  "inLanguage": "en"
+}
+</script>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham</a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/#work">Work</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">case study · AI system · Model Context Protocol · open source</p>
+    <h1>Memory that makes an AI assistant cheaper and more careful.</h1>
+    <p class="lede">
+      <b>kravitz-mind</b> is a memory server for AI assistants. It decides what the assistant is handed,
+      what it is allowed to save, and how it checks itself, without touching the model. Any client that
+      speaks MCP can use it, including Claude Code.
+    </p>
+    <div class="btn-row">
+      <a class="btn" href="https://github.com/kenbin64/kravitz-mind" rel="noopener">Source on GitHub</a>
+      <a class="btn ghost" href="https://github.com/kenbin64/kravitz-mind#run-it" rel="noopener">Run the benchmark yourself</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <h2>The problem</h2>
+    <p>
+      An AI assistant with memory usually reads that memory the expensive way. A whole index of notes is
+      loaded into every session, whatever the question is, and a whole note is read when one line would
+      have answered it. Every one of those tokens is paid for.
+    </p>
+    <p>
+      Memory also lets mistakes stick. If an assistant saves whatever it is told, sourced or not, a guess
+      written down once comes back later looking like a fact.
+    </p>
+
+    <h2>Why it is hard</h2>
+    <ul>
+      <li><b>Finding the right note.</b> Handing over less only helps if what is handed over is the right
+          thing. A wrong pick costs a second lookup and can cost more than loading everything.</li>
+      <li><b>Saving safely.</b> The assistant writes to its own memory. Without rules, duplicates pile up,
+          old versions overwrite new ones, and unsourced claims sit beside verified ones.</li>
+      <li><b>Measuring honestly.</b> A token saving is easy to overstate by choosing friendly questions or
+          comparing against an unfair baseline.</li>
+    </ul>
+
+    <h2>What I built</h2>
+    <p>Five tools the assistant calls over MCP:</p>
+    <ul>
+      <li><b>recall</b> returns the top three subjects for a question, one line each.</li>
+      <li><b>open</b> returns one subject in full, only when its one line is not enough.</li>
+      <li><b>remember</b> saves or updates a subject, through a gate.</li>
+      <li><b>check</b> returns the exact stored sentences that bear on a claim, or says plainly that memory
+          has no evidence. It never decides what is true.</li>
+      <li><b>report</b> shows the tokens handed out this session against loading every note whole.</li>
+    </ul>
+    <p>
+      The gate is deterministic, with no AI judgment in it. A summary must fit on one line. A note with no
+      source is stored but always shown as unverified. A near-duplicate is refused with the name of the
+      subject it repeats. An update must name the version it replaces, so a stale update is dropped.
+    </p>
+
+    <h2>The proof</h2>
+    <p>
+      Measured on 116 real working notes with 30 questions asked in everyday wording. Tokens are estimated
+      at four characters per token, with the same rule on both sides. The baseline loads the full index
+      once per session.
+    </p>
+    <ul>
+      <li><b>Recall accuracy:</b> the right subject came first for 26 of 30 questions (87%), and was in the
+          top three for all 30.</li>
+      <li><b>One question, summary enough:</b> 134 tokens against 4,589.</li>
+      <li><b>One question, full note needed:</b> 670 tokens against 5,131.</li>
+      <li><b>Three questions:</b> 426 against 4,589 when summaries answer, 2,529 against 6,186 when notes
+          are needed.</li>
+      <li><b>Tests:</b> 16 checks on made-up notes try to break the gate, the receipts and the MCP protocol,
+          and all pass.</li>
+    </ul>
+    <p>
+      Anyone can rerun the benchmark on the example notes in the repository, or point it at their own.
+    </p>
+
+    <h2>What it does not claim</h2>
+    <ul>
+      <li>A long session that opens many full notes costs more than the baseline. At ten note-heavy
+          questions it used 16,313 tokens against 10,617, because a wrong first pick is opened and paid for.</li>
+      <li>Matching is by shared words, not meaning. A question that uses none of a note's words misses it.
+          The public example set shows this on purpose.</li>
+      <li>The 30 questions were written by the same AI that built the tool. A test with questions written by
+          someone else is still owed.</li>
+      <li>Token counts are estimates, not billing figures.</li>
+    </ul>
+
+    <h2>Technologies and skills</h2>
+    <ul>
+      <li><b>Model Context Protocol</b> over JSON-RPC 2.0 on standard input and output, with no outside packages.</li>
+      <li><b>Node.js</b> with the built-in SQLite, storing subjects in my
+          <a href="https://github.com/kenbin64/kravitz" rel="noopener">kravitz</a> datastore.</li>
+      <li><b>Context and token optimization:</b> summaries first, detail on demand, a per-session token ledger.</li>
+      <li><b>Evaluation:</b> a benchmark that charges every miss and every wrong pick, against a fair baseline.</li>
+      <li><b>AI-assisted engineering</b> with Claude Code. I set the design and the rules; the AI wrote and
+          tested the code under my direction.</li>
+    </ul>
+
+    <div class="metrics">
+      <div class="metric"><span class="n">7&ndash;34&times;</span><span class="l">fewer tokens, short sessions</span></div>
+      <div class="metric"><span class="n">30/30</span><span class="l">right note in the top three</span></div>
+      <div class="metric"><span class="n">16</span><span class="l">tests, all passing</span></div>
+      <div class="metric"><span class="n">0</span><span class="l">outside packages</span></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <p>
+      <a href="/">Home</a> &middot;
+      <a href="https://github.com/kenbin64/kravitz-mind" rel="noopener">Source</a> &middot;
+      <a href="/contact.html">Contact</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

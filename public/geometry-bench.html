@@ -156,7 +156,9 @@
       <summary class="small" style="cursor:pointer; color:var(--accent)">How to read the table</summary>
       <div class="small muted" style="margin-top:.7rem; line-height:1.7">
         <strong>Raw</strong> is the file as it sits on disk.
-        <strong>gzip</strong> is that file compressed the ordinary way, which is the number to beat.
+        <strong>gzip</strong> is that file compressed the ordinary way, the one compressor every browser can run.
+        It is not the best one: brotli, zstd and format-specific tools like PNG usually do better, so beating
+        gzip here is a first check, not proof that the shapes beat the best methods out there.
         <strong>Shapes fitted</strong> says how many 1 KB blocks the file was cut into and which
         shapes won most often: a flat line, a slope, a curve or a wave.
         <strong>Rules + corrections</strong> is the total cost of this approach: the coefficients
