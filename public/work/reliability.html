@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reliability engine · fewer wrong AI answers, measured on public tests · Kenneth W. Bingham</title>
+<meta name="description" content="Asking the same AI model five times barely changed its wrong answers. Asking a model from a different family cut them from 10.0% to 2.7% on SQuAD 2.0. A reliability engine tested on public sets, with its pass marks set before the run and its failures shown.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/work/reliability.html">
+<link rel="icon" href="/assets/butterfly.png">
+<link rel="stylesheet" href="/site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/work/reliability.html">
+<meta property="og:title" content="Asking the same AI twice does not make it right">
+<meta property="og:image" content="https://butterflyfx.us/kennethbingham.jpg">
+<meta property="og:description" content="Same model five times: wrong answers 10.0% to 9.7%. Two model families: 10.0% to 2.7%. Measured on public test sets, marks set first.">
+<style>
+  .tradeoffs td b { font-family: var(--mono); color: var(--text); }
+  .tradeoffs td:first-child { white-space: normal; min-width: 11rem; }
+  .metric .n { font-size: 1.15rem; overflow-wrap: anywhere; }
+  .tradeoffs tr.best td { background: var(--good-bg); }
+  .pass { color: var(--good); font-weight: 600; }
+  .fail { color: var(--stop); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham</a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/#work">Work</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">case study · AI reliability · measured on public test sets</p>
+    <h1>Asking the same AI twice does not make it right. Asking a different one helps.</h1>
+    <p class="lede">
+      A common way to make an AI answer more reliable is to ask the same model several times and take the answer it
+      gives most. I built a reliability engine and tested that idea against another one on two public question sets
+      I did not write. Asking the same model five times cost five times as much and barely moved its wrong answers.
+      Checking it against a model from a <b>different family</b> cut them from 10.0% to 2.7%.
+    </p>
+    <div class="btn-row">
+      <a class="btn" href="#results">See the results</a>
+      <a class="btn ghost" href="#design">How the engine works</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <h2>The problem</h2>
+    <p>
+      A wrong answer from an AI looks exactly like a right one. In regulated or customer-facing work, that is the
+      whole risk: nobody can check every answer, so the system has to know when it should not answer. The usual
+      fixes, asking the model again or having a second call check the first, cost more tokens. Whether they actually
+      catch the wrong answers is rarely measured.
+    </p>
+
+    <h2>What was tested</h2>
+    <p>Two public sets, chosen because they are built to catch a model out:</p>
+    <ul>
+      <li><b>Documents:</b> 300 questions from <a href="https://rajpurkar.github.io/SQuAD-explorer/" rel="noopener">SQuAD 2.0</a>,
+          each about one paragraph. Half cannot be answered from the paragraph, and were written on purpose to look
+          as if they can. The right response to those is "the paragraph does not say".</li>
+      <li><b>Misconceptions:</b> 200 multiple-choice questions from <a href="https://github.com/sylinrl/TruthfulQA" rel="noopener">TruthfulQA</a>,
+          where the wrong choices are things many people, and many models, believe.</li>
+    </ul>
+    <p>
+      Three model families ran locally on one laptop: Llama (llama3.1:8b), Qwen (qwen2.5-coder:7b) and DeepSeek
+      (deepseek-coder-v2 16B lite). Every answer was marked by fixed rules, never by a model: 3,256 model calls in all.
+    </p>
+
+    <h2 id="results">Results: documents</h2>
+    <div class="tbl-scroll"><table class="tradeoffs">
+      <thead><tr><th>Design</th><th>Right</th><th>Wrong</th><th>No answer</th><th>Tokens per correct answer</th></tr></thead>
+      <tbody>
+        <tr><td>One call to Llama</td><td>82.7%</td><td><b>10.0%</b></td><td>7.3%</td><td>350</td></tr>
+        <tr><td>Llama asked five times, majority answer</td><td>83.3%</td><td><b>9.7%</b></td><td>7.0%</td><td>1,731</td></tr>
+        <tr class="best"><td>Two families, Llama and Qwen, must agree</td><td>79.0%</td><td><b>2.7%</b></td><td>18.3%</td><td>845</td></tr>
+        <tr><td>Two families plus a word-matching check</td><td>76.7%</td><td><b>7.0%</b></td><td>16.3%</td><td>871</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>Results: misconceptions</h2>
+    <div class="tbl-scroll"><table class="tradeoffs">
+      <thead><tr><th>Design</th><th>Right</th><th>Wrong</th><th>No answer</th><th>Tokens per correct answer</th></tr></thead>
+      <tbody>
+        <tr><td>One call to Llama</td><td>49.5%</td><td><b>50.5%</b></td><td>0%</td><td>241</td></tr>
+        <tr><td>Llama asked five times, majority answer</td><td>50.0%</td><td><b>50.0%</b></td><td>0%</td><td>1,192</td></tr>
+        <tr class="best"><td>Three families must all agree</td><td>22.0%</td><td><b>13.5%</b></td><td>64.5%</td><td>1,732</td></tr>
+        <tr><td>Two of three families agree</td><td>38.5%</td><td><b>42.5%</b></td><td>19.0%</td><td>990</td></tr>
+      </tbody>
+    </table></div>
+    <p>"No answer" means the system declined and handed the question to a person. It is never counted as right
+      on a question that has an answer.</p>
+
+    <h2>What it shows</h2>
+    <ul>
+      <li><b>The same model, asked again, mostly repeats itself.</b> Five samples changed wrong answers by less than
+          half a point on both sets, at five times the tokens. A model's mistakes are not random noise that averaging
+          removes; they are what the model believes.</li>
+      <li><b>A different family is a genuinely independent check.</b> Models trained by different teams make
+          different mistakes, so where they agree the answer is far more often right. On documents that cut wrong
+          answers by about 3.7 times, at half the cost of asking one model five times.</li>
+      <li><b>A check is only useful if it can be wrong for a different reason.</b> I expected a word-matching check
+          with no AI in it to settle disagreements between the models. It made things worse: the trick questions are
+          built from the paragraph's own words, so it found the very sentence the trap came from and backed the wrong
+          answer, all 13 times it settled a trick question. It shared the trap's blind spot.</li>
+      <li><b>Different families still share popular myths.</b> On 13.5% of the misconception questions all three
+          families agreed on the same wrong answer. Agreement is evidence, not proof. Where it matters, only a source
+          can settle it.</li>
+      <li><b>Fewer wrong answers cost more referrals to a person.</b> The two-family design declined about a third
+          of the answerable document questions. Whether that trade is worth it depends on what a wrong answer costs.</li>
+    </ul>
+
+    <h2 id="design">How the engine works</h2>
+    <p>The design principles, in the order the engine applies them:</p>
+    <ul>
+      <li><b>Software first.</b> Where an answer can be computed or read exactly (a sum, a date in a fixed format),
+          code does it and no model is called. In an earlier benchmark this alone took one task from 0% to 100% right.</li>
+      <li><b>Every claim must be found in the source.</b> A model answering from a document must copy the sentence it
+          relied on. If that sentence is not in the document, or the answer is not in that sentence, the answer is refused.</li>
+      <li><b>Independent checks, not repeated ones.</b> A second opinion comes from a different family of model, never
+          the same model asked again.</li>
+      <li><b>Disagreement goes to a person.</b> When the checks split and nothing independent settles it, the engine
+          says so instead of picking one.</li>
+      <li><b>Only checked answers are remembered.</b> An answer confirmed against its source is kept as a fact; an answer
+          that is merely agreed on is kept, but marked unverified, so it is never built on as if it were proven.</li>
+    </ul>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 760 210" role="img" aria-labelledby="dg-t">
+        <title id="dg-t">A question goes to two model families; each answer must quote the document; if they agree the answer is given, otherwise a person decides.</title>
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="d-arrow"/></marker></defs>
+        <rect class="d-box" x="10" y="80" width="130" height="50" rx="8"/><text class="d-label" x="75" y="104" text-anchor="middle">Question</text><text class="d-sub" x="75" y="120" text-anchor="middle">and its document</text>
+        <rect class="d-box-accent" x="200" y="20" width="160" height="50" rx="8"/><text class="d-label" x="280" y="44" text-anchor="middle">Model family 1</text><text class="d-sub" x="280" y="60" text-anchor="middle">answer + quote</text>
+        <rect class="d-box-accent" x="200" y="140" width="160" height="50" rx="8"/><text class="d-label" x="280" y="164" text-anchor="middle">Model family 2</text><text class="d-sub" x="280" y="180" text-anchor="middle">answer + quote</text>
+        <rect class="d-box" x="410" y="80" width="140" height="50" rx="8"/><text class="d-label" x="480" y="104" text-anchor="middle">Quote in source?</text><text class="d-sub" x="480" y="120" text-anchor="middle">do they agree?</text>
+        <rect class="d-box-good" x="600" y="20" width="150" height="50" rx="8"/><text class="d-label" x="675" y="44" text-anchor="middle">Answer</text><text class="d-sub" x="675" y="60" text-anchor="middle">with its source</text>
+        <rect class="d-box-warn" x="600" y="140" width="150" height="50" rx="8"/><text class="d-label" x="675" y="164" text-anchor="middle">A person decides</text><text class="d-sub" x="675" y="180" text-anchor="middle">split or unsupported</text>
+        <path class="d-line" d="M140 105 L200 45" marker-end="url(#ar)"/><path class="d-line" d="M140 105 L200 165" marker-end="url(#ar)"/>
+        <path class="d-line" d="M360 45 L410 100" marker-end="url(#ar)"/><path class="d-line" d="M360 165 L410 110" marker-end="url(#ar)"/>
+        <path class="d-line-good" d="M550 100 L600 45" marker-end="url(#ar)"/><path class="d-line-warn" d="M550 110 L600 165" marker-end="url(#ar)"/>
+      </svg>
+      <figcaption>The document path. Questions without a document go to three families instead, and agreement there is marked "consistent", never "verified".</figcaption>
+    </figure>
+
+    <h2>How the test was kept fair</h2>
+    <ul>
+      <li><b>Marks set first.</b> The pass marks were written down before any engine or test code existed, so the result
+          could not be argued into a win afterwards.</li>
+      <li><b>Questions I did not write.</b> Both sets are public, written by other people, and drawn with a fixed seed.</li>
+      <li><b>One set of calls for every design.</b> Designs that share a step share the same saved model calls, so the
+          comparison is between designs, not between lucky and unlucky samples.</li>
+      <li><b>No model as judge.</b> Answers were marked by fixed rules (SQuAD's own word-overlap scoring), with 31 unit
+          checks on the engine's decision rules.</li>
+    </ul>
+
+    <h2>Did it pass?</h2>
+    <p>Not yet. Three marks had to pass for the engine to count as finished; one did.</p>
+    <div class="tbl-scroll"><table class="tradeoffs">
+      <thead><tr><th>Mark</th><th>Result</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Halve wrong answers against one call, documents</td><td class="fail">No</td><td>The full engine went from 10.0% to 7.0%. The word-matching check was the cause; the two-family design alone reached 2.7%, but it was not the design the mark was set for.</td></tr>
+        <tr><td>Fewer wrong answers than five samples, at lower cost</td><td class="pass">Yes</td><td>7.0% against 9.7%, at half the tokens per correct answer.</td></tr>
+        <tr><td>Fewer wrong answers on misconceptions, while still answering enough</td><td class="fail">No</td><td>Wrong answers fell from 50.0% to 13.5%, but it answered too few questions: 22.0% right against a floor of 34.6%.</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      The next step follows from the result: drop the word-matching check as a tie-breaker, make the two-family
+      design the engine for documents, and test it on a fresh draw of questions with the marks set first again.
+    </p>
+
+    <h2>Why it matters to an employer</h2>
+    <ul>
+      <li>It shows how I evaluate an AI system: on questions built to break it, against baselines, with the cost of every
+          answer counted, and with a plan written before the results exist.</li>
+      <li>It reports what failed. The most useful finding here, that a check is only worth having if it fails for a
+          different reason, came from a part of my own design that did not work.</li>
+      <li>The principles carry over to any AI feature that must not make things up: support every claim from a source,
+          get second opinions that are really independent, and send the hard cases to a person.</li>
+    </ul>
+
+    <h2>Technologies and skills</h2>
+    <ul>
+      <li>Node.js, local models through Ollama with structured (JSON schema) output, LLM evaluation design,
+          retrieval-style grounding, benchmark statistics.</li>
+    </ul>
+
+    <h2>What it does not claim</h2>
+    <ul>
+      <li>Three small open models on one machine. Large commercial models are more accurate, and the gaps may differ on them.</li>
+      <li>SQuAD paragraphs are short and clean; real documents are longer and messier.</li>
+      <li>Multiple choice is easier to mark than free answers. A result on it says nothing about free-text answers.</li>
+      <li>No design here makes an AI never wrong. The goal is fewer wrong answers, and knowing which answers to check.</li>
+      <li>The engine's code is private. The results, the design and the test sets are here so the claims can be checked.</li>
+    </ul>
+
+    <div class="metrics">
+      <div class="metric"><span class="n">10.0% to 2.7%</span><span class="l">wrong answers, one model against two families</span></div>
+      <div class="metric"><span class="n">10.0% to 9.7%</span><span class="l">wrong answers, one model against itself five times</span></div>
+      <div class="metric"><span class="n">3,256</span><span class="l">model calls, marked by rule</span></div>
+      <div class="metric"><span class="n">1 of 3</span><span class="l">pass marks met, so not yet finished</span></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <p>
+      <a href="/">Home</a> &middot;
+      <a href="/work/citeline.html">citeline: answers with a citation</a> &middot;
+      <a href="/least-tokens.html">Least Tokens benchmark</a> &middot;
+      <a href="/resume.html">Resume</a> &middot;
+      <a href="/contact.html">Contact</a>
+    </p>
+    <p>Run on 2026-11-03. Concept and direction: Kenneth W. Bingham. Built with the help of Claude AI under a standing
+      directive to be skeptical, to insist on proof, and to allow no claim that is not demonstrated in tested code. The
+      ideas are the author's; the AI implemented and verified them, it did not originate them.</p>
+  </div>
+</footer>
+
+</body>
+</html>
