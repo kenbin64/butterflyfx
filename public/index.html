@@ -69,12 +69,32 @@
     <div class="fact"><b>1,129</b><span>automated checks behind Chomp 3D, a complete game directed solo with AI agents</span></div>
   </section>
 
+  <section class="block" id="featured" aria-labelledby="featured-title">
+    <div class="block-head">
+      <h2 id="featured-title">Featured: QA in a box, <em>built with AI in about two hours</em></h2>
+      <p>TestThisPuppy tests a running Spring Boot app and its real PostgreSQL database: the API, every form, wrong input, SQL injection, race conditions and recorded workflows, then restores the database exactly. The first working version took 36 minutes; the full version about two hours, measured from the file system and git history. It found four real bugs on its first run. The case study shows every prompt I gave, in order, and the AI and tools used.</p>
+    </div>
+    <div class="cta"><a class="btn go" href="work/testthispuppy.html#how-it-was-built">See the prompts and the timeline</a><a class="btn" href="work/testthispuppy.html">Read the case study</a><a class="btn" href="https://github.com/kenbin64/testthispuppy">Source on GitHub</a></div>
+  </section>
+
   <section class="block" id="work" aria-labelledby="work-title">
     <div class="block-head">
       <h2 id="work-title">Work you can <em>open right now</em></h2>
       <p>Each of these was conceived and directed by me and written by an AI under my rules: nothing is called done until it has been run, every sum has a test that tries to break it, and I am told plainly what was and was not checked.</p>
     </div>
     <div class="work">
+      <article class="card" style="--k: #2dd4bf">
+        <div class="card-in">
+          <small>Featured &middot; Testing &middot; Java 21 &middot; Spring Boot &middot; PostgreSQL &middot; Selenium</small>
+          <h3>QA in a box that found four real bugs on its first run</h3>
+          <dl>
+            <dt>The problem</dt><dd>Tests that mock the database test the mock. Tests on a shared database leave rows behind. Neither shows whether the real app survives wrong or hostile input.</dd>
+            <dt>What I built</dt><dd>TestThisPuppy: one command tests the network path, the API, every form, wrong input, SQL injection, race conditions and recorded workflows on a real database, then restores it exactly.</dd>
+            <dt>The proof</dt><dd>It found four server bugs the browser had been hiding, now fixed and pinned by regression tests. 143 of 143 checks in one run, 54 unit and error-path tests, and zero rows left behind.</dd>
+          </dl>
+          <div class="links"><a href="work/testthispuppy.html">Read the case study</a><a href="work/testthispuppy.html#how-it-was-built">The prompts</a><a href="https://github.com/kenbin64/testthispuppy">Source</a></div>
+        </div>
+      </article>
       <article class="card" style="--k: #ffd166">
         <div class="card-in">
           <small>AI system &middot; MCP &middot; memory and token cost &middot; new</small>

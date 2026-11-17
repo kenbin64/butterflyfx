@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TestThisPuppy · QA in a box: real-database testing that leaves no trace · Kenneth W. Bingham</title>
+<meta name="description" content="TestThisPuppy tests a running Java Spring Boot app and its real PostgreSQL database over HTTP and in a real browser: wrong input, SQL injection, race conditions and recorded workflows, then restores the database exactly. It found four real bugs on its first run. 54 tests, open source.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/work/testthispuppy.html">
+<link rel="icon" href="/assets/butterfly.png">
+<link rel="stylesheet" href="/site.css">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://butterflyfx.us/work/testthispuppy.html">
+<meta property="og:title" content="TestThisPuppy · QA in a box">
+<meta property="og:description" content="Real-database testing over HTTP and the browser, with wrong input, SQL injection, race and workflow tests, restored exactly afterwards.">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham</a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/#work">Work</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">case study · Java 21 · Spring Boot · PostgreSQL · Selenium · open source</p>
+    <h1>QA in a box: test the real system, then leave no trace.</h1>
+    <p class="lede">
+      <b>TestThisPuppy</b> tests a running web application and its real database in one command: the network path,
+      the API, every form, wrong input, SQL injection, race conditions and whole user workflows. Then it puts the
+      database back exactly as it found it. It rebuilds a test harness I first wrote and used at Axis41, Finicity and InComm.
+    </p>
+    <div class="btn-row">
+      <a class="btn" href="https://github.com/kenbin64/testthispuppy" rel="noopener">Source on GitHub</a>
+      <a class="btn ghost" href="https://github.com/kenbin64/testthispuppy/blob/main/docs/GUIDE.md" rel="noopener">User guide</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <h2>The problem</h2>
+    <p>
+      Most automated tests either mock the database, which tests the mock and not the system, or run against a
+      shared database and leave test rows behind for the next person to trip over. Neither tells you whether the
+      real application, on a real database, behaves when someone types something wrong or something hostile.
+    </p>
+
+    <h2>Why it is hard</h2>
+    <ul>
+      <li><b>Cleaning up.</b> The usual trick, rolling back a test transaction, cannot undo what the application
+          writes through its own database connections.</li>
+      <li><b>Testing the server, not the browser.</b> A form's own checks hide server bugs, because an attacker
+          simply skips them.</li>
+      <li><b>Safety.</b> A SQL injection test that works really does drop a table, so it must never touch a real database.</li>
+      <li><b>Scale.</b> Hundreds of tests are only useful if anyone can add one without writing code.</li>
+    </ul>
+
+    <h2>What it does</h2>
+    <ul>
+      <li><b>Two database modes.</b> External connects to an approved test database with credentials and restores it.
+          Internal creates a throwaway PostgreSQL in Docker (Testcontainers), starts the app against it, and deletes it afterwards.</li>
+      <li><b>Snapshot and exact restore.</b> Every row and id sequence is recorded first. Afterwards, added rows are
+          deleted children first, changed rows set back, removed rows put back parents first, sequences reset, all in one
+          transaction, and a second snapshot must match the first exactly.</li>
+      <li><b>Checks:</b> connection (resolve, port, <code>SELECT 1</code>, route trace), HTTP, happy path, wrong input
+          with browser checks switched off, SQL injection (throwaway database only), and a race test that fires many
+          requests at the same instant.</li>
+      <li><b>Workflows as tables.</b> Multi-step macros written by hand or recorded by clicking through the app,
+          repeated as often as you like with fresh Latin dummy data.</li>
+      <li><b>Log analysis.</b> Stack traces reduced to root causes with secrets hidden, and an optional Claude
+          explanation of each failure.</li>
+    </ul>
+
+    <h2>The proof</h2>
+    <ul>
+      <li><b>It found four real bugs on its first run.</b> The demo app saved a customer with an empty name, saved
+          "not-an-email" as an email, crashed on an order for a customer that does not exist, and saved an order with
+          an empty product. All four were hidden by the browser's own checks. They are fixed, and four regression
+          tests pin them; those tests were run against the original code, where they failed, to prove they catch the bugs.</li>
+      <li><b>143 of 143 passed</b> in one internal-mode run with each workflow repeated 50 times, including 25 requests
+          fired at once (exactly 25 rows appeared) and 15 SQL injection attacks (every table intact).</li>
+      <li><b>The database is left exactly as found.</b> In external mode, a real customer and order were untouched,
+          and the next id was still the next id.</li>
+      <li><b>54 unit, controller, regression and error-path tests.</b> The error-path tests break things on purpose:
+          a seed that cannot succeed, an unreachable database, a restore blocked partway through (it rolls back
+          completely), an app that dies at start.</li>
+    </ul>
+
+    <h2>Technologies and skills</h2>
+    <ul>
+      <li><b>Java 21, Maven,</b> one class per job, plain JDBC for the database work.</li>
+      <li><b>Spring Boot 3.5</b> demo app with embedded Tomcat, Spring Data JPA, Thymeleaf, and MockMvc controller tests with Mockito.</li>
+      <li><b>PostgreSQL 16</b> schema discovery from <code>information_schema</code>, foreign-key ordering, sequence reset.</li>
+      <li><b>Selenium WebDriver</b> for page scanning, form filling, macros and a macro recorder.</li>
+      <li><b>Testcontainers and Docker</b> for throwaway databases; <b>GitHub Actions</b> for CI.</li>
+      <li><b>Anthropic Java SDK</b> for the optional failure analysis, sent only redacted evidence.</li>
+      <li><b>AI-assisted engineering.</b> I set the design, the rules and every check; the AI wrote and tested the code
+          under my direction. I am now rewriting three of its parts by hand as practice drills.</li>
+    </ul>
+
+    <h2 id="how-it-was-built">How it was built: about two hours, from my prompts</h2>
+    <p>
+      This is a featured AI-assisted build. I directed it; Claude wrote and ran the code. The times come from the
+      file system and the git history, measured, not estimated. They are wall-clock time with me directing,
+      including every round of changes.
+    </p>
+    <ul>
+      <li><b>9:30 PM.</b> First file written.</li>
+      <li><b>10:06 PM, 36 minutes in.</b> First working version committed: seeding, HTTP and browser tests, exact
+          restore, 22 tests passing, and a run that left the database untouched.</li>
+      <li><b>11:31 PM, about 2 hours in.</b> The full QA-in-a-box version: two database modes, wrong input, SQL
+          injection, race and connection checks, macros and a recorder, log and AI analysis, 54 tests, CI and documentation.</li>
+    </ul>
+
+    <h3>The AI and tools</h3>
+    <ul>
+      <li><b>AI:</b> Claude Code (Anthropic's coding agent) running Claude Opus 5.5, inside VS Code on Windows 11.</li>
+      <li><b>Build and run:</b> Java 21 (Eclipse Temurin), Maven 3.9, Docker Desktop, PostgreSQL 16, Google Chrome.</li>
+      <li><b>Libraries:</b> Spring Boot 3.5 with embedded Tomcat 10.1, Spring Data JPA and Thymeleaf; Selenium WebDriver 4.27;
+          Testcontainers 1.21; JUnit 5, Mockito and MockMvc; the Anthropic Java SDK.</li>
+      <li><b>Delivery:</b> Git and GitHub, GitHub Actions.</li>
+    </ul>
+
+    <h3>The prompts I gave, in order</h3>
+    <p class="small">Exactly as I typed them, with spelling tidied. Most came in while the AI was already working; it
+      finished the step in hand, then took up the next.</p>
+    <ol>
+      <li>"I want to rebuild TestThisPuppy with a tester that sends HTTP requests, opens the database, fills it with dummy
+          data, runs the tests and sends the results, and have it integrated with Selenium and WebDriver, where it scans
+          the page, finds all the elements and populates them. Then when it's complete it cleans up the database as if it
+          was never there. This way, real database testing on the code base."</li>
+      <li>Asked three questions, I chose: write it as a mix (the AI builds the plumbing, I write three core parts as
+          practice drills), Java 21 with Maven, and PostgreSQL.</li>
+      <li>"https://github.com/kenbin64/testthispuppy.git"</li>
+      <li>"Just use Latin words to fill the forms and data. Create a filler word CSV file."</li>
+      <li>"It can connect to the actual database with credentials, or create an internal DB just for testing."</li>
+      <li>"Have a happy path option, a wrong input type test, and test your try-catches to throw errors."</li>
+      <li>"Also test for SQL injection, using the internal database only, for safety."</li>
+      <li>"Test ping and source route to check the database connection, test forms in the UI, test backend controllers
+          and objects, test race conditions, regression tests and unit tests."</li>
+      <li>"Do we have Tomcat?" Then: "That's right, Spring Boot has it."</li>
+      <li>"I also AI-assisted to analyze logs and stack traces."</li>
+      <li>"Also include complete documentation."</li>
+      <li>"Workflows."</li>
+      <li>"Ways to create macros and automated tests using WebDriver."</li>
+      <li>"Able to do hundreds of tests, all automated."</li>
+      <li>"Your QA in a box."</li>
+      <li>"Yes, let's put it in GitHub and on butterflyfx.us, my portfolio page."</li>
+      <li>"I am going to do a featured AI-assisted program. Say how long it took to build and add the prompts I used to create it."</li>
+      <li>"And the AI and tools used, VS Code, etc."</li>
+    </ol>
+    <p>
+      What the prompts do not show is the checking. Every claim on this page was run before it was written down, and
+      when a check found a problem (a test that passed for the wrong reason, a safety notice that could be skipped,
+      a regression test that needed proof it could fail), it was fixed before moving on.
+    </p>
+
+    <h2>What it does not claim</h2>
+    <ul>
+      <li>It reads PostgreSQL's public schema; other databases need their own schema handling.</li>
+      <li>Every table needs a primary key.</li>
+      <li>The AI analysis is built and tested up to the API call, but needs your own Anthropic credentials and costs money per run.</li>
+    </ul>
+
+    <div class="metrics">
+      <div class="metric"><span class="n">4</span><span class="l">real bugs found, first run</span></div>
+      <div class="metric"><span class="n">143/143</span><span class="l">checks in one run</span></div>
+      <div class="metric"><span class="n">54</span><span class="l">unit and error-path tests</span></div>
+      <div class="metric"><span class="n">0</span><span class="l">rows left behind</span></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <p>
+      <a href="/">Home</a> &middot;
+      <a href="https://github.com/kenbin64/testthispuppy" rel="noopener">Source</a> &middot;
+      <a href="/contact.html">Contact</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
