@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fabric of Space · the solar system in 3D, checked against NASA JPL · Kenneth W. Bingham</title>
+<meta name="description" content="The solar system in 3D with every planet on its real orbit and the Sun's gravity field drawn as a sheet. Seasons land on the real dates without being entered; every planet matches NASA JPL within 0.25 degrees.">
+<link rel="canonical" href="https://butterflyfx.us/demos/fabric-of-space/">
+<link rel="icon" href="/assets/butterfly.png">
+<style>#bfx-back{position:fixed;right:10px;top:10px;z-index:9999;font:13px system-ui,sans-serif;background:rgba(10,14,20,.78);color:#cfe;padding:6px 10px;border-radius:8px;text-decoration:none;border:1px solid rgba(255,255,255,.18)}</style>
+</head><body>
+<a id="bfx-back" href="/#work">&larr; Kenneth W. Bingham, portfolio</a>
+<title>Fabric of Space</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* An instrument bench at night: the field and Earth side by side, with the measured readings beneath them. */
+:root {
+  color-scheme: dark;
+  --sky: #070b14; --panel: #0f1624; --rule: #26324a; --ink: #eef1ea; --dim: #9aa6b8;
+  --sun: #ffc857; --field: #6fb7d6;
+  --display: "Spectral", Georgia, serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--sky); color: var(--ink); font: 16px/1.5 var(--body); padding-block: 18px 34px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 14px; }
+h1 { margin: 0; font: 700 clamp(26px, 4vw, 38px)/1.1 var(--display); text-wrap: balance; }
+.lead { margin: 4px 0 0; color: var(--dim); max-width: 72ch; }
+.views { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); grid-template-rows: repeat(2, clamp(230px, 34vh, 340px)); gap: 10px; }
+#field-view { grid-row: span 2; }
+.view { position: relative; min-width: 0; background: #05080f; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.view canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.view h2 { position: absolute; left: 10px; top: 8px; margin: 0; font: 600 13px var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); pointer-events: none; z-index: 2; }
+.labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.labels span { position: absolute; font: 500 12px var(--mono); color: var(--ink); white-space: nowrap; transform: translate(9px, -50%); text-shadow: 0 0 4px #000, 0 0 2px #000; }
+.note-on-view { position: absolute; left: 10px; bottom: 8px; right: 10px; margin: 0; font-size: 12.5px; color: var(--dim); pointer-events: none; text-shadow: 0 0 4px #000; }
+.date { position: absolute; right: 10px; top: 8px; font: 500 14px var(--mono); color: var(--ink); z-index: 2; pointer-events: none; }
+.bench { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+button { font: 600 14px var(--body); color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 12px; cursor: pointer; min-height: 40px; }
+button[aria-pressed="true"] { background: var(--ink); color: var(--sky); border-color: var(--ink); }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; }
+.seg { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.seg > span { font-size: 13px; color: var(--dim); margin-right: 4px; }
+label.range { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--dim); flex: 1 1 260px; min-width: 0; }
+label.range input { flex: 1; min-width: 0; accent-color: var(--sun); }
+label.range b { font: 500 13px var(--mono); color: var(--ink); white-space: nowrap; }
+.result { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 10px; }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px; min-width: 0; display: grid; gap: 8px; align-content: start; }
+.card h2 { margin: 0; font: 700 18px var(--display); }
+.card p { margin: 0; font-size: 15px; }
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { text-align: right; font-weight: 600; color: var(--dim); padding: 3px 0 5px 12px; vertical-align: bottom; border-bottom: 1px solid var(--rule); }
+td { text-align: right; font: 500 13px var(--mono); padding: 4px 0 4px 12px; white-space: nowrap; font-variant-numeric: tabular-nums; border-bottom: 1px solid rgba(38, 50, 74, 0.5); }
+th:first-child, td:first-child { text-align: left; padding-left: 0; font: 600 13.5px var(--body); }
+#chart { width: 100%; height: 170px; display: block; }
+dl.read { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 12px; font-size: 14px; }
+dl.read dt { color: var(--dim); }
+dl.read dd { margin: 0; font: 500 14px var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+details { font-size: 14px; color: var(--dim); }
+details summary { cursor: pointer; font-weight: 600; color: var(--ink); padding: 4px 0; }
+details ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 5px; }
+@media (max-width: 820px) { .views, .result { grid-template-columns: minmax(0, 1fr); } .views { grid-template-rows: none; } #field-view { grid-row: auto; } .view { height: 68vw; min-height: 300px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Fabric of Space</h1>
+    <p class="lead">The Sun and eight planets on their real orbits at their real speeds, moving through the field their masses make. Height shows how deep the field is at each point. The whole system is also crossing the Milky Way at 230 km/s, so each planet leaves a coil behind it like a wake, rising out of the disc 30.4&deg; from exactly perpendicular.</p>
+  </header>
+
+  <div class="views">
+    <div class="view" id="field-view"><h2>The field</h2><div class="date" id="date"></div><canvas id="field-canvas"></canvas><div class="labels" id="labels"></div><p class="note-on-view" id="field-note"></p></div>
+    <div class="view" id="follow-view"><h2>Following Earth around the Sun</h2><canvas id="follow-canvas"></canvas><p class="note-on-view">The camera rides behind Earth on its path, which is the blue line. The stars stay put, so the Sun drifts across them as Earth goes around. Sun's size and distance not to scale.</p></div>
+    <div class="view" id="earth-view"><h2>Earth, side-on to the Sun</h2><canvas id="earth-canvas"></canvas><p class="note-on-view">Sunlight comes along the yellow arrow. Lines mark the equator and tropics. The axis keeps pointing at one star all year.</p></div>
+  </div>
+
+  <div class="bench">
+    <button type="button" id="play" aria-pressed="true">Pause</button>
+    <div class="seg" role="group" aria-label="View"><span>View:</span><button type="button" id="view-galaxy">Through the galaxy</button><button type="button" id="view-sun">Around the Sun</button></div>
+    <div class="seg" role="group" aria-label="Travel" id="travel-group"><span>Coil length:</span><button type="button" id="travel-slow">Shortened to see coils</button><button type="button" id="travel-true">True ratio</button></div>
+    <div class="seg" role="group" aria-label="What the coils run along" id="path-group"><span>Coils run along:</span><button type="button" id="path-real">Sun's path in space</button><button type="button" id="path-perp">Time, perpendicular</button></div>
+    <div class="seg" role="group" aria-label="Shape of the fabric"><span>Sheet:</span><button type="button" id="shape-funnel">Plain</button><button type="button" id="shape-spiral">Spiral drawn flat on it</button></div>
+    <div class="seg" role="group" aria-label="Planet dips"><span>Planets' dips:</span><button type="button" id="dips-big">Enlarged to see</button><button type="button" id="dips-true">True strength</button></div>
+    <div class="seg" role="group" aria-label="Distance scale"><span>Distances:</span><button type="button" id="scale-squeezed">Squeezed to fit</button><button type="button" id="scale-true">True scale</button></div>
+    <div class="seg" role="group" aria-label="Time"><span>Time:</span><button type="button" id="time-fast">Whole system</button><button type="button" id="time-slow">Watch Earth turn</button></div>
+    <label class="range" for="relief">Flat disc <input type="range" id="relief" min="0" max="100" step="1" value="100"> Funnel</label>
+    <label class="range" for="speed">Speed <input type="range" id="speed" min="1" max="120" step="1" value="30"><b id="speed-text"></b></label>
+  </div>
+
+  <div class="result">
+    <div class="card">
+      <h2>Each planet, right now</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Planet</th><th>From Sun (AU)</th><th>Speed (km/s)</th><th>Year (Earth years)</th><th>Moved since start</th><th>Orbit against galactic plane</th><th>Sun's pull (mm/s&sup2;)</th><th>Field from other planets</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table></div>
+      <p id="round"></p>
+    </div>
+    <div class="card">
+      <h2>Earth's seasons</h2>
+      <canvas id="chart" aria-label="Latitude where the Sun is overhead through the year, measured from the model."></canvas>
+      <dl class="read">
+        <dt>Sun overhead at</dt><dd id="r-lat"></dd>
+        <dt>Season in the north</dt><dd id="r-season"></dd>
+        <dt>Noon Sun height at 40&deg;N</dt><dd id="r-noon"></dd>
+        <dt>How much space warps at Earth</dt><dd id="r-warp"></dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>The trip around the Milky Way</h2>
+    <p id="galaxy-line"></p>
+    <dl class="read" style="max-width:760px">
+      <dt>Sun's speed around the galaxy</dt><dd>230 km/s</dd>
+      <dt>Distance it covers in one Earth year</dt><dd id="g-au"></dd>
+      <dt>Distance to the galactic center</dt><dd>8.2 kpc (26,700 light years)</dd>
+      <dt>One trip around the galaxy</dt><dd id="g-year"></dd>
+      <dt>Planets' orbital plane against the galactic plane</dt><dd id="g-plane"></dd>
+      <dt>Planets' orbital plane against the Sun's path</dt><dd id="g-path"></dd>
+      <dt>Coils' direction from exactly perpendicular to the disc</dt><dd id="g-perp"></dd>
+      <dt>Earth's speed through the galaxy, now</dt><dd id="g-speed"></dd>
+      <dt>Earth ahead of the Sun (+) or behind it (-), now</dt><dd id="g-ahead"></dd>
+    </dl>
+  </div>
+
+  <details>
+    <summary>How this model is built, and what it is an estimate of</summary>
+    <ul>
+      <li>Orbits are real ellipses in three dimensions, tilted against each other and set against the galactic plane, from JPL's approximate orbital elements with their slow changes. Each planet speeds up near the Sun. These elements are meant for 1800 to 2050, and the positions were checked against JPL's own positions. They do not carry the planets' short-term tugs on each other.</li>
+      <li>The field is Newton's sum: each body contributes its mass divided by its distance. At these speeds and distances, general relativity changes this by only parts in 100 million, which the warp reading shows.</li>
+      <li>The funnel is a graph, not a shape in space. The planets lie in a flat disc, and the funnel's height shows field strength at each point of that disc. The depth axis is not a direction you could travel. Slide "Flat disc" to see this: the planets keep their places while the height goes away. Around the Sun, the field itself is close to round in all directions, like nested shells.</li>
+      <li>Each coil marks where a planet has been, trailing behind it like a wake. It is the path itself, and nothing physical is left along it in this model.</li>
+      <li>"Time, perpendicular" is a spacetime diagram: the disc is space, and the axis square to it is time, so each coil is a planet's worldline, the record of where it was at each moment. The past lies back along the axis. Its true scale is one light year of axis per year, 63,241 AU, which makes the coils almost straight. The time axis is a way of drawing time and is not a direction in space. "Sun's path in space" is the other view: a real direction, 30.4 degrees from perpendicular to the disc.</li>
+      <li>"Spiral drawn flat on it" is a depiction added to the sheet: a logarithmic spiral with a ratio of 6.5 per turn, chosen to show well. The sum over the masses does not produce it, and the planets do not fall in. The coils are the calculated spirals.</li>
+      <li>The coils are calculated: each planet's real orbit, tilted by the measured angle, carried along the Sun's path. Only "True ratio" keeps the true proportion between the Sun's travel and the orbits, where the coils are nearly straight lines. "Slowed to see coils" shortens the travel and squeezes distances so the shape can be seen.</li>
+      <li>The Sun's path is drawn straight, since it bends only about 1 degree per 600,000 years. Its speed and the distance to the center are standard round values. Its small drift relative to nearby stars and its slow bob through the galactic plane are left out.</li>
+      <li>The sheet is a slice through Earth's orbital plane, and the other planets rise slightly off it by their true tilts. The real field fills all of space around the Sun.</li>
+      <li>Height is drawn on a logarithmic scale, because the field is far too steep near the Sun to show otherwise. "Squeezed" distances are logarithmic too, so straight sides on the funnel are expected from that scale.</li>
+      <li>"Enlarged to see" makes each planet's dip deep enough to notice, ordered by mass but not to scale. The numbers in the table are always the true ones.</li>
+      <li>The Sun stays at the center, though it really shifts a little as the planets pull it. Bodies are drawn far larger than true scale. Earth's map is a hand-drawn simplified outline.</li>
+      <li>"Watch Earth turn" runs one day in 6 seconds, with Earth spinning at its true rate against its orbit: about 361 degrees a day while it moves about 1 degree along its path. At faster speeds a true spin would only flicker, so it is slowed to 24 turns per year.</li>
+    </ul>
+  </details>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+'use strict';
+const $ = (id) => document.getElementById(id);
+const D2R = Math.PI / 180, AU_KM = 149597870.7, TILT = 23.44, YEAR_DAYS = 365.25, START_MS = Date.UTC(2000, 0, 1, 12);
+const GM_SUN = 1.32712e11; // km cubed per second squared
+// Standard orbital elements for January 2000, each with its slow change per century (JPL's approximate elements, valid 1800 to 2050).
+// Name, GM, then value and change for: distance a (AU), eccentricity, tilt, mean longitude, perihelion longitude, node longitude (deg); then colour and drawn size.
+const BODIES = [
+  ['Mercury', 2.2032e4, [0.38709927, 0.00000037], [0.20563593, 0.00001906], [7.00497902, -0.00594749], [252.25032350, 149472.67411175], [77.45779628, 0.16047689], [48.33076593, -0.12534081], 0xb9b0a3, 0.05],
+  ['Venus', 3.2486e5, [0.72333566, 0.00000390], [0.00677672, -0.00004107], [3.39467605, -0.00078890], [181.97909950, 58517.81538729], [131.60246718, 0.00268329], [76.67984255, -0.27769418], 0xe6c98a, 0.075],
+  ['Earth', 3.9860e5, [1.00000261, 0.00000562], [0.01671123, -0.00004392], [-0.00001531, -0.01294668], [100.46457166, 35999.37244981], [102.93768193, 0.32327364], [0, 0], 0x6fb7d6, 0.08],
+  ['Mars', 4.2828e4, [1.52371034, 0.00001847], [0.09339410, 0.00007882], [1.84969142, -0.00813131], [-4.55343205, 19140.30268499], [-23.94362959, 0.44441088], [49.55953891, -0.29257343], 0xd0704a, 0.06],
+  ['Jupiter', 1.26687e8, [5.20288700, -0.00011607], [0.04838624, -0.00013253], [1.30439695, -0.00183714], [34.39644051, 3034.74612775], [14.72847983, 0.21252668], [100.47390909, 0.20469106], 0xd9a877, 0.17],
+  ['Saturn', 3.7931e7, [9.53667594, -0.00125060], [0.05386179, -0.00050991], [2.48599187, 0.00193609], [49.95424423, 1222.49362201], [92.59887831, -0.41897216], [113.66242448, -0.28867794], 0xe3cf9a, 0.145],
+  ['Uranus', 5.7940e6, [19.18916464, -0.00196176], [0.04725744, -0.00004397], [0.77263783, -0.00242939], [313.23810451, 428.48202785], [170.95427630, 0.40805281], [74.01692503, 0.04240589], 0x9fd8e0, 0.11],
+  ['Neptune', 6.8365e6, [30.06992276, 0.00026291], [0.00859048, 0.00005105], [1.77004347, 0.00035372], [-55.12002969, 218.45945325], [44.96476227, -0.32241464], [131.78422574, -0.00508664], 0x5d7fe0, 0.11],
+].map(([name, gm, aE, eE, iE, LE, pE, nE, color, size]) => ({ name, gm, aE, eE, iE, LE, pE, nE, color, size, a: aE[0], e: eE[0], i: iE[0], node: nE[0], year: 36000 / LE[1] }));
+
+// ---- The orbits: Kepler's equation gives where each body is on any date, in three dimensions, and how fast it moves.
+function orbitAt(b, days) {
+  const T = days / 36525, at = ([v, rate]) => v + rate * T, a = at(b.aE), e = at(b.eE), inc = at(b.iE) * D2R, L = at(b.LE), peri = at(b.pE), node = at(b.nE);
+  const M = (L - peri) * D2R, mean = Math.atan2(Math.sin(M), Math.cos(M));
+  let E = mean; for (let k = 0; k < 8; k++) E -= (E - e * Math.sin(E) - mean) / (1 - e * Math.cos(E));
+  const r = a * (1 - e * Math.cos(E)), nu = 2 * Math.atan2(Math.sqrt(1 + e) * Math.sin(E / 2), Math.sqrt(1 - e) * Math.cos(E / 2));
+  const u = nu + (peri - node) * D2R, cn = Math.cos(node * D2R), sn = Math.sin(node * D2R), cu = Math.cos(u), su = Math.sin(u), ci = Math.cos(inc);
+  const x = r * (cn * cu - sn * su * ci), y = r * (sn * cu + cn * su * ci), z = r * su * Math.sin(inc);
+  return { r, x, y, z, lon: Math.atan2(y, x), lat: Math.asin(z / r), speed: Math.sqrt(GM_SUN * (2 / (r * AU_KM) - 1 / (a * AU_KM))) };
+}
+const EARTH = BODIES[2];
+
+// ---- The field, in km squared per second squared: each body's mass over its distance. Positions in AU, in the orbital plane.
+function field(x, y, days, skip = null, z = 0) {
+  let sum = skip === 'Sun' ? 0 : GM_SUN / (Math.max(Math.hypot(x, y, z), 1e-6) * AU_KM);
+  for (const b of BODIES) { if (b.name === skip) continue; const o = orbitAt(b, days); sum += b.gm / (Math.max(Math.hypot(x - o.x, y - o.y, z - o.z), 1e-6) * AU_KM); }
+  return sum;
+}
+
+// ---- What is on screen: distance and height mapped to the drawing.
+const state = { days: 0, playing: true, daysPerSec: 30, dips: 'big', scale: 'squeezed', spin: 0, shape: 'funnel', view: 'galaxy', travel: 'slow', relief: 1, path: 'real' };
+// How much of the field's strength is drawn as height. At zero the same picture is the flat disc the planets really lie in.
+const reliefK = () => Math.max(state.relief, 0.002);
+const RMAX = 5.6, DEEP = 2.6, TOP_AU = 36, FLOOR = GM_SUN / (TOP_AU * AU_KM);
+const toScreen = (r) => (state.scale === 'squeezed' ? Math.log10(1 + r / 0.25) / Math.log10(1 + TOP_AU / 0.25) : r / TOP_AU) * RMAX;
+const fromUnit = (u) => (state.scale === 'squeezed' ? 0.25 * (Math.pow(1 + TOP_AU / 0.25, u) - 1) : u * TOP_AU);
+const depth = (phi) => -DEEP * reliefK() * Math.log10(Math.max(phi, FLOOR) / FLOOR) / 2.2;
+
+// The drawn spiral: a logarithmic spiral with six arms. Going inward, the angle grows in the direction the planets travel, by one full turn each time distance divides by RATIO.
+const ARMS = 6, RATIO = 6.5, WIND = 2 * Math.PI / Math.log(RATIO), INNER_AU = 0.03, GROOVE = 0.05;
+const armAngle = (r, arm) => arm / ARMS * 2 * Math.PI + WIND * Math.log(TOP_AU / r);
+function groove(r, angle) { if (state.shape !== 'spiral') return 0; return -GROOVE * reliefK() * (0.5 + 0.5 * Math.cos(ARMS * (angle - WIND * Math.log(TOP_AU / r)))); }
+// ---- The Milky Way. Standard directions in the planets' own sky coordinates: the galactic center and the galaxy's north pole.
+const fromSky = (lon, lat) => [Math.cos(lat * D2R) * Math.cos(lon * D2R), Math.cos(lat * D2R) * Math.sin(lon * D2R), Math.sin(lat * D2R)];
+const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2], cross3 = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]], unit3 = (a) => { const l = Math.hypot(...a); return a.map((v) => v / l); };
+const G_NORTH = unit3(fromSky(180.02, 29.81)), G_TRAVEL_RAW = cross3(G_NORTH, fromSky(266.84, -5.54)), G_TRAVEL = unit3(G_TRAVEL_RAW), G_CENTER = cross3(G_TRAVEL, G_NORTH);
+const SUN_KMS = 230, KM_PER_YEAR = 86400 * YEAR_DAYS, AU_PER_YEAR = SUN_KMS * KM_PER_YEAR / AU_KM, GAL_R_KM = 8200 * 3.0857e13, GAL_YEAR_MY = 2 * Math.PI * GAL_R_KM / SUN_KMS / KM_PER_YEAR / 1e6;
+const NEAR_POLE = [0, 0, 1];
+// In the drawing, the orbital plane's coordinates are (x, height, -y). This turns a drawn point into the galaxy's frame: toward the center, north, against the direction of travel.
+function galaxyMatrix() { const t = (x, y, z) => { const e = [x, -z, y], g = [dot3(e, G_CENTER), dot3(e, G_TRAVEL), dot3(e, G_NORTH)]; return new THREE.Vector3(g[0], g[2], -g[1]); }; return new THREE.Matrix4().makeBasis(t(1, 0, 0), t(0, 1, 0), t(0, 0, 1)); }
+const toGalaxy = galaxyMatrix();
+const planeTilt = Math.acos(dot3(NEAR_POLE, G_NORTH)) / D2R, pathTilt = Math.asin(Math.abs(dot3(NEAR_POLE, G_TRAVEL))) / D2R;
+const renderer = new THREE.WebGLRenderer({ canvas: $('field-canvas'), antialias: true });
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x05080f);
+const camera = new THREE.PerspectiveCamera(40, 1, 0.01, 800);
+const controls = new THREE.OrbitControls(camera, $('field-canvas')); controls.enableDamping = true; controls.target.set(0, -0.75, 0);
+camera.position.set(5.6, 5.6, 8.8);
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const lamp = new THREE.PointLight(0xfff0c8, 1.2, 0, 0); scene.add(lamp);
+
+const RINGS = 84, SPOKES = 144, count = (RINGS + 1) * SPOKES, sheetPos = new Float32Array(count * 3), sheetCol = new Float32Array(count * 3);
+const tri = [], wires = [], rimOnly = [];
+for (let i = 0; i < RINGS; i++) for (let j = 0; j < SPOKES; j++) { const a = i * SPOKES + j, b = i * SPOKES + (j + 1) % SPOKES, c = a + SPOKES, d = b + SPOKES; tri.push(a, c, b, b, c, d); if (i % 6 === 0) { wires.push(a, b); rimOnly.push(a, b); } if (j % 8 === 0) wires.push(a, c); }
+for (let j = 0; j < SPOKES; j++) wires.push(RINGS * SPOKES + j, RINGS * SPOKES + (j + 1) % SPOKES);
+const sheet = new THREE.BufferGeometry(); sheet.setAttribute('position', new THREE.BufferAttribute(sheetPos, 3)); sheet.setAttribute('color', new THREE.BufferAttribute(sheetCol, 3)); sheet.setIndex(tri);
+scene.add(new THREE.Mesh(sheet, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide, transparent: true, opacity: 0.62, depthWrite: false })));
+const wire = new THREE.BufferGeometry(); wire.setAttribute('position', new THREE.BufferAttribute(sheetPos, 3)); wire.setIndex(wires);
+const wireLines = new THREE.LineSegments(wire, new THREE.LineBasicMaterial({ color: 0x8fb8d0, transparent: true, opacity: 0.32 })); scene.add(wireLines);
+const rimGeo = new THREE.BufferGeometry(); rimGeo.setAttribute('position', new THREE.BufferAttribute(sheetPos, 3)); rimGeo.setIndex(rimOnly);
+const rimLines = new THREE.LineSegments(rimGeo, new THREE.LineBasicMaterial({ color: 0x8fb8d0, transparent: true, opacity: 0.12 })); scene.add(rimLines);
+const ARM_POINTS = 260, armLines = Array.from({ length: ARMS }, () => { const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(Array.from({ length: ARM_POINTS }, () => new THREE.Vector3())), new THREE.LineBasicMaterial({ color: 0xffe2a0, transparent: true, opacity: 0.75 })); scene.add(l); return l; });
+const FLOW = 300, flowPos = new Float32Array(FLOW * 3), flowGeo = new THREE.BufferGeometry(); flowGeo.setAttribute('position', new THREE.BufferAttribute(flowPos, 3));
+const flow = new THREE.Points(flowGeo, new THREE.PointsMaterial({ color: 0xfff1c8, size: 0.05, transparent: true, opacity: 0.95, depthWrite: false })); scene.add(flow);
+const flowU = Array.from({ length: FLOW }, (_, k) => (k * 0.61803) % 1), FLOW_DAYS = 3 * YEAR_DAYS;
+const sunBall = new THREE.Mesh(new THREE.SphereGeometry(0.15, 24, 16), new THREE.MeshBasicMaterial({ color: 0xffc857, depthTest: false, transparent: true })); sunBall.renderOrder = 5; scene.add(sunBall);
+const balls = BODIES.map((b) => { const m = new THREE.Mesh(new THREE.SphereGeometry(b.size, 20, 14), new THREE.MeshStandardMaterial({ color: b.color, roughness: 0.6, emissive: b.color, emissiveIntensity: 0.3 })); scene.add(m); return m; });
+const paths = BODIES.map((b) => { const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(Array.from({ length: 121 }, () => new THREE.Vector3())), new THREE.LineBasicMaterial({ color: b.name === 'Earth' ? 0x6fb7d6 : 0xaab4c6, transparent: true, opacity: b.name === 'Earth' ? 0.9 : 0.42 })); scene.add(l); return l; });
+const labelBox = $('labels'), labels = [...BODIES.map((b) => b.name), 'Sun'].map((n) => { const s = document.createElement('span'); s.textContent = n; if (n === 'Sun') s.style.color = 'var(--sun)'; labelBox.append(s); return s; });
+
+// The grid's rings are fixed in the drawing; which real distance each stands for depends on the distance scale.
+let ringR = [];
+function setRings() { ringR = []; for (let i = 0; i <= RINGS; i++) ringR.push(Math.max(fromUnit(i / RINGS), 0.012)); }
+// The drawn height at a point. True strength is the field as it is. Enlarged adds a visible dip around each planet, ordered by mass.
+function heightAt(x, y, planets) {
+  let phi = GM_SUN / (Math.max(Math.hypot(x, y), 0.012) * AU_KM), extra = 0;
+  for (const p of planets) {
+    const d = Math.hypot(x - p.x, y - p.y);
+    if (state.dips === 'true') phi += p.b.gm / (Math.max(d, 0.012) * AU_KM);
+    else { const w = 0.06 + 0.14 * p.r * (state.scale === 'squeezed' ? 1 : 0.35), q = d / w; if (q < 3) extra += (0.09 + 0.05 * (Math.log10(p.b.gm) - 4)) * Math.exp(-q * q); }
+  }
+  return depth(phi) - extra * reliefK();
+}
+const shallow = new THREE.Color(0x1a3a5c), deep = new THREE.Color(0xffc857), mid = new THREE.Color(0x6fb7d6), tint = new THREE.Color();
+function drawSheet(planets) {
+  for (let i = 0; i <= RINGS; i++) {
+    const r = ringR[i], R = toScreen(r);
+    for (let j = 0; j < SPOKES; j++) {
+      const a = j / SPOKES * 2 * Math.PI, c = Math.cos(a), s = Math.sin(a), g = groove(r, a), h = heightAt(r * c, r * s, planets) + g, k = (i * SPOKES + j) * 3, f = Math.min(1, -h / (DEEP * reliefK()));
+      sheetPos[k] = R * c; sheetPos[k + 1] = h; sheetPos[k + 2] = -R * s;
+      tint.copy(shallow).lerp(mid, Math.min(1, f * 2)); if (f > 0.5) tint.lerp(deep, (f - 0.5) * 2);
+      if (g) tint.multiplyScalar(0.72 - 7 * g / reliefK());
+      sheetCol[k] = tint.r; sheetCol[k + 1] = tint.g; sheetCol[k + 2] = tint.b;
+    }
+  }
+  sheet.attributes.position.needsUpdate = true; sheet.attributes.color.needsUpdate = true;
+}
+const onSheet = (r, a, planets, lift = 0.012) => { const R = toScreen(r), c = Math.cos(a), n = Math.sin(a); return [R * c, heightAt(r * c, r * n, planets) + groove(r, a) + lift, -R * n]; };
+function drawSpiral(planets) {
+  const on = state.shape === 'spiral'; flow.visible = on; armLines.forEach((l) => { l.visible = on; }); wireLines.visible = !on; rimLines.visible = on;
+  if (!on) return;
+  armLines.forEach((l, arm) => { const attr = l.geometry.attributes.position; for (let k = 0; k < ARM_POINTS; k++) { const r = TOP_AU * Math.pow(INNER_AU / TOP_AU, k / (ARM_POINTS - 1)); attr.setXYZ(k, ...onSheet(r, armAngle(r, arm), planets)); } attr.needsUpdate = true; });
+  flowU.forEach((u, n) => { const r = TOP_AU * Math.pow(INNER_AU / TOP_AU, u), p = onSheet(r, armAngle(r, n % ARMS), planets, 0.03); flowPos.set(p, n * 3); });
+  flowGeo.attributes.position.needsUpdate = true;
+}
+function drawPaths(planets) {
+  BODIES.forEach((b, n) => { const attr = paths[n].geometry.attributes.position; for (let k = 0; k <= 120; k++) { const o = orbitAt(b, k / 120 * b.year * YEAR_DAYS), R = toScreen(o.r); attr.setXYZ(k, R * Math.cos(o.lat) * Math.cos(o.lon), heightAt(o.x, o.y, planets.filter((p) => p.b !== b)) + groove(o.r, o.lon) + 0.012 + R * Math.sin(o.lat), -R * Math.cos(o.lat) * Math.sin(o.lon)); } attr.needsUpdate = true; });
+}
+
+// ---- Earth, with a simplified outline map painted once.
+function earthMap() {
+  const c = document.createElement('canvas'); c.width = 2048; c.height = 1024;
+  const g = c.getContext('2d'), X = (lon) => (lon + 180) / 360 * c.width, Y = (lat) => (90 - lat) / 180 * c.height;
+  const sea = g.createLinearGradient(0, 0, 0, c.height); sea.addColorStop(0, '#163a63'); sea.addColorStop(0.5, '#1d5f8f'); sea.addColorStop(1, '#163a63');
+  g.fillStyle = sea; g.fillRect(0, 0, c.width, c.height);
+  const LAND = [
+    [[-168, 66], [-156, 71], [-125, 70], [-95, 72], [-80, 73], [-62, 60], [-55, 52], [-66, 44], [-75, 35], [-81, 26], [-90, 29], [-97, 26], [-96, 18], [-88, 16], [-83, 9], [-78, 8], [-92, 14], [-105, 20], [-115, 31], [-124, 40], [-125, 49], [-135, 58], [-150, 60], [-165, 55]],
+    [[-78, 8], [-60, 10], [-50, 0], [-35, -6], [-39, -16], [-48, -25], [-57, -36], [-65, -42], [-68, -54], [-74, -50], [-72, -30], [-71, -18], [-81, -5]],
+    [[-17, 15], [-16, 22], [-9, 32], [10, 37], [32, 31], [37, 20], [43, 12], [51, 11], [40, -3], [40, -15], [33, -26], [20, -35], [14, -22], [12, -5], [9, 4], [-7, 5]],
+    [[-9, 37], [-9, 43], [-1, 48], [3, 52], [9, 57], [5, 62], [15, 69], [28, 71], [60, 69], [75, 73], [105, 77], [140, 73], [180, 68], [178, 63], [160, 60], [155, 52], [140, 50], [130, 42], [122, 38], [122, 30], [110, 20], [105, 10], [100, 13], [98, 8], [95, 16], [88, 22], [80, 12], [72, 20], [60, 25], [50, 30], [56, 24], [52, 16], [43, 13], [35, 28], [35, 36], [28, 37], [22, 38], [14, 41], [3, 43], [-5, 36]],
+    [[114, -22], [122, -18], [131, -12], [142, -11], [146, -19], [153, -27], [150, -37], [140, -38], [131, -32], [116, -35]],
+    [[-55, 82], [-25, 83], [-20, 72], [-40, 60], [-52, 65]],
+    [[-6, 50], [1, 51], [-2, 58], [-6, 57]], [[130, 32], [136, 34], [141, 37], [142, 44], [139, 38], [132, 34]], [[44, -16], [50, -14], [47, -25], [44, -24]], [[167, -46], [174, -41], [178, -38], [173, -35], [172, -42]],
+    [[95, 5], [105, -5], [115, -8], [105, -7], [97, 2]], [[109, 1], [118, 5], [118, -3], [110, -3]], [[131, -2], [141, -3], [150, -9], [140, -8]],
+  ];
+  for (const shape of LAND) {
+    g.beginPath(); shape.forEach(([lon, lat], i) => (i ? g.lineTo(X(lon), Y(lat)) : g.moveTo(X(lon), Y(lat)))); g.closePath();
+    g.fillStyle = Math.abs(shape.reduce((s, p) => s + p[1], 0) / shape.length) < 28 ? '#a69a58' : '#5c8a4a'; g.fill();
+    g.strokeStyle = 'rgba(40, 60, 40, 0.55)'; g.lineWidth = 2; g.stroke();
+  }
+  g.fillStyle = '#eef3f6'; g.fillRect(0, Y(-70), c.width, c.height - Y(-70));
+  const north = g.createLinearGradient(0, 0, 0, Y(74)); north.addColorStop(0, '#f4f7f9'); north.addColorStop(1, 'rgba(244, 247, 249, 0)'); g.fillStyle = north; g.fillRect(0, 0, c.width, Y(74));
+  const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
+}
+const earthRenderer = new THREE.WebGLRenderer({ canvas: $('earth-canvas'), antialias: true });
+const earthScene = new THREE.Scene(); earthScene.background = new THREE.Color(0x05080f);
+const earthCam = new THREE.PerspectiveCamera(32, 1, 0.1, 40);
+earthScene.add(new THREE.AmbientLight(0x8fa6c8, 0.1));
+const sunlight = new THREE.DirectionalLight(0xfff4dd, 1.7); earthScene.add(sunlight);
+const pivot = new THREE.Group(); earthScene.add(pivot);
+const globe = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 44), new THREE.MeshStandardMaterial({ map: earthMap(), roughness: 0.82 })); pivot.add(globe);
+const line = (points, color, opacity = 1) => new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), new THREE.LineBasicMaterial({ color, transparent: opacity < 1, opacity }));
+const circle = (lat, color, opacity) => { const r = Math.cos(lat * D2R) * 1.003, y = Math.sin(lat * D2R) * 1.003, pts = []; for (let a = 0; a <= 120; a++) pts.push(new THREE.Vector3(r * Math.cos(a / 120 * 2 * Math.PI), y, r * Math.sin(a / 120 * 2 * Math.PI))); return line(pts, color, opacity); };
+pivot.add(circle(0, 0xffffff, 0.55), circle(TILT, 0xffc857, 0.5), circle(-TILT, 0xffc857, 0.5));
+pivot.add(line([new THREE.Vector3(0, -1.32, 0), new THREE.Vector3(0, 1.32, 0)], 0xffffff));
+const northTag = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); g.fillStyle = '#fff'; g.font = '700 46px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('N', 32, 34); const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false })); s.scale.set(0.2, 0.2, 1); s.position.set(0, 1.45, 0); return s; })();
+pivot.add(northTag);
+const overhead = new THREE.Mesh(new THREE.SphereGeometry(0.03, 12, 10), new THREE.MeshBasicMaterial({ color: 0xffc857 })); earthScene.add(overhead);
+const beam = new THREE.ArrowHelper(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(2.15, 0, 0), 0.8, 0xffc857, 0.2, 0.11); earthScene.add(beam);
+
+// The view that follows Earth. Earth stays at the center of this scene, so the Sun and its path are placed around it, and the stars do not move.
+const followRenderer = new THREE.WebGLRenderer({ canvas: $('follow-canvas'), antialias: true });
+const followCam = new THREE.PerspectiveCamera(62, 1, 0.05, 240);
+const SUN_AWAY = 34;
+const distantSun = new THREE.Mesh(new THREE.SphereGeometry(3.2, 32, 22), new THREE.MeshBasicMaterial({ color: 0xffc857 })); earthScene.add(distantSun);
+const sunHalo = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), r = g.createRadialGradient(64, 64, 8, 64, 64, 64); r.addColorStop(0, 'rgba(255, 214, 120, 0.9)'); r.addColorStop(1, 'rgba(255, 214, 120, 0)'); g.fillStyle = r; g.fillRect(0, 0, 128, 128); const q = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false })); q.scale.set(16, 16, 1); return q; })(); distantSun.add(sunHalo);
+const pathRing = line(Array.from({ length: 241 }, (_, k) => new THREE.Vector3(SUN_AWAY * Math.cos(k / 240 * 2 * Math.PI), 0, SUN_AWAY * Math.sin(k / 240 * 2 * Math.PI))), 0x6fb7d6, 0.7); earthScene.add(pathRing);
+const stars = (() => { const pts = [], R = 170; let seed = 77; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647; for (let k = 0; k < 1500; k++) { const u = 2 * rnd() - 1, a = rnd() * 2 * Math.PI, w = Math.sqrt(1 - u * u); pts.push(new THREE.Vector3(R * w * Math.cos(a), R * u, R * w * Math.sin(a))); } return new THREE.Points(new THREE.BufferGeometry().setFromPoints(pts), new THREE.PointsMaterial({ color: 0xdfe6f2, size: 0.7, sizeAttenuation: true })); })(); earthScene.add(stars);
+
+// Earth's axis leans toward the point of the sky at orbital longitude 90 degrees, and stays there. Everything else follows from where Earth is.
+const UP = new THREE.Vector3(0, 1, 0), AXIS = new THREE.Vector3(0, Math.cos(TILT * D2R), -Math.sin(TILT * D2R)).normalize();
+function seasonAt(days) {
+  const o = orbitAt(EARTH, days), toSun = new THREE.Vector3(-Math.cos(o.lon), 0, Math.sin(o.lon));
+  return { toSun, lat: Math.asin(toSun.dot(AXIS)) / D2R, lon: o.lon, r: o.r };
+}
+const seasonName = (days) => { const lat = seasonAt(days).lat, rising = seasonAt(days + 1).lat > lat; return rising ? (lat < 0 ? 'Winter' : 'Spring') : (lat > 0 ? 'Summer' : 'Autumn'); };
+
+// ---- The tables and the chart
+const rows = BODIES.map((b) => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${b.name}</td><td></td><td></td><td>${b.year < 10 ? b.year.toFixed(2) : b.year.toFixed(1)}</td><td></td><td></td><td></td><td></td>`; $('rows').append(tr); return tr.children; });
+// The angle between a body's orbital plane and the galactic plane, from the two planes' perpendiculars.
+function orbitToGalaxy(b) { const i = b.i * D2R, n = b.node * D2R, up = [Math.sin(i) * Math.sin(n), -Math.sin(i) * Math.cos(n), Math.cos(i)]; return Math.acos(dot3(up, G_NORTH)) / D2R; }
+function moved(b, days) { const turns = days / (b.year * YEAR_DAYS); return turns >= 1 ? `${turns.toFixed(1)} orbits` : `${(turns * 360).toFixed(1)}°`; }
+function fillTable() {
+  BODIES.forEach((b, n) => {
+    const o = orbitAt(b, state.days), r = o.r * AU_KM, pull = GM_SUN / (r * r) * 1e6, others = field(o.x, o.y, state.days, b.name, o.z) - GM_SUN / r;
+    const c = rows[n]; c[1].textContent = o.r.toFixed(3); c[2].textContent = o.speed.toFixed(2); c[4].textContent = moved(b, state.days); c[5].textContent = `${orbitToGalaxy(b).toFixed(1)}\u00b0`; c[6].textContent = pull.toFixed(pull < 1 ? 4 : 2); c[7].textContent = `${(others / (GM_SUN / r) * 100).toFixed(3)}%`;
+  });
+}
+// How round is the field? The highest and lowest true field around a circle, as a difference. Points within 0.1 AU of a planet are its own well, reported apart.
+function roundness(radius, days) { let lo = Infinity, hi = 0; for (let k = 0; k < 720; k++) { const a = k / 720 * 2 * Math.PI, x = radius * Math.cos(a), y = radius * Math.sin(a); if (BODIES.some((b) => { const o = orbitAt(b, days); return Math.hypot(x - o.x, y - o.y) < 0.1; })) continue; const f = field(x, y, days); lo = Math.min(lo, f); hi = Math.max(hi, f); } return (hi - lo) / ((hi + lo) / 2) * 100; }
+function fillRound() { const a = roundness(1, state.days), b = roundness(10, state.days), c = roundness(30, state.days); $('round').textContent = `The field this moment is close to round. Going all the way around the Sun, it varies by ${a.toFixed(3)}% at 1 AU, ${b.toFixed(2)}% at 10 AU and ${c.toFixed(2)}% at 30 AU, away from each planet's own small well. The Sun holds 99.86% of the mass, and the sum depends only on distance from each mass, so it does not produce a spiral by itself. The coils are the planets' paths through space, and any spiral on the sheet is drawn onto this field.`; }
+function drawChart() {
+  const chart = $('chart'), box = chart.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2); chart.width = box.width * dpr; chart.height = box.height * dpr;
+  const g = chart.getContext('2d'); g.scale(dpr, dpr);
+  const W = box.width, H = box.height, L = 38, R = 8, T = 6, B = 20, base = Math.floor(state.days / YEAR_DAYS) * YEAR_DAYS, x = (d) => L + d / YEAR_DAYS * (W - L - R), y = (v) => T + (30 - v) / 60 * (H - T - B);
+  g.font = '12px "IBM Plex Mono", monospace'; g.textBaseline = 'middle';
+  for (const v of [-23.44, 0, 23.44]) { g.strokeStyle = v ? '#26324a' : '#3a4763'; g.beginPath(); g.moveTo(L, y(v)); g.lineTo(W - R, y(v)); g.stroke(); g.fillStyle = '#9aa6b8'; g.textAlign = 'right'; g.fillText(v === 0 ? '0' : v > 0 ? '23N' : '23S', L - 5, y(v)); }
+  g.textAlign = 'center'; g.textBaseline = 'top';
+  for (const [d, n] of [[0, 'Jan'], [91, 'Apr'], [182, 'Jul'], [274, 'Oct']]) { g.fillStyle = '#9aa6b8'; g.fillText(n, x(d) + 12, H - B + 5); }
+  g.strokeStyle = '#ffc857'; g.lineWidth = 2.5; g.beginPath(); for (let d = 0; d <= YEAR_DAYS; d += 3) { const p = [x(d), y(seasonAt(base + d).lat)]; d ? g.lineTo(...p) : g.moveTo(...p); } g.stroke();
+  g.fillStyle = '#eef1ea'; g.beginPath(); g.arc(x(state.days - base), y(seasonAt(state.days).lat), 5, 0, 7); g.fill();
+}
+
+// ---- One frame
+const clock = new THREE.Clock();
+function fit(r, cam, box) { const w = box.clientWidth, h = box.clientHeight; if (r.domElement.width !== Math.floor(w * r.getPixelRatio()) || r.domElement.height !== Math.floor(h * r.getPixelRatio())) { r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); drawChart(); } }
+const v3 = new THREE.Vector3();
+function placeLabels() {
+  const box = $('field-view'), w = box.clientWidth, h = box.clientHeight, used = [];
+  const put = (el, world) => { v3.copy(world).project(camera); const px = (v3.x + 1) / 2 * w, py = (1 - v3.y) / 2 * h, clash = used.some(([a, b]) => Math.abs(a - px) < 56 && Math.abs(b - py) < 13), show = v3.z < 1 && !clash; el.hidden = !show; if (show) { el.style.left = `${px}px`; el.style.top = `${py}px`; el.style.transform = px + el.offsetWidth + 12 > w ? 'translate(calc(-100% - 9px), -50%)' : ''; used.push([px, py]); } };
+  put(labels[8], sunBall.getWorldPosition(new THREE.Vector3()));
+  BODIES.forEach((b, n) => put(labels[n], balls[n].getWorldPosition(new THREE.Vector3())));
+  put(travelLabel, trailDir().clone().multiplyScalar(-3.7)); put(centerLabel, new THREE.Vector3(5.5, 0.05, 0)); put(planeLabel, new THREE.Vector3(-6, 0, -6));
+}
+// ---- The coils: where each planet has been, carried along the Sun's path. The Sun stays at the center of the view and its past stretches out behind it.
+const TRAIL = 700, TRAIL_YEARS = 14;
+const trails = BODIES.map((b) => { const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(Array.from({ length: TRAIL }, () => new THREE.Vector3())), new THREE.LineBasicMaterial({ color: b.color, transparent: true, opacity: b.name === 'Earth' ? 1 : 0.8 })); l.frustumCulled = false; return l; });
+const TRAIL_REAL = new THREE.Vector3(0, 0, 1), NORMAL_WORLD = new THREE.Vector3(0, 1, 0).applyMatrix4(toGalaxy).normalize();
+const TRAIL_PERP = NORMAL_WORLD.clone().multiplyScalar(NORMAL_WORLD.dot(TRAIL_REAL) >= 0 ? 1 : -1);
+const trailDir = () => (state.path === 'perp' ? TRAIL_PERP : TRAIL_REAL);
+const offPerpendicular = () => Math.acos(Math.abs(NORMAL_WORLD.dot(TRAIL_REAL))) / D2R;
+const AU_PER_LIGHT_YEAR = 63241;
+const unitsPerYear = () => (state.travel === 'true' ? (state.path === 'perp' ? AU_PER_LIGHT_YEAR : AU_PER_YEAR) * toScreen(TOP_AU) / TOP_AU : 1.1);
+const trailPoint = new THREE.Vector3();
+function coilPoint(b, ago, out) { const o = orbitAt(b, state.days - ago), R = toScreen(o.r), h = depth(GM_SUN / (Math.max(o.r, 0.012) * AU_KM)); out.set(R * Math.cos(o.lat) * Math.cos(o.lon), h + R * Math.sin(o.lat), -R * Math.cos(o.lat) * Math.sin(o.lon)).applyMatrix4(toGalaxy); out.addScaledVector(trailDir(), ago / YEAR_DAYS * unitsPerYear()); return out; }
+function drawTrails() {
+  const on = state.view === 'galaxy'; trails.forEach((l) => { l.visible = on; }); sunPath.visible = on; arrowTravel.visible = on; arrowCenter.visible = on; galaxyGrid.visible = on; travelLabel.hidden = !on; centerLabel.hidden = !on; planeLabel.hidden = !on;
+  if (!on) return;
+  BODIES.forEach((b, n) => { const span = Math.min(TRAIL_YEARS, b.year * 7) * YEAR_DAYS, attr = trails[n].geometry.attributes.position; for (let k = 0; k < TRAIL; k++) { coilPoint(b, k / (TRAIL - 1) * span, trailPoint); attr.setXYZ(k, trailPoint.x, trailPoint.y, trailPoint.z); } attr.needsUpdate = true; });
+  sunPath.geometry.setFromPoints([new THREE.Vector3(0, 0, 0), trailDir().clone().multiplyScalar(TRAIL_YEARS * unitsPerYear())]);
+  arrowTravel.setDirection(trailDir().clone().negate());
+}
+const sunPath = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0, 0, 1)]), new THREE.LineBasicMaterial({ color: 0xffc857, transparent: true, opacity: 0.8 })); sunPath.frustumCulled = false;
+const arrowTravel = new THREE.ArrowHelper(new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, 0, 0), 3.6, 0xffc857, 0.34, 0.17);
+const arrowCenter = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 0), 5.4, 0xd38cff, 0.34, 0.17);
+const galaxyGrid = new THREE.GridHelper(44, 44, 0x3b4664, 0x1c2438); galaxyGrid.material.transparent = true; galaxyGrid.material.opacity = 0.5;
+const makeTag = (text, color) => { const t = document.createElement('span'); t.textContent = text; t.style.color = color; labelBox.append(t); return t; };
+const planeLabel = makeTag('Galactic plane', '#8d9bc0');
+const travelLabel = makeTag("Sun's direction of travel", 'var(--sun)'), centerLabel = makeTag('To galactic center', '#d38cff');
+function fillGalaxy() {
+  $('g-au').textContent = `${AU_PER_YEAR.toFixed(1)} AU`; $('g-year').textContent = `${GAL_YEAR_MY.toFixed(0)} million years`;
+  $('g-plane').textContent = `${planeTilt.toFixed(1)}\u00b0`; $('g-path').textContent = `${pathTilt.toFixed(1)}\u00b0`; $('g-perp').textContent = `${offPerpendicular().toFixed(1)}\u00b0`;
+  const m = earthMotion(state.days); $('g-speed').textContent = `${m.speed.toFixed(1)} km/s`; $('g-ahead').textContent = `${m.ahead >= 0 ? '+' : ''}${m.ahead.toFixed(2)} AU`;
+  const orbits = (state.days / YEAR_DAYS).toFixed(1), moved = (state.days / YEAR_DAYS * AU_PER_YEAR).toFixed(0), lap = (state.days / YEAR_DAYS / (GAL_YEAR_MY * 1e6) * 360);
+  $('galaxy-line').textContent = `Since the start, Earth has gone around the Sun ${orbits} times while the Sun has moved ${moved} AU along its path, which is ${lap.toFixed(6)}\u00b0 of its trip around the galaxy. Relative to the galaxy, Earth never goes backward. It goes a little faster than the Sun for half the year and a little slower for the other half.`;
+}
+// Earth's real velocity added to the Sun's, in the galaxy's frame, and how far along the Sun's path Earth is from the Sun.
+function earthMotion(days) {
+  const a = orbitAt(EARTH, days), c = orbitAt(EARTH, days + 0.01), per = 0.01 * 86400, v = [(c.x - a.x) * AU_KM / per, (c.y - a.y) * AU_KM / per, 0];
+  const total = [v[0] + SUN_KMS * G_TRAVEL[0], v[1] + SUN_KMS * G_TRAVEL[1], SUN_KMS * G_TRAVEL[2]];
+  return { speed: Math.hypot(...total), ahead: a.x * G_TRAVEL[0] + a.y * G_TRAVEL[1] };
+}
+let tick = 0;
+// Degrees Earth spins per day shown. True at slow speeds; at faster ones a true spin would only flicker.
+const SIDEREAL = 360.9856;
+const spinPerDay = () => (state.daysPerSec <= 2 ? SIDEREAL : 24 * 360 / YEAR_DAYS);
+function frame() {
+  const dt = Math.min(clock.getDelta(), 0.1);
+  if (state.playing) { state.days += state.daysPerSec * dt; state.spin += state.daysPerSec * dt * spinPerDay(); }
+  const planets = BODIES.map((b) => { const o = orbitAt(b, state.days); return { b, x: o.x, y: o.y, r: o.r, lon: o.lon, lat: o.lat }; });
+  if (state.playing) for (let n = 0; n < FLOW; n++) flowU[n] = (flowU[n] + state.daysPerSec * dt / FLOW_DAYS) % 1;
+  drawSheet(planets); drawSpiral(planets);
+  if (tick % 4 === 0) drawTrails();
+  planets.forEach((p, n) => { const R = toScreen(p.r); balls[n].position.set(R * Math.cos(p.lat) * Math.cos(p.lon), heightAt(p.x, p.y, planets) + groove(p.r, p.lon) + BODIES[n].size * 0.75 + R * Math.sin(p.lat), -R * Math.cos(p.lat) * Math.sin(p.lon)); });
+  sunBall.position.set(0, depth(GM_SUN / (0.012 * AU_KM)), 0); lamp.position.copy(sunBall.position);
+  const s = seasonAt(state.days);
+  if (++tick % 12 === 1) { fillTable(); drawChart(); drawPaths(planets); $('date').textContent = new Date(START_MS + state.days * 864e5).toISOString().slice(0, 10); $('r-lat').textContent = `${Math.abs(s.lat).toFixed(1)}° ${s.lat >= 0 ? 'N' : 'S'}`; $('r-season').textContent = seasonName(state.days); $('r-noon').textContent = `${(90 - Math.abs(40 - s.lat)).toFixed(1)}°`; $('r-warp').textContent = `${(2 * GM_SUN / (s.r * AU_KM * 299792.458 ** 2) * 1e8).toFixed(2)} in 100 million`; }
+  if (tick % 240 === 1) fillRound();
+  if (tick % 12 === 1) fillGalaxy();
+  const side = s.toSun.clone().cross(UP).normalize();
+  earthCam.position.copy(side.multiplyScalar(5.2)).add(UP.clone().multiplyScalar(0.7)); earthCam.lookAt(0, 0, 0);
+  sunlight.position.copy(s.toSun).multiplyScalar(10);
+  pivot.quaternion.setFromUnitVectors(UP, AXIS); globe.rotation.y = state.spin * D2R;
+  overhead.position.copy(s.toSun).multiplyScalar(1.01);
+  beam.position.copy(s.toSun).multiplyScalar(2.05); beam.setDirection(s.toSun.clone().negate());
+  // The following camera: behind Earth along its path and a little above, with Earth in front and the Sun ahead to one side.
+  const ahead = s.toSun.clone().cross(UP).normalize().negate();
+  followCam.position.copy(ahead.clone().multiplyScalar(-5.2)).add(UP.clone().multiplyScalar(1.1)).add(s.toSun.clone().multiplyScalar(-1.4));
+  followCam.lookAt(s.toSun.clone().multiplyScalar(3.1).add(ahead.clone().multiplyScalar(-1.5)).add(UP.clone().multiplyScalar(-0.45)));
+  distantSun.position.copy(s.toSun).multiplyScalar(SUN_AWAY); pathRing.position.copy(distantSun.position);
+  fit(renderer, camera, $('field-view')); fit(earthRenderer, earthCam, $('earth-view')); fit(followRenderer, followCam, $('follow-view'));
+  controls.update(); renderer.render(scene, camera);
+  distantSun.visible = false; pathRing.visible = false; stars.visible = false; earthRenderer.render(earthScene, earthCam);
+  distantSun.visible = true; pathRing.visible = true; stars.visible = true; beam.visible = false; followRenderer.render(earthScene, followCam); beam.visible = true;
+  placeLabels();
+  requestAnimationFrame(frame);
+}
+function press(on, off) { $(on).setAttribute('aria-pressed', 'true'); $(off).setAttribute('aria-pressed', 'false'); }
+function setDips(mode) { state.dips = mode; mode === 'big' ? press('dips-big', 'dips-true') : press('dips-true', 'dips-big'); note(); tick = 0; }
+function setScale(mode) { state.scale = mode; mode === 'squeezed' ? press('scale-squeezed', 'scale-true') : press('scale-true', 'scale-squeezed'); setRings(); note(); tick = 0; }
+function setShape(mode) { state.shape = mode; mode === 'spiral' ? press('shape-spiral', 'shape-funnel') : press('shape-funnel', 'shape-spiral'); note(); tick = 0; }
+function setView(mode) {
+  state.view = mode; mode === 'galaxy' ? press('view-galaxy', 'view-sun') : press('view-sun', 'view-galaxy'); $('travel-group').hidden = mode !== 'galaxy'; $('path-group').hidden = mode !== 'galaxy';
+  system.quaternion.identity(); if (mode === 'galaxy') system.setRotationFromMatrix(toGalaxy);
+  if (mode === 'galaxy') { controls.target.set(0, -0.3, 2.5); camera.position.set(11.5, 7.5, 12.5); } else { controls.target.set(0, -0.75, 0); camera.position.set(5.6, 5.6, 8.8); }
+  note(); tick = 0; drawTrails();
+}
+function setPath(mode) { state.path = mode; mode === 'real' ? press('path-real', 'path-perp') : press('path-perp', 'path-real'); travelLabel.textContent = mode === 'perp' ? 'Time, toward the future' : "Sun's direction of travel"; note(); tick = 0; drawTrails(); }
+function setTravel(mode) { state.travel = mode; mode === 'slow' ? press('travel-slow', 'travel-true') : press('travel-true', 'travel-slow'); setScale(mode === 'true' ? 'true' : state.scale); note(); tick = 0; drawTrails(); }
+function note() { $('field-note').textContent = `Drag to look around. ${state.view === 'galaxy' ? 'Each coil is the path a planet has left behind, like a wake. ' : ''}${state.view === 'galaxy' && state.path === 'perp' ? 'Time drawn as the axis square to the disc, with the past behind. ' : ''}${state.view === 'galaxy' ? (state.travel === 'true' ? (state.path === 'perp' ? 'True ratio: one year of time is one light year, 63,241 AU. ' : 'Coils at the true ratio: the Sun moves 48.5 AU each Earth year. ') : 'Coils calculated, with the travel shortened to see them. ') : ''}${state.shape === 'spiral' ? 'The spiral is drawn onto the calculated field. ' : ''}${state.dips === 'big' ? 'Planet dips enlarged so you can see them.' : 'True strength: the planets’ dips are too small and narrow to see.'} ${state.scale === 'squeezed' ? 'Distances squeezed to fit.' : 'True distances: the inner planets crowd together.'} Height on a logarithmic scale. Bodies drawn far larger than true scale.`; }
+function setSpeed(v) {
+  state.daysPerSec = v; const y = YEAR_DAYS / v, slow = v <= 2;
+  $('speed-text').textContent = slow ? `${(1 / v).toFixed(1)} s per day` : `${y < 100 ? y.toFixed(1) : y.toFixed(0)} s per Earth year`;
+  $('time-fast').setAttribute('aria-pressed', String(!slow)); $('time-slow').setAttribute('aria-pressed', String(slow));
+}
+for (const r of [renderer, earthRenderer, followRenderer]) r.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+$('play').addEventListener('click', () => { state.playing = !state.playing; $('play').textContent = state.playing ? 'Pause' : 'Play'; $('play').setAttribute('aria-pressed', String(state.playing)); });
+$('view-galaxy').addEventListener('click', () => setView('galaxy')); $('view-sun').addEventListener('click', () => setView('sun'));
+$('path-real').addEventListener('click', () => setPath('real')); $('path-perp').addEventListener('click', () => setPath('perp'));
+$('travel-slow').addEventListener('click', () => setTravel('slow')); $('travel-true').addEventListener('click', () => setTravel('true'));
+$('shape-spiral').addEventListener('click', () => setShape('spiral')); $('shape-funnel').addEventListener('click', () => setShape('funnel'));
+$('dips-big').addEventListener('click', () => setDips('big')); $('dips-true').addEventListener('click', () => setDips('true'));
+$('scale-squeezed').addEventListener('click', () => setScale('squeezed')); $('scale-true').addEventListener('click', () => setScale('true'));
+$('speed').addEventListener('input', (e) => setSpeed(Number(e.target.value)));
+$('relief').addEventListener('input', (e) => { state.relief = Number(e.target.value) / 100; drawTrails(); tick = 0; });
+$('time-fast').addEventListener('click', () => { $('speed').value = 30; setSpeed(30); });
+$('time-slow').addEventListener('click', () => { $('speed').value = 1; setSpeed(1 / 6); });
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) { state.playing = false; $('play').textContent = 'Play'; $('play').setAttribute('aria-pressed', 'false'); }
+addEventListener('resize', drawChart);
+const system = new THREE.Group(); scene.children.slice().forEach((c) => { if (!c.isLight) system.add(c); }); scene.add(system);
+trails.forEach((l) => scene.add(l)); scene.add(sunPath, arrowTravel, arrowCenter, galaxyGrid);
+window.fabric = { state, BODIES, orbitAt, field, roundness, seasonAt, seasonName, heightAt, setDips, setScale, setSpeed, spinPerDay, SUN_AWAY, followCam, distantSun, AU_PER_LIGHT_YEAR, orbitToGalaxy, setView, setTravel, setPath, trailDir, offPerpendicular, coilPoint, toGalaxy, earthMotion, planeTilt, pathTilt, AU_PER_YEAR, GAL_YEAR_MY, unitsPerYear, trails, system, G_NORTH, G_TRAVEL, G_CENTER, toScreen, setShape, armAngle, groove, flowU, RATIO, TOP_AU, INNER_AU, armLines, wireLines, flow, balls };
+setSpeed(30); setRings(); setDips('big'); setScale('squeezed'); setShape('funnel'); setPath('real'); setView('galaxy'); fillTable(); fillRound(); drawChart(); frame();
+</script>
+
+</body></html>
