@@ -56,6 +56,30 @@ async function contact(request, env) {
   return sent ? json(200, { ok: true }) : json(502, { error: 'The message could not be sent just now. Please try again in a few minutes, or use LinkedIn.' });
 }
 
+// Video files: answer byte-range requests with just the bytes asked for (206), so a visitor can jump
+// anywhere in a video without downloading it all first. The static file service sends the whole file.
+const VIDEO = /\.(webm|mp4)$/i;
+
+async function video(request, env, url) {
+  const full = await env.ASSETS.fetch(new Request(url.toString(), { method: 'GET' }));
+  if (!full.ok) return full;
+  const type = full.headers.get('content-type') || 'video/webm';
+  const range = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get('range') || '');
+  const body = await full.arrayBuffer(), size = body.byteLength;
+  let response;
+  if (!range) {
+    response = new Response(request.method === 'HEAD' ? null : body, { status: 200, headers: { 'content-type': type, 'content-length': String(size), 'accept-ranges': 'bytes', 'cache-control': 'public, max-age=3600' } });
+  } else {
+    let start = range[1] === '' ? size - Number(range[2]) : Number(range[1]);
+    let end = range[1] === '' || range[2] === '' ? size - 1 : Math.min(Number(range[2]), size - 1);
+    if (start < 0) start = 0;
+    response = start >= size || start > end
+      ? new Response(null, { status: 416, headers: { 'content-range': `bytes */${size}` } })
+      : new Response(request.method === 'HEAD' ? null : body.slice(start, end + 1), { status: 206, headers: { 'content-type': type, 'content-length': String(end - start + 1), 'content-range': `bytes ${start}-${end}/${size}`, 'accept-ranges': 'bytes', 'cache-control': 'public, max-age=3600' } });
+  }
+  return response;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -63,6 +87,7 @@ export default {
       if (request.method !== 'POST') return json(405, { error: 'Send the form with POST.' });
       return contact(request, env);
     }
+    if (VIDEO.test(url.pathname) && (request.method === 'GET' || request.method === 'HEAD')) return video(request, env, url);
     return env.ASSETS.fetch(request);
   },
 };

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ButterflyFx Podcast Creator · a podcast studio with no post-production · Kenneth W. Bingham</title>
+<meta name="description" content="A video podcast studio that runs on your own computer: write the visuals into the script and they appear on the exact word, while the teleprompter keeps that word under the camera. Watch a 75-second episode it made with no host and no editing.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://butterflyfx.us/work/podcaster.html">
+<link rel="icon" href="/assets/butterfly.png">
+<link rel="stylesheet" href="/site.css">
+<meta property="og:type" content="video.other">
+<meta property="og:url" content="https://butterflyfx.us/work/podcaster.html">
+<meta property="og:title" content="ButterflyFx Podcast Creator · a complete episode with no post-production">
+<meta property="og:image" content="https://butterflyfx.us/demos/podcaster/poster.jpg">
+<meta property="og:description" content="Write it once and the show assembles itself as you talk. A 75-second episode made by the studio, with no host and no editing.">
+<style>
+  .video { margin: 1.4rem 0 .4rem; border-radius: 12px; overflow: hidden; border: 1px solid rgba(127,127,127,.35); background: #000; }
+  .video video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+  .video-note { font-size: .92rem; opacity: .8; margin: 0 0 1.4rem; }
+  pre.cue { overflow-x: auto; padding: .8rem 1rem; border-radius: 8px; background: rgba(127,127,127,.12); white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="/">Kenneth&nbsp;W.&nbsp;Bingham</a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/#work">Work</a>
+      <a href="/resume.html">Resume</a>
+      <a href="/contact.html">Contact</a>
+      <a href="https://github.com/kenbin64/podcaster" rel="noopener">Source</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="kicker">portfolio project · JavaScript · Electron · Web Audio · MediaPipe · local AI</p>
+    <h1>A podcast studio where the episode is finished when you stop talking.</h1>
+    <p class="lede">
+      <b>ButterflyFx Podcast Creator</b> lets you write the visuals into the script. Every graphic, caption,
+      transition and effect appears on the exact word you say, while a teleprompter keeps that word right under
+      the camera so you are always looking at the lens. No post-production.
+    </p>
+    <div class="btn-row">
+      <a class="btn" href="https://github.com/kenbin64/podcaster" rel="noopener">Source on GitHub</a>
+      <a class="btn ghost" href="https://github.com/kenbin64/podcaster/blob/main/docs/WRITING-SCRIPTS-WITH-ASSETS.md" rel="noopener">How to write a script with assets</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap narrow">
+    <div class="video">
+      <video controls preload="metadata" poster="/demos/podcaster/poster.jpg" playsinline>
+        <source src="/demos/podcaster/demo-episode.webm" type="video/webm">
+        Your browser cannot play this video. <a href="/demos/podcaster/demo-episode.webm">Download it</a> instead.
+      </video>
+    </div>
+    <p class="video-note">
+      A 75-second episode made by the studio itself, with no person on camera and no editing afterwards. The host is
+      an illustration, the narration is computer speech, and every picture and caption was placed by the script.
+    </p>
+
+    <h2>The problem</h2>
+    <p>
+      Most video podcasts are recorded first and dressed afterwards. Someone scrubs through the footage, finds the
+      moment the host mentions the chart, drops the chart in, and does that again for every caption and transition.
+      It takes hours, and the pictures rarely land on the word that needs them. Meanwhile the host reads from notes
+      off to the side, so they look like they are reading.
+    </p>
+
+    <h2>What it does</h2>
+    <ul>
+      <li><b>The script carries the show.</b> A cue in curly braces is something the audience sees, and it fires on the
+          word right after it. A note in square brackets is a direction for the host alone.</li>
+      <li><b>A teleprompter built for the lens.</b> The current word sits right under the camera, with the next words
+          beside it, so the host's eyes stay on the lens.</li>
+      <li><b>A director for takes.</b> It splits the script into scenes, waits until the host's delivery is in range,
+          slates and records each take, and assembles the keepers with transitions.</li>
+      <li><b>AI writing on your own machine.</b> Describe the topic and a local model writes a script in the cue
+          format, or rewrites a scene on request. Nothing leaves the computer.</li>
+    </ul>
+    <p>Here is part of the script behind the demo above:</p>
+    <pre class="cue">A cue names {text ll | Where it goes} where it goes, {cleartext} {text ll | Which asset} which asset to show,
+{cleartext} {text ll | A short label} and a short label.
+{clear} {news | placement.svg | Cue before the word} The one rule: put the cue right before its word,
+and the picture lands the moment you say it.</pre>
+
+    <h2>How the demo was made</h2>
+    <p>
+      The narration was spoken by computer speech, which reports the exact moment each word begins. Those moments drove
+      the studio the same way its voice-follow mode tracks a live speaker: each word advanced the teleprompter and fired
+      that word's cues, while the studio rendered and recorded its own stage. The same steps can turn any script and a
+      folder of pictures into a finished episode, which is how I plan to make demo videos of my other projects.
+    </p>
+
+    <h2>The proof</h2>
+    <ul>
+      <li>All 41 cues in the demo script fired on their words, across 134 spoken words, with no page errors.</li>
+      <li>The studio loads with no page errors in Chrome, and its launcher installs Electron and starts it, loading
+          the demo episode from the repository's own folder.</li>
+      <li>The full user guide, the cue reference and the writing guide are in the repository, along with the demo
+          episode and the pipeline that recorded it.</li>
+    </ul>
+
+    <h2>Technologies and skills</h2>
+    <ul>
+      <li><b>JavaScript, Canvas 2D and Web Audio:</b> a 1920 by 1080 compositor, synthesized effects and an adaptive score.</li>
+      <li><b>Electron and Node.js:</b> a local-only desktop shell and file server.</li>
+      <li><b>MediaPipe:</b> on-device background removal.</li>
+      <li><b>MediaRecorder:</b> takes, assembly and export to WebM.</li>
+      <li><b>Ollama:</b> local AI for writing and rewriting scripts.</li>
+      <li><b>AI-assisted engineering</b> with Claude Code, under my design and direction.</li>
+    </ul>
+
+    <h2>What it does not claim</h2>
+    <ul>
+      <li>Export is WebM only, and AI video generation is not built yet.</li>
+      <li>Following the host's voice depends on the browser's speech recognition, which may not be available in the desktop shell.</li>
+      <li>The demo's host and voice are synthetic; a live episode uses your camera and microphone.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <p>
+      <a href="/">Home</a> &middot;
+      <a href="https://github.com/kenbin64/podcaster" rel="noopener">Source</a> &middot;
+      <a href="/contact.html">Contact</a>
+    </p>
+    <p>Concept and direction: Kenneth W. Bingham. Built with the help of Claude AI under a standing directive to be skeptical, to insist on proof, and to allow no claim that is not demonstrated in tested code. The ideas are the author's; the AI implemented and verified them, it did not originate them.</p>
+  </div>
+</footer>
+
+</body>
+</html>

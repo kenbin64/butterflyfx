@@ -6,7 +6,8 @@
   "name": "butterflyfx",
   "compatibility_date": "2026-10-01",
   "main": "worker.js",
-  "assets": { "directory": "./public", "binding": "ASSETS", "not_found_handling": "404-page" },
+  // Videos under /demos go through the worker first, so it can answer byte-range requests (see worker.js).
+  "assets": { "directory": "./public", "binding": "ASSETS", "not_found_handling": "404-page", "run_worker_first": ["/demos/*"] },
   // The contact form's email (worker.js). The two addresses are secrets, never written here:
   //   npx wrangler secret put CONTACT_TO      and      npx wrangler secret put CONTACT_BACKUP
   "send_email": [ { "name": "MAIL" } ],
