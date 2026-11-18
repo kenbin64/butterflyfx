@@ -12,7 +12,7 @@
 <meta property="og:type" content="video.other">
 <meta property="og:url" content="https://butterflyfx.us/work/podcaster.html">
 <meta property="og:title" content="ButterflyFx Podcast Creator · a complete episode with no post-production">
-<meta property="og:image" content="https://butterflyfx.us/demos/podcaster/poster.jpg">
+<meta property="og:image" content="https://butterflyfx.us/demos/podcaster/walkthrough-poster.jpg">
 <meta property="og:description" content="Write it once and the show assembles itself as you talk. A 75-second episode made by the studio, with no host and no editing.">
 <style>
   .video { margin: 1.4rem 0 .4rem; border-radius: 12px; overflow: hidden; border: 1px solid rgba(127,127,127,.35); background: #000; }
@@ -54,15 +54,29 @@
 
 <section>
   <div class="wrap narrow">
+    <h3>Watch it being used</h3>
     <div class="video">
-      <video controls preload="metadata" poster="/demos/podcaster/poster.jpg" playsinline>
+      <video controls preload="metadata" poster="/demos/podcaster/walkthrough-poster.jpg" playsinline>
+        <source src="/demos/podcaster/walkthrough.webm" type="video/webm">
+        Your browser cannot play this video. <a href="/demos/podcaster/walkthrough.webm">Download it</a> instead.
+      </video>
+    </div>
+    <p class="video-note">
+      A 69-second walkthrough of the real studio: open an episode folder, see the cues in the script, set the look,
+      then talk. The marquee teleprompter keeps the current word under the camera, and each graphic and caption appears
+      on the word that calls for it. Narrated by an Australian neural voice; recorded straight from the studio's screen.
+    </p>
+
+    <h3>The episode it made</h3>
+    <div class="video">
+      <video controls preload="none" poster="/demos/podcaster/poster.jpg" playsinline>
         <source src="/demos/podcaster/demo-episode.webm" type="video/webm">
         Your browser cannot play this video. <a href="/demos/podcaster/demo-episode.webm">Download it</a> instead.
       </video>
     </div>
     <p class="video-note">
-      A 75-second episode made by the studio itself, with no person on camera and no editing afterwards. The host is
-      an illustration, the narration is computer speech, and every picture and caption was placed by the script.
+      A 75-second episode recorded by the studio itself, with no person on camera and no editing afterwards. The host is
+      an illustration, and every picture and caption was placed by the script.
     </p>
 
     <h2>The problem</h2>
@@ -92,9 +106,9 @@ and the picture lands the moment you say it.</pre>
 
     <h2>How the demo was made</h2>
     <p>
-      The narration was spoken by computer speech, which reports the exact moment each word begins. Those moments drove
+      The narration is a Microsoft neural voice, which reports the exact moment each word begins. Those moments drove
       the studio the same way its voice-follow mode tracks a live speaker: each word advanced the teleprompter and fired
-      that word's cues, while the studio rendered and recorded its own stage. The same steps can turn any script and a
+      that word's cues, and each narrated step clicked through the real interface, while the browser recorded the screen. The same steps can turn any script and a
       folder of pictures into a finished episode, which is how I plan to make demo videos of my other projects.
     </p>
 
